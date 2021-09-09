@@ -17,11 +17,6 @@ public class TestController {
         return "测试搭建完成";
     }
 
-//    @RequestMapping(value = "test2")
-//    public String test2(){
-//        return "测试搭建完成";
-//    }
-
     @RequestMapping(value = "test2")
     public String test2(){
         try {
