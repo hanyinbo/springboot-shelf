@@ -1,15 +1,15 @@
 package com.aison.controller;
 
+import com.aison.entity.MInfo;
 import com.aison.service.MInfoService;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -38,12 +38,22 @@ public class TestController {
 
     @GetMapping(value = "test2")
     public String testQuery() {
-        logger.info("请求成功:");
+       List<MInfo> mInfos =  mInfoService.testquery();
+        logger.info("请求成功:"+ JSONObject.toJSONString(mInfos));
         return "请求成功";
     }
 
-    @DeleteMapping(value = "test3")
-    public String test3(){
-        return "";
+    @DeleteMapping(value = "test2")
+    public String testDelete(){
+        Integer e = mInfoService.testDelete();
+        if(e<=0){
+            return "删除失败";
+        }
+        return "删除成功";
+    }
+    @PutMapping(value = "test2")
+    public String testPut(Long id){
+        Integer in = mInfoService.testPut(id);
+        return "删除成功";
     }
 }

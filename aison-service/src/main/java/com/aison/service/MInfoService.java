@@ -3,21 +3,17 @@ package com.aison.service;
 import com.aison.entity.MInfo;
 import com.aison.mapper.MInfoMapper;
 import com.aison.utils.SnowflakeIdWorkerUtils;
-import com.aison.utils.UniqId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.xml.ws.ServiceMode;
+import java.util.List;
 
 @Service
 public class MInfoService {
     @Autowired
     private MInfoMapper mInfoMapper;
-    @Autowired
-    private UniqId id;
 
-//    @Autowired
-//    private SnowflakeIdWorkerUtils snowflakeIdWorkerUtils;
+    @Autowired
+    private SnowflakeIdWorkerUtils snowflakeIdWorkerUtils;
 
     public void test(){
         MInfo mInfo = new MInfo();
@@ -26,7 +22,22 @@ public class MInfoService {
         mInfo.setMName("mybatisplus");
         mInfo.setMType("orm");
         mInfo.setVersion(1);
-        mInfo.setRemark("备注");
+        mInfo.setRemark("rewt");
         mInfoMapper.insert(mInfo);
+    }
+
+    public List<MInfo> testquery(){
+        return mInfoMapper.selectList(null);
+    }
+
+    public Integer testDelete(){
+        return mInfoMapper.delete(null);
+    }
+
+    public Integer testPut(Long id){
+        MInfo mInfo = new MInfo();
+        mInfo.setMOid(id);
+        mInfo.setRemark("更新成功");
+        return mInfoMapper.updateById(mInfo);
     }
 }

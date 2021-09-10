@@ -3,15 +3,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.aison</groupId>-->
-<!--            <artifactId>aison-service</artifactId>-->
-<!--            <version>0.0.1-SNAPSHOT</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>com.aison</groupId>
             <artifactId>aison-service</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.aison</groupId>
+            <artifactId>aison-common</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
@@ -22,17 +22,17 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-
     <artifactId>aison-manage</artifactId>
 
-
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork><!-- 如果没有该配置，热部署的devtools不生效 -->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
