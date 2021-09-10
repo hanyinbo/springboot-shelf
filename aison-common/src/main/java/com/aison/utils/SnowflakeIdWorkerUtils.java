@@ -44,9 +44,9 @@ public class SnowflakeIdWorkerUtils {
      */
     private static final int TIME_LEFT_BIT = 64 - 1 - TIME_LEN;
 
-    private static final long DATA_ID = getDataId();
+    private  final long DATA_ID = getDataId();
 
-    private static final long WORK_ID = getWorkId();
+    private  final long WORK_ID = getWorkId();
 
     /**
      * 数据中心id最大值 31
@@ -92,7 +92,7 @@ public class SnowflakeIdWorkerUtils {
      * 根据host name 取余，发生异常就获取0到31之间的随机数
      * @return
      */
-    public static int getWorkId() {
+    public int getWorkId() {
 
         try {
             return getHostId(Inet4Address.getLocalHost().getHostAddress(), WORK_MAX_NUM);
@@ -106,7 +106,7 @@ public class SnowflakeIdWorkerUtils {
      * 根据host name 取余，发生异常就获取0到31之间的随机数
      * @return
      */
-    public static int getDataId() {
+    public int getDataId() {
 
         try {
             return getHostId(Inet4Address.getLocalHost().getHostAddress(), DATA_MAX_NUM);
@@ -135,7 +135,7 @@ public class SnowflakeIdWorkerUtils {
      *
      * @return SnowflakeId
      */
-    public static synchronized long genId() {
+    public synchronized long genId() {
         long now = timeGen();
 
         //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
@@ -174,7 +174,7 @@ public class SnowflakeIdWorkerUtils {
      * @param lastTimestamp 上次生成ID的时间截
      * @return 当前时间戳
      */
-    protected static  long tilNextMillis(long lastTimestamp) {
+    protected  long tilNextMillis(long lastTimestamp) {
         long timestamp = timeGen();
         while (timestamp <= lastTimestamp) {
             timestamp = timeGen();
@@ -187,7 +187,7 @@ public class SnowflakeIdWorkerUtils {
      *
      * @return 当前时间(毫秒)
      */
-    protected static long timeGen() {
+    protected long timeGen() {
         return System.currentTimeMillis();
     }
 

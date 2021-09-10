@@ -10,8 +10,6 @@ public class tes2 {
         System.out.println("雪花ID的size:"+size);
         System.out.println("雪花算法生成的ID:" + snowFlakeID.nextId());
 
-       Long s =  SnowflakeIdWorkerUtils.genId();
-        System.out.println(s);
 
     }
 }
