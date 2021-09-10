@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,9 +35,15 @@ public class TestController {
         }
         return "请求成功";
     }
+
     @GetMapping(value = "test2")
-    public String testQuery(){
+    public String testQuery() {
         logger.info("请求成功:");
-        return  "请求成功";
+        return "请求成功";
+    }
+
+    @DeleteMapping(value = "test3")
+    public String test3(){
+        return "";
     }
 }
