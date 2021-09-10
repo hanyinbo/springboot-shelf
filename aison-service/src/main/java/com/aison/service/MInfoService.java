@@ -17,7 +17,6 @@ public class MInfoService {
 
     public void test(){
         MInfo mInfo = new MInfo();
-//        System.out.println(Long.valueOf(id.getUniqID()));
         mInfo.setMOid(id.getUniqID());
         mInfo.setMName("mybatisplus");
         mInfo.setMType("orm");
