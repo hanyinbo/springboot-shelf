@@ -11,7 +11,7 @@ public class MInfo {
 
     @TableField(value = "m_oid")
     @TableId
-    private String mOid;
+    private Long mOid;
     @TableField(value = "m_name")
     private String mName;
     @TableField(value = "m_type")

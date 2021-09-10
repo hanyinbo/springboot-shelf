@@ -14,4 +14,4 @@ mybatis-plus:
 logging:
   level:
     com.baomidou.mybatisplus.sample: debug
-    com.aison: info
+    com.aison.mapper: debug  #配置控制台打印sql
