@@ -2,6 +2,7 @@ package com.aison.controller;
 
 import com.aison.service.MInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,5 +27,10 @@ public class TestController {
             return "请求失败";
         }
         return "请求成功";
+    }
+
+    @DeleteMapping(value = "test3")
+    public String test3(){
+        return "";
     }
 }
