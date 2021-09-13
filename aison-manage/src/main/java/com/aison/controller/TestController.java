@@ -1,5 +1,6 @@
 package com.aison.controller;
 
+import com.aison.dto.MInfoUnionQuery;
 import com.aison.entity.MInfo;
 import com.aison.service.MInfoService;
 import com.alibaba.fastjson.JSONObject;
@@ -61,5 +62,10 @@ public class TestController {
     @GetMapping(value="test3")
     public List<MInfo> testXML(){
         return mInfoService.tesXML();
+    }
+
+    @GetMapping(value = "test4")
+    public List<MInfoUnionQuery> testUnionQuery(){
+        return mInfoService.findUnionQuery();
     }
 }

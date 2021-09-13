@@ -13,5 +13,6 @@ mybatis-plus:
     map-underscore-to-camel-case: true
 logging:
   level:
+    root: info
     com.baomidou.mybatisplus.sample: debug
     com.aison.mapper: debug  #配置控制台打印sql

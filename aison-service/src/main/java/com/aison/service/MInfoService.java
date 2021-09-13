@@ -1,5 +1,6 @@
 package com.aison.service;
 
+import com.aison.dto.MInfoUnionQuery;
 import com.aison.entity.MInfo;
 import com.aison.mapper.MInfoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,11 @@ public class MInfoService {
         return mInfoMapper.updateById(mInfo);
     }
 
-
     public List<MInfo> tesXML(){
         return mInfoMapper.findAllUser();
+    }
+
+    public List<MInfoUnionQuery> findUnionQuery(){
+        return mInfoMapper.findUnionQuery();
     }
 }
