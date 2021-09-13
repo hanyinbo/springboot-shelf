@@ -36,4 +36,9 @@ public class MInfoService {
         mInfo.setRemark("更新成功");
         return mInfoMapper.updateById(mInfo);
     }
+
+
+    public List<MInfo> tesXML(){
+        return mInfoMapper.findAllUser();
+    }
 }

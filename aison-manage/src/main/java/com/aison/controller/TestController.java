@@ -57,4 +57,9 @@ public class TestController {
         Integer in = mInfoService.testPut(id);
         return "更新成功";
     }
+
+    @GetMapping(value="test3")
+    public List<MInfo> testXML(){
+        return mInfoService.tesXML();
+    }
 }

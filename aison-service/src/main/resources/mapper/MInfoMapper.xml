@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aison.mapper.MInfoMapper">
+
+    <!-- 查找m_info信息 -->
+    <select id="findAllUser" resultType="com.aison.entity.MInfo">
+       select * from m_info
+    </select>
+
+</mapper>
