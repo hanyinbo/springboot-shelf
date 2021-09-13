@@ -1,5 +1,6 @@
 package com.aison.controller;
 
+import com.aison.dto.MInfoDto;
 import com.aison.dto.MInfoUnionQuery;
 import com.aison.entity.MInfo;
 import com.aison.service.MInfoService;
@@ -68,4 +69,10 @@ public class TestController {
     public List<MInfoUnionQuery> testUnionQuery(){
         return mInfoService.findUnionQuery();
     }
+
+    @GetMapping(value = "test5")
+    public List<MInfoDto> queryUnionAll(){
+        return  mInfoService.queryUnionAll();
+    }
+
 }

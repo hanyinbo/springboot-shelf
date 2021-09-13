@@ -1,5 +1,6 @@
 package com.aison.service;
 
+import com.aison.dto.MInfoDto;
 import com.aison.dto.MInfoUnionQuery;
 import com.aison.entity.MInfo;
 import com.aison.mapper.MInfoMapper;
@@ -45,4 +46,8 @@ public class MInfoService {
     public List<MInfoUnionQuery> findUnionQuery(){
         return mInfoMapper.findUnionQuery();
     }
+    public List<MInfoDto> queryUnionAll(){
+        return mInfoMapper.findUnionAll();
+    }
+
 }
