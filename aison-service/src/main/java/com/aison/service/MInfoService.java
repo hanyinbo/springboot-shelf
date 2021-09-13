@@ -12,7 +12,7 @@ public class MInfoService {
     @Autowired
     private MInfoMapper mInfoMapper;
 
-    public void test(){
+    public MInfo test() {
         MInfo mInfo = new MInfo();
 
         mInfo.setMName("mybatisplus");
@@ -20,17 +20,18 @@ public class MInfoService {
         mInfo.setVersion(1);
         mInfo.setRemark("rewt");
         mInfoMapper.insert(mInfo);
+        return mInfo;
     }
 
-    public List<MInfo> testquery(){
+    public List<MInfo> testquery() {
         return mInfoMapper.selectList(null);
     }
 
-    public Integer testDelete(){
+    public Integer testDelete() {
         return mInfoMapper.delete(null);
     }
 
-    public Integer testPut(Long id){
+    public Integer testPut(Long id) {
         MInfo mInfo = new MInfo();
         mInfo.setMOid(id);
         mInfo.setRemark("更新成功");

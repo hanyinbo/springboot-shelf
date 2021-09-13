@@ -1,5 +1,6 @@
 package com.aison.entity;
 
+import com.aison.bean.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -7,7 +8,7 @@ import lombok.Data;
 
 @Data
 @TableName(value = "m_info")//指定表名
-public class MInfo {
+public class MInfo extends BaseEntity {
 
     @TableField(value = "m_oid")
     @TableId
@@ -20,5 +21,6 @@ public class MInfo {
     private Integer version;
     @TableField(value = "remark")
     private String remark;
+
 
 }

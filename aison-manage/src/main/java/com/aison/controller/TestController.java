@@ -26,21 +26,22 @@ public class TestController {
     }
 
     @PostMapping(value = "test2")
-    public String testSave(){
+    public MInfo testSave(){
+        MInfo mInfo = new MInfo();
         try {
-            mInfoService.test();
+            mInfo = mInfoService.test();
         }catch (Exception e){
             e.printStackTrace();
-            return "请求失败";
+            return mInfo;
         }
-        return "请求成功";
+        return mInfo;
     }
 
     @GetMapping(value = "test2")
-    public String testQuery() {
+    public List<MInfo> testQuery() {
        List<MInfo> mInfos =  mInfoService.testquery();
         logger.info("请求成功:"+ JSONObject.toJSONString(mInfos));
-        return "请求成功";
+        return mInfos;
     }
 
     @DeleteMapping(value = "test2")
@@ -54,6 +55,6 @@ public class TestController {
     @PutMapping(value = "test2")
     public String testPut(Long id){
         Integer in = mInfoService.testPut(id);
-        return "删除成功";
+        return "更新成功";
     }
 }
