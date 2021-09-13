@@ -14,7 +14,6 @@ public class MInfoService {
 
     public MInfo test() {
         MInfo mInfo = new MInfo();
-
         mInfo.setMName("mybatisplus");
         mInfo.setMType("orm");
         mInfo.setVersion(1);
