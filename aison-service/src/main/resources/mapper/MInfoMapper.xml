@@ -24,9 +24,29 @@
     </resultMap>
 
     <!-- 一对多，第一种方式 -->
+<!--    <select id="findUnionAll" resultMap="BaseResultMap">-->
+<!--       select m.m_oid,m.m_name,m.remark ,i.oid,i.name,i.level  from m_info m-->
+<!--       left join m_info_item i on m.m_oid= i.r_oid-->
+<!--    </select>-->
+<!--    <resultMap id="BaseResultMap" type="com.aison.dto.MInfoDto">-->
+<!--        <id property="mOid" column="m_oid"></id>-->
+<!--        <result property="mName" column="m_name"></result>-->
+<!--        <result property="mType" column="m_type"></result>-->
+<!--        <result property="remark" column="remark"></result>-->
+<!--        <collection property="children" ofType="com.aison.dto.MInfoItemDto">-->
+<!--            <id property="oid" column="oid"></id>-->
+<!--            <result property="name" column="name"></result>-->
+<!--            <result property="level" column="level"></result>-->
+<!--            <result property="roid" column="r_oid"></result>-->
+<!--        </collection>-->
+<!--    </resultMap>-->
+
+    <!-- 一对多，第一种方式 -->
     <select id="findUnionAll" resultMap="BaseResultMap">
-       select m.m_oid,m.m_name,m.remark ,i.oid,i.name,i.level  from m_info m
+       select m.m_oid,m.m_name,m.remark ,i.oid,i.name,i.level ,
+       v.oid as void,v.v_name as vName ,v.r_oid as roid from m_info m
        left join m_info_item i on m.m_oid= i.r_oid
+       left join m_info_var v on m.m_oid=v.r_oid
     </select>
     <resultMap id="BaseResultMap" type="com.aison.dto.MInfoDto">
         <id property="mOid" column="m_oid"></id>
@@ -38,6 +58,11 @@
             <result property="name" column="name"></result>
             <result property="level" column="level"></result>
             <result property="roid" column="r_oid"></result>
+        </collection>
+        <collection property="vars" ofType="com.aison.dto.MInfoVarDto">
+            <id property="vOid" column="vOid"></id>
+            <result property="vName" column="vName"></result>
+            <result property="roid" column="roid"></result>
         </collection>
     </resultMap>
 </mapper>

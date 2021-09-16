@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class MInfoVarDto {
-    private Long oid;
+    private Long vOid;
     private String vName;
+    private Long roid;
 }

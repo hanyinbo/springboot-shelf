@@ -14,4 +14,6 @@ public class MInfoVar extends BaseEntity {
     private Long oid;
     @TableField(value = "vName")
     private String vName;
+    @TableField(value = "r_oid")
+    private Long roid;
 }
