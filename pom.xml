@@ -13,6 +13,7 @@
         <mybatisplus-version>3.4.0</mybatisplus-version>
         <fastjson-version>1.2.75</fastjson-version>
         <commons-version>3.8.1</commons-version>
+        <swagger-version>2.2.2</swagger-version>
     </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -77,6 +78,18 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <!-- Swagger依赖包 -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger-version}</version>
+        </dependency>
+        <!-- Swagger的ui界面 -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger-version}</version>
         </dependency>
         <!-- DEVTOOLS-->
         <dependency>

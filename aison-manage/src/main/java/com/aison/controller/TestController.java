@@ -3,21 +3,23 @@ package com.aison.controller;
 import com.aison.dto.MInfoDto;
 import com.aison.dto.MInfoUnionQuery;
 import com.aison.entity.MInfo;
+import com.aison.mapper.MInfoMapper;
 import com.aison.service.MInfoService;
 import com.aison.service.MInfoServices;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-
-
-@AllArgsConstructor //它是lombok上的注解，使用后添加一个构造函数，该函数含有所有已声明字段属性参数
+@Api(value="测试controller",tags={"测试操作接口"})
 @RestController
+@AllArgsConstructor //它是lombok上的注解，使用后添加一个构造函数，该函数含有所有已声明字段属性参数
 @RequestMapping(value = "aison")
 @Slf4j
 public class TestController {
@@ -26,11 +28,14 @@ public class TestController {
 
     private MInfoServices mInfoServices;
 
-    @RequestMapping(value = "test1")
+    private MInfoMapper mInfoMapper;
+
+    @ApiOperation("测试项目搭建启动")
+    @GetMapping(value = "test1")
     public String test1() {
         return "测试搭建完成";
     }
-
+    @ApiOperation("测试PostMapping")
     @PostMapping(value = "test2")
     public MInfo testSave() {
         MInfo mInfo = new MInfo();
@@ -42,7 +47,7 @@ public class TestController {
         }
         return mInfo;
     }
-
+    @ApiOperation("测试GetMapping")
     @GetMapping(value = "test2")
     public List<MInfo> testQuery() {
         List<MInfo> mInfos = mInfoService.testquery();
@@ -50,6 +55,7 @@ public class TestController {
         return mInfos;
     }
 
+    @ApiOperation("测试DeleteMapping")
     @DeleteMapping(value = "test2")
     public String testDelete() {
         Integer e = mInfoService.testDelete();
@@ -59,40 +65,50 @@ public class TestController {
         return "删除成功";
     }
 
+    @ApiOperation("测试PutMapping")
     @PutMapping(value = "test2")
     public String testPut(Long id) {
         Integer in = mInfoService.testPut(id);
         return "更新成功";
     }
 
+    @ApiOperation("测试Mybatisplus的XML形式")
     @GetMapping(value = "test3")
     public List<MInfo> testXML() {
         return mInfoService.tesXML();
     }
 
+    @ApiOperation("测试Mybatisplus的XML联表查询")
     @GetMapping(value = "test4")
     public List<MInfoUnionQuery> testUnionQuery() {
         return mInfoService.findUnionQuery();
     }
 
+    @ApiOperation("测试Mybatisplus的XML联表查询collection集合")
     @GetMapping(value = "test5")
     public List<MInfoDto> queryUnionAll() {
         return mInfoService.queryUnionAll();
     }
 
+    @ApiOperation("测试Mybatisplus的XML联表查询多个collection集合")
     @GetMapping(value = "test6")
-    public List<MInfoDto> testLamdba(Date beginTime, Date endTime,String moid) {
+    public List<MInfo> testLamdba(Date beginTime, Date endTime,  String moid) {
 
-        LambdaQueryWrapper<MInfoDto> wrapper = new LambdaQueryWrapper<>();
-        wrapper.between(MInfoDto::getCreatime,beginTime,endTime);
-        wrapper.like(MInfoDto::getMOid, moid);
-
-        return null;
+        log.info("参数："+moid);
+        LambdaQueryWrapper<MInfo> wrapper = new LambdaQueryWrapper<>();
+        if (beginTime != null && endTime != null) {
+            wrapper.between(MInfo::getCreatime, beginTime, endTime);
+        }
+        if (moid != null) {
+            wrapper.like(MInfo::getMOid, moid);
+        }
+        return  mInfoMapper.selectList(wrapper);
     }
 
+    @ApiOperation("测试Wrappers方式查询")
     @GetMapping(value = "test7")
-    public MInfo testGetOne(){
-        return mInfoServices.getOne(Wrappers.query(),false);
+    public MInfo testGetOne() {
+        return mInfoServices.getOne(Wrappers.query(), false);
     }
 
 }
