@@ -1,11 +1,14 @@
 package com.aison.controller;
 
+import com.aison.authority.ManageUserDetailServiceImpl;
 import com.aison.dto.MInfoDto;
 import com.aison.dto.MInfoUnionQuery;
 import com.aison.entity.MInfo;
+import com.aison.entity.TUser;
 import com.aison.mapper.MInfoMapper;
 import com.aison.service.MInfoService;
 import com.aison.service.MInfoServices;
+import com.aison.service.impl.TUserServiceImpl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -30,11 +33,16 @@ public class TestController {
 
     private MInfoMapper mInfoMapper;
 
+    private TUserServiceImpl tUserServiceImpl;
+
+    private ManageUserDetailServiceImpl  manageUserDetailService;
+
     @ApiOperation("测试项目搭建启动")
     @GetMapping(value = "test1")
     public String test1() {
         return "测试搭建完成";
     }
+
     @ApiOperation("测试PostMapping")
     @PostMapping(value = "test2")
     public MInfo testSave() {
@@ -47,6 +55,7 @@ public class TestController {
         }
         return mInfo;
     }
+
     @ApiOperation("测试GetMapping")
     @GetMapping(value = "test2")
     public List<MInfo> testQuery() {
@@ -110,5 +119,16 @@ public class TestController {
     public MInfo testGetOne() {
         return mInfoServices.getOne(Wrappers.query(), false);
     }
+
+    @ApiOperation("测试查询登录用户")
+    @GetMapping(value = "test8")
+    public TUser testUser(String username){
+
+//        UserDetails details = manageUserDetailService.loadUserByUsername(username);
+
+        return tUserServiceImpl.findUserByUserName(username);
+
+    }
+
 
 }
