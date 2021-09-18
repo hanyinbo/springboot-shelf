@@ -29,9 +29,6 @@ public class ManageUserDetailServiceImpl implements UserDetailsService {
 
     private TUserServiceImpl tUserService;
 
-//    private PasswordEncoderFilter passwordEncoderFilter;
-
-
     @Override
     public UserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
         ManageUserDetails userInfo = new ManageUserDetails();

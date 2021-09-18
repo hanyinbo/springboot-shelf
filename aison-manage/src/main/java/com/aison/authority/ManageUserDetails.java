@@ -11,6 +11,7 @@ import java.util.Set;
 /**
  * TODO
  *
+ * 重写sercuity中UserDetails
  * @author hyb
  * @date 2021/9/18 11:35
  */

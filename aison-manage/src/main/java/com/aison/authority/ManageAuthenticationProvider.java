@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * TODO
- *
+ * 登录验证类
  * @author hyb
  * @date 2021/9/18 15:19
  */

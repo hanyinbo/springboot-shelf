@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * TODO
- *
+ *  获取用户信息
  * @author hyb
  * @date 2021/9/18 10:59
  */
