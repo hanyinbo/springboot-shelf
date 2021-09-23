@@ -1,14 +1,18 @@
 package com.aison.configuration;
 
+import com.aison.authority.JWTAuthorizationFilter;
+import com.aison.filter.JwtLoginFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import javax.servlet.http.HttpServletResponse;
@@ -20,10 +24,12 @@ import java.util.Map;
  * Security配置类
  */
 @AllArgsConstructor
-@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private ObjectMapper objectMapper;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -40,12 +46,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     out.flush();
                     out.close();
                 })
-
                 .and()
                 .authorizeRequests()
-                .antMatchers("/aison/**")
+                .antMatchers("/aison/**","/auth/**")
                 .permitAll()
                 .anyRequest().authenticated() //必须授权才能访问
+                .and()
+                .addFilter(new JwtLoginFilter(authenticationManager()))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                .csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .formLogin() //使用自带的登录
                 .permitAll()
@@ -119,4 +130,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //对于在header里面增加token等类似情况，放行所有OPTIONS请求。
         web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
     }
+
+
+//    @Bean
+//    @Override
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
 }

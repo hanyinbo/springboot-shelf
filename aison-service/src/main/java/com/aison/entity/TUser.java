@@ -44,4 +44,6 @@ public class TUser {
     @TableField(value = "updatime")
     @ApiModelProperty(value = "修改时间")
     private LocalDateTime updatime;
+    @TableField(value = "role")
+    private String role;
 }

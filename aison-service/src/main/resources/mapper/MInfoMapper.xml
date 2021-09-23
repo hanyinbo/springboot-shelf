@@ -28,12 +28,12 @@
 <!--       select m.m_oid,m.m_name,m.remark ,i.oid,i.name,i.level  from m_info m-->
 <!--       left join m_info_item i on m.m_oid= i.r_oid-->
 <!--    </select>-->
-<!--    <resultMap id="BaseResultMap" type="com.aison.dto.MInfoDto">-->
+<!--    <resultMap id="BaseResultMap" type="com.aison.dto.UserDTO.MInfoDto">-->
 <!--        <id property="mOid" column="m_oid"></id>-->
 <!--        <result property="mName" column="m_name"></result>-->
 <!--        <result property="mType" column="m_type"></result>-->
 <!--        <result property="remark" column="remark"></result>-->
-<!--        <collection property="children" ofType="com.aison.dto.MInfoItemDto">-->
+<!--        <collection property="children" ofType="com.aison.dto.UserDTO.MInfoItemDto">-->
 <!--            <id property="oid" column="oid"></id>-->
 <!--            <result property="name" column="name"></result>-->
 <!--            <result property="level" column="level"></result>-->

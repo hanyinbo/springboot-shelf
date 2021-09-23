@@ -46,7 +46,7 @@ public class ManageUserDetailServiceImpl implements UserDetailsService {
         Set<SimpleGrantedAuthority> authoritiesSet = new HashSet<>();
 //        List<UserRole> userRoles = roleService.findAllByUserId(user.getId());
 //        List<String> roleNames = userRoles.stream().map(UserRole::getRole).collect(Collectors.toList()).stream().map(Role::getRoleName).collect(Collectors.toList());
-          List<String> roleNames =  Arrays.asList("管理员");
+          List<String> roleNames =  Arrays.asList("admin");
         for (String roleName : roleNames) {
             //用户拥有的角色
             SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(roleName);
