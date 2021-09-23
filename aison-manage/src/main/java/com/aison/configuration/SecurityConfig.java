@@ -1,7 +1,7 @@
 package com.aison.configuration;
 
-import com.aison.authority.JWTAuthorizationFilter;
-import com.aison.filter.JwtLoginFilter;
+import com.aison.filter.JWTAuthorizationFilter;
+import com.aison.filter.JWTAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
@@ -48,11 +48,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 })
                 .and()
                 .authorizeRequests()
-                .antMatchers("/aison/**","/auth/**")
+                .antMatchers("/auth/**")
                 .permitAll()
                 .anyRequest().authenticated() //必须授权才能访问
                 .and()
-                .addFilter(new JwtLoginFilter(authenticationManager()))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager()))
                 .csrf().disable()
                 .sessionManagement()

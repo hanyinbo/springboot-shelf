@@ -1,4 +1,4 @@
-package com.aison.authority;
+package com.aison.filter;
 
 import com.aison.utils.JwtTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 /**
  * TODO
- *
+ * 鉴定权限
  * @author hyb
  * @date 2021/9/23 10:18
  */
@@ -34,14 +34,14 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
 
-        String tokenHeader = request.getHeader( jwtTokenUtils.TOKENPREFIX);
+        String tokenHeader = request.getHeader( jwtTokenUtils.TOKENHEADER);
         // 如果请求头中没有Authorization信息则直接放行了
         if (tokenHeader == null || !tokenHeader.startsWith( jwtTokenUtils.TOKENPREFIX)) {
             chain.doFilter(request, response);
             return;
         }
         //如果请求头中有token,则进行解析，并且设置认证信息
-        if(!JwtTokenUtils.isExpiration(tokenHeader.replace(JwtTokenUtils.TOKENPREFIX,""))){
+        if(!JwtTokenUtils.isExpiration(tokenHeader.replace(jwtTokenUtils.TOKENPREFIX,""))){
             SecurityContextHolder.getContext().setAuthentication(getAuthentication(tokenHeader));
         }
         chain.doFilter(request, response);

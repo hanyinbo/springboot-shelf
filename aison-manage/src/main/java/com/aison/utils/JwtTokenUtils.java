@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,7 @@ public class JwtTokenUtils {
     public static final String SECRET = "aisonjwt";
     public static final Long EXPIRATION = 7200L;
     public static final Long REMEMBEEXPIRATON=14400L;
+    private static final String ROLE = "role";
     /**
      * token前缀
      */
@@ -73,7 +75,9 @@ public class JwtTokenUtils {
 //                .compact();
 //    }
     // 创建token
-    public static String createToken(String username, boolean isRememberMe) {
+    public static String createToken(String username, String role,boolean isRememberMe) {
+        HashMap<Object, Object> map = new HashMap<>();
+        map.put(ROLE,role);
         long expiration = isRememberMe ? REMEMBEEXPIRATON : EXPIRATION;
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, SECRET)

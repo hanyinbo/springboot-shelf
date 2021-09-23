@@ -20,12 +20,12 @@ import java.util.Map;
 
 /**
  * TODO
- *
+ * 登录验证
  * @author hyb
  * @date 2021/9/22 14:36
  */
 
-public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     /**
      * 获取授权管理, 创建JWTLoginFilter时获取
      */
@@ -37,7 +37,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
      *
      * @param authenticationManager
      */
-    public JwtLoginFilter(AuthenticationManager authenticationManager) {
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         super.setFilterProcessesUrl("/auth/login");
     }
@@ -71,8 +71,9 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         // 查看源代码会发现调用getPrincipal()方法会返回一个实现了`UserDetails`接口的对象
         // 所以就是JwtUser啦
         String jwtUser = authResult.getPrincipal().toString();
+        String role="admin";
         System.out.println("jwtUser:" + jwtUser.toString());
-        String token = JwtTokenUtils.createToken(jwtUser,false);
+        String token = JwtTokenUtils.createToken(jwtUser,role,false);
         // 返回创建成功的token
         // 但是这里创建的token只是单纯的token
         // 按照jwt的规定，最后请求的格式应该是 `Bearer token`
@@ -86,7 +87,6 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         out.write(JSON.toJSONString(map));
         out.flush();
         out.close();
-
     }
     /**
      * TODO 一旦调用 springSecurity认证失败 ，立即执行该方法
