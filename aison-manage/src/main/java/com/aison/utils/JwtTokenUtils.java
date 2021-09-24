@@ -145,6 +145,7 @@ public class JwtTokenUtils {
         try {
             return getTokenBody(token).getExpiration().before(new Date());
         } catch (Exception e) {
+            log.info("校验报错");
             e.printStackTrace();
         }
         return true;
