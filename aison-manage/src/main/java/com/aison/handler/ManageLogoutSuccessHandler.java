@@ -26,11 +26,13 @@ public class ManageLogoutSuccessHandler implements LogoutSuccessHandler {
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.debug("登出成功");
+        response.reset();
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("code", 200);
         map.put("message", "退出成功");
         map.put("data", authentication);
         response.setContentType("application/json;charset=utf-8");
+//        response.setHeader("token","");
         PrintWriter out = response.getWriter();
         out.write(JSON.toJSONString(map));
         out.flush();

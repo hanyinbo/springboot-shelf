@@ -60,6 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(manageAccessDeniedHandler)
                 .and()
                 .logout()
+                .logoutUrl("/aison/logout")
                 //退出成功，返回json
                 .logoutSuccessHandler(manageLogoutSuccessHandler)
                 .permitAll();
