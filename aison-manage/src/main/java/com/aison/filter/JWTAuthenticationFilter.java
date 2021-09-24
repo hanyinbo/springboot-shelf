@@ -2,6 +2,7 @@ package com.aison.filter;
 
 import com.aison.utils.JwtTokenUtils;
 import com.alibaba.fastjson.JSON;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,22 +22,25 @@ import java.util.Map;
 /**
  * TODO
  * 登录验证
+ *
  * @author hyb
  * @date 2021/9/22 14:36
  */
-
+@AllArgsConstructor
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     /**
      * 获取授权管理, 创建JWTLoginFilter时获取
      */
     private AuthenticationManager authenticationManager;
 
+    private JwtTokenUtils jwtTokenUtils;
 
     /**
      * 创建JWTLoginFilter,构造器，定义后端登陆接口-【/auth/login】，当调用该接口直接执行 attemptAuthentication 方法
      *
      * @param authenticationManager
      */
+
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         super.setFilterProcessesUrl("/auth/login");
@@ -71,13 +75,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // 查看源代码会发现调用getPrincipal()方法会返回一个实现了`UserDetails`接口的对象
         // 所以就是JwtUser啦
         String jwtUser = authResult.getPrincipal().toString();
-        String role="admin";
-        System.out.println("jwtUser:" + jwtUser.toString());
-        String token = JwtTokenUtils.createToken(jwtUser,role,false);
+        String role = "admin";
+
+        String token = jwtTokenUtils.createToken(jwtUser, role, false);
         // 返回创建成功的token
         // 但是这里创建的token只是单纯的token
         // 按照jwt的规定，最后请求的格式应该是 `Bearer token`
-        response.setHeader("token", JwtTokenUtils.TOKENPREFIX + token);
+        response.setHeader("token", JwtTokenUtils.TOKEN_PREFIX + token);
         response.setContentType("application/json;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         PrintWriter out = response.getWriter();
@@ -88,6 +92,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         out.flush();
         out.close();
     }
+
     /**
      * TODO 一旦调用 springSecurity认证失败 ，立即执行该方法
      *

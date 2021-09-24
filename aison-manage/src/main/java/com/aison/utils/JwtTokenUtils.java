@@ -1,19 +1,12 @@
 package com.aison.utils;
 
-import com.aison.dto.UserDTO;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import io.jsonwebtoken.*;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * jwt工具类
@@ -22,63 +15,76 @@ import java.util.Map;
  * @version 1.0
  * @date 2019-10-24 11:13
  */
+//@ConfigurationProperties 可直接定义yml中属性，变量名可与配置文件属性名成驼峰命名直接使用，切记不可定义static变量
+//@ConfigurationProperties(prefix = "jwt")
 @Component
-@ConfigurationProperties(prefix = "jwt")
-@Data
 @Slf4j
 public class JwtTokenUtils {
-
     /**
      * header名称
      */
-    public  static String TOKENHEADER="Authorization";
-    public static final String TOKENPREFIX = "Bearer ";
-    public static final String SECRET = "aisonjwt";
-    public static final Long EXPIRATION = 7200L;
-    public static final Long REMEMBEEXPIRATON=14400L;
-    private static final String ROLE = "role";
+    public static String TOKEN_HEADER;
     /**
      * token前缀
      */
-    public   String tokenPrefix;
+    public static String TOKEN_PREFIX;
     /**
      * 秘钥
      */
-    public static String secret;
+    public static String SECRET;
     /**
      * 过期时间
      */
-    public static Long expiration;
+    public static String EXPIRATIO;
     /**
      * 选择记住后过期时间
      */
-    public static Long rememberExpiraton;
+    public static String REMEMBEREXPIRATION;
+    /**
+     * 权限
+     */
+    public static String ROLE;
 
+    @Value("${jwt.tokenHeader}")
+    public void setTokenHeader(String tokenHeader) {
+        JwtTokenUtils.TOKEN_HEADER = tokenHeader;
+    }
+
+    @Value("${jwt.tokenPrefix}")
+    public void setTokenPrefix(String tokenPrefix) {
+        JwtTokenUtils.TOKEN_PREFIX = tokenPrefix + " ";
+    }
+
+    @Value("${jwt.secret}")
+    public void setSECRET(String SECRET) {
+        JwtTokenUtils.SECRET = SECRET;
+    }
+
+    @Value("${jwt.expiration}")
+    public void setEXPIRATIO(String EXPIRATIO) {
+        JwtTokenUtils.EXPIRATIO = EXPIRATIO;
+    }
+
+    @Value("${jwt.remembeExpiraton}")
+    public void setREMEMBEREXPIRATION(String REMEMBEREXPIRATION) {
+        JwtTokenUtils.REMEMBEREXPIRATION = REMEMBEREXPIRATION;
+    }
+
+    @Value("${jwt.role}")
+    public void setROLE(String ROLE) {
+        JwtTokenUtils.ROLE = ROLE;
+    }
 
     /**
      * 生成token
      *
-     * @param uSerDTO
+     * @param
      * @return
      */
-//    public String createToken(UserDTO uSerDTO) {
-////        Long time = uSerDTO.getRemember() ? this.rememberExpiraton : this.expiration;
-//        Long time = uSerDTO.getRemember() ? this.REMEMBEEXPIRATON : this.EXPIRATION;
-//
-//        Map<String, Object> map = new HashMap<>(1);
-//        map.put("user", uSerDTO);
-//        return Jwts.builder()
-//                .setClaims(map)
-//                .setSubject(uSerDTO.getUsername())
-//                .setExpiration(new Date(System.currentTimeMillis() + time * 1000))
-//                .signWith(SignatureAlgorithm.HS512, SECRET)
-//                .compact();
-//    }
-    // 创建token
-    public static String createToken(String username, String role,boolean isRememberMe) {
+    public static String createToken(String username, String role, boolean isRememberMe) {
         HashMap<Object, Object> map = new HashMap<>();
-        map.put(ROLE,role);
-        long expiration = isRememberMe ? REMEMBEEXPIRATON : EXPIRATION;
+        map.put(ROLE, role);
+        long expiration = isRememberMe ? Long.valueOf(REMEMBEREXPIRATION) : Long.valueOf(EXPIRATIO);
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .setSubject(username)
@@ -86,8 +92,9 @@ public class JwtTokenUtils {
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
                 .compact();
     }
+
     /**
-     * 解析token
+     * token规则
      *
      * @param token
      * @return
@@ -109,32 +116,12 @@ public class JwtTokenUtils {
         return generateToken(token).getSubject();
     }
 
-
     /**
-     * 获取userDTO
+     * 解析token
      *
      * @param token
      * @return
      */
-    public UserDTO getUserDTO(String token) {
-        Claims claims = generateToken(token);
-        Map<String, String> map = claims.get("user", Map.class);
-        UserDTO userDTO = JSON.parseObject(JSON.toJSONString(map), UserDTO.class);
-        return userDTO;
-    }
-
-    /**
-     * 获取用户角色的权限列表, 没有返回空
-     *
-     * @param token
-     * @return
-     */
-    public static List<SimpleGrantedAuthority> getUserAuth(String token) {
-
-        String json = JSONArray.toJSONString("admin");
-        List<SimpleGrantedAuthority> grantedAuthorityList = JSON.parseArray(json, SimpleGrantedAuthority.class);
-        return grantedAuthorityList;
-    }
     private static Claims getTokenBody(String token) {
         Claims claims = null;
         try {
@@ -154,18 +141,12 @@ public class JwtTokenUtils {
     }
 
     //是否已过期
-    public static boolean isExpiration(String token){
-        try{
+    public static boolean isExpiration(String token) {
+        try {
             return getTokenBody(token).getExpiration().before(new Date());
-        } catch(Exception e){
-           e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return true;
     }
-
-    public static void main(String[] args) {
-
-        System.out.println("变量："+SECRET);
-    }
-
 }

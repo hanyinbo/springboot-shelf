@@ -34,14 +34,14 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
 
-        String tokenHeader = request.getHeader( jwtTokenUtils.TOKENHEADER);
+        String tokenHeader = request.getHeader(JwtTokenUtils.TOKEN_HEADER);
         // 如果请求头中没有Authorization信息则直接放行了
-        if (tokenHeader == null || !tokenHeader.startsWith( jwtTokenUtils.TOKENPREFIX)) {
+        if (tokenHeader == null || !tokenHeader.startsWith( JwtTokenUtils.TOKEN_PREFIX)) {
             chain.doFilter(request, response);
             return;
         }
         //如果请求头中有token,则进行解析，并且设置认证信息
-        if(!JwtTokenUtils.isExpiration(tokenHeader.replace(jwtTokenUtils.TOKENPREFIX,""))){
+        if(!jwtTokenUtils.isExpiration(tokenHeader.replace(JwtTokenUtils.TOKEN_PREFIX,""))){
             SecurityContextHolder.getContext().setAuthentication(getAuthentication(tokenHeader));
         }
         chain.doFilter(request, response);
@@ -50,8 +50,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     // 这里从token中获取用户信息并新建一个token
     private UsernamePasswordAuthenticationToken getAuthentication(String tokenHeader) {
-        String token = tokenHeader.replace( jwtTokenUtils.TOKENPREFIX, "");
-        String username = JwtTokenUtils.getUserName(token);
+        String token = tokenHeader.replace( JwtTokenUtils.TOKEN_PREFIX, "");
+        String username = jwtTokenUtils.getUserName(token);
         if (username != null) {
             return new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
         }

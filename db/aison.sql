@@ -11,7 +11,7 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 22/09/2021 11:39:53
+ Date: 23/09/2021 16:53:28
 */
 
 SET NAMES utf8mb4;
@@ -240,14 +240,15 @@ CREATE TABLE `t_user`  (
   `updator` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '修改人',
   `updatime` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
   `del_flag` char(1) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '逻辑删除标识，0-正常，1-删除',
+  `role` varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '权限ID',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES (1, 'zhangsan', '$2a$10$O5GasI8Ta2RF1XeMPQ2nJuaIAVGQPWPBGYosj.CncSLLl8W1xUOI6', '张三', '13856565656', NULL, NULL, NULL, NULL, '0');
-INSERT INTO `t_user` VALUES (2, 'lisi', '$2a$10$O5GasI8Ta2RF1XeMPQ2nJuaIAVGQPWPBGYosj.CncSLLl8W1xUOI6', '李四', '13945454545', NULL, NULL, NULL, NULL, '0');
+INSERT INTO `t_user` VALUES (1, 'zhangsan', '$2a$10$O5GasI8Ta2RF1XeMPQ2nJuaIAVGQPWPBGYosj.CncSLLl8W1xUOI6', '张三', '13856565656', NULL, NULL, NULL, NULL, '0', NULL);
+INSERT INTO `t_user` VALUES (2, 'lisi', '$2a$10$O5GasI8Ta2RF1XeMPQ2nJuaIAVGQPWPBGYosj.CncSLLl8W1xUOI6', '李四', '13945454545', NULL, NULL, NULL, NULL, '0', NULL);
 
 -- ----------------------------
 -- Table structure for t_user_role
