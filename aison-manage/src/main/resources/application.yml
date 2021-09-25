@@ -16,3 +16,10 @@ logging:
     root: info
     com.baomidou.mybatisplus.sample: debug
     com.aison.mapper: debug  #配置控制台打印sql
+jwt:
+  secret: aisonjwt
+  tokenHeader: Authorization
+  remembeExpiraton: 7800
+  tokenPrefix: Bearer
+  expiration: 1000
+  role: role
