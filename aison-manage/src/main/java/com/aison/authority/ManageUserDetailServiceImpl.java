@@ -1,10 +1,9 @@
 package com.aison.authority;
 
 import com.aison.entity.TUser;
-import com.aison.service.impl.TUserServiceImpl;
+import com.aison.service.TUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -27,10 +26,10 @@ import java.util.Set;
 @Component
 public class ManageUserDetailServiceImpl implements UserDetailsService {
 
-    private TUserServiceImpl tUserService;
+    private TUserService tUserService;
 
     @Override
-    public UserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
+    public ManageUserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
         ManageUserDetails userInfo = new ManageUserDetails();
 
         TUser tUser = tUserService.findUserByUserName(loginName);
@@ -40,6 +39,7 @@ public class ManageUserDetailServiceImpl implements UserDetailsService {
         if(tUser.getDelFlag()){
             throw new UsernameNotFoundException("用户[" + loginName + "]不存在");
         }
+        userInfo.setId(tUser.getId());
         //登录用户名
         userInfo.setUsername(loginName);
         userInfo.setPassword(tUser.getPassword());

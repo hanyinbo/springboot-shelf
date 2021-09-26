@@ -16,8 +16,8 @@ import java.util.Collections;
  * @date 2021/9/22 15:04
  */
 @Data
-public class UserDTO  implements UserDetails {
-   private Long id;
+public class UserDetailsDTO implements UserDetails {
+    private Long id;
     /**
      * 是否记住密码
      */
@@ -33,15 +33,23 @@ public class UserDTO  implements UserDetails {
      */
     private String userPassword;
 
+    private String ip;
+
+    private String role;
+
     private Collection<? extends GrantedAuthority> authorities;
 
+    public UserDetailsDTO(){}
 
-    public UserDTO(TUser loginUser){
+    public UserDetailsDTO(TUser loginUser) {
         this.id = loginUser.getId();
         this.userName = loginUser.getUsername();
         this.userPassword = loginUser.getPassword();
         authorities = Collections.singleton(new SimpleGrantedAuthority(loginUser.getRole()));
+        this.ip = loginUser.getIp();
+        this.role=loginUser.getRole();
     }
+
     @Override
     public String getPassword() {
         return userPassword;
@@ -73,7 +81,7 @@ public class UserDTO  implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities(){
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 }

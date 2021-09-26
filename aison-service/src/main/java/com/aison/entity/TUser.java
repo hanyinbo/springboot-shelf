@@ -46,4 +46,6 @@ public class TUser {
     private LocalDateTime updatime;
     @TableField(value = "role")
     private String role;
+    @TableField(value = "ip")
+    private String ip;
 }

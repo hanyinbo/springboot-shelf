@@ -8,7 +8,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -30,13 +29,13 @@ public class ManageAuthenticationProvider implements AuthenticationProvider {
         String loginName = (String) authentication.getPrincipal();
         //表单输入的密码
         String password = (String) authentication.getCredentials();
-        UserDetails userInfo = manageUserDetailService.loadUserByUsername(loginName);
+        ManageUserDetails userInfo = manageUserDetailService.loadUserByUsername(loginName);
         log.info("ManageAuthenticationProvider监听密码："+password +"   数据库密码:"+userInfo.getPassword());
         boolean matches = new BCryptPasswordEncoder().matches(password, userInfo.getPassword());
         if (!matches) {
             throw new LoginFailException(Msg.TEXT_LOGIN_FAIL);
         }
-        return new UsernamePasswordAuthenticationToken(loginName, userInfo.getPassword(), userInfo.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userInfo, userInfo.getPassword(), userInfo.getAuthorities());
     }
 
     @Override
