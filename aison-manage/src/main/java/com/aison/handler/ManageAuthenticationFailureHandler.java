@@ -1,6 +1,6 @@
 package com.aison.handler;
 
-import com.alibaba.fastjson.JSON;
+import com.aison.utils.ResponseUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -13,9 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * TODO
@@ -32,18 +29,12 @@ public class ManageAuthenticationFailureHandler implements AuthenticationFailure
         log.debug("登录失败");
         response.setContentType("application/json;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        PrintWriter out = response.getWriter();
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("code", 401);
         if (e instanceof UsernameNotFoundException || e instanceof BadCredentialsException) {
-            map.put("message", "用户名或密码错误");
+            ResponseUtils.responseJson(response, ResponseUtils.response(401, "登录失败,用户名或密码错误", e.getMessage()));
         } else if (e instanceof DisabledException) {
-            map.put("message", "账户被禁用");
+            ResponseUtils.responseJson(response, ResponseUtils.response(401, "登录失败,账户被禁用", e.getMessage()));
         } else {
-            map.put("message", "登录失败!");
+            ResponseUtils.responseJson(response, ResponseUtils.response(401, "登录失败", e.getMessage()));
         }
-        out.write(JSON.toJSONString(map));
-        out.flush();
-        out.close();
     }
 }

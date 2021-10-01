@@ -25,6 +25,13 @@ public class ManageUserDetails implements UserDetails {
     public Long id;
     private String username;
     private String password;
+    private String ip;
+    private String role;
+    /**
+     * 是否记住密码
+     */
+    private Boolean remember;
+
     private Set<? extends GrantedAuthority> authorities;
 
     public ManageUserDetails() {
@@ -35,6 +42,8 @@ public class ManageUserDetails implements UserDetails {
         this.id = loginUser.getId();
         this.username = loginUser.getUsername();
         this.password = loginUser.getPassword();
+        this.ip=loginUser.getIp();
+        this.role= loginUser.getRole();
         authorities = Collections.singleton(new SimpleGrantedAuthority(loginUser.getRole()));
     }
 

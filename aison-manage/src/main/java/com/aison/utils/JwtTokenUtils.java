@@ -1,12 +1,25 @@
 package com.aison.utils;
 
-import io.jsonwebtoken.*;
+import com.aison.authority.ManageUserDetailServiceImpl;
+import com.aison.authority.ManageUserDetails;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
+import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 /**
  * jwt工具类
@@ -20,6 +33,23 @@ import java.util.HashMap;
 @Component
 @Slf4j
 public class JwtTokenUtils {
+
+    /**
+     * 时间格式化
+     */
+    private static final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @Autowired
+    private ManageUserDetailServiceImpl manageUserDetailService;
+
+    private static JwtTokenUtils jwtTokenUtils;
+
+    @PostConstruct
+    public void init() {
+        jwtTokenUtils = this;
+        jwtTokenUtils.manageUserDetailService = this.manageUserDetailService;
+    }
+
     /**
      * header名称
      */
@@ -35,11 +65,17 @@ public class JwtTokenUtils {
     /**
      * 过期时间
      */
-    public static String EXPIRATIO;
+    public static Integer EXPIRATIO;
     /**
      * 选择记住后过期时间
      */
-    public static String REMEMBEREXPIRATION;
+    public static Integer REMEMBEREXPIRATION;
+
+    /**
+     * 有效时间
+     */
+    public static Integer REFRESH_EXPIRATION;
+
     /**
      * 权限
      */
@@ -61,12 +97,12 @@ public class JwtTokenUtils {
     }
 
     @Value("${jwt.expiration}")
-    public void setEXPIRATIO(String EXPIRATIO) {
-        JwtTokenUtils.EXPIRATIO = EXPIRATIO;
+    public void setEXPIRATIO(Integer EXPIRATIO) {
+        JwtTokenUtils.EXPIRATIO = EXPIRATIO * 1000;
     }
 
     @Value("${jwt.remembeExpiraton}")
-    public void setREMEMBEREXPIRATION(String REMEMBEREXPIRATION) {
+    public void setREMEMBEREXPIRATION(Integer REMEMBEREXPIRATION) {
         JwtTokenUtils.REMEMBEREXPIRATION = REMEMBEREXPIRATION;
     }
 
@@ -75,45 +111,68 @@ public class JwtTokenUtils {
         JwtTokenUtils.ROLE = ROLE;
     }
 
+    @Value("${jwt.refreshExpiraton}")
+    public void setRefreshExpiration(Integer refreshExpiraton) {
+        JwtTokenUtils.REFRESH_EXPIRATION = refreshExpiraton * 24 * 60 * 60 * 1000;
+    }
+
     /**
      * 生成token
      *
      * @param
      * @return
      */
-    public static String createToken(String username, String role, boolean isRememberMe) {
+    public static String createToken(ManageUserDetails userDTO) {
         HashMap<Object, Object> map = new HashMap<>();
-        map.put(ROLE, role);
-        long expiration = isRememberMe ? Long.valueOf(REMEMBEREXPIRATION) : Long.valueOf(EXPIRATIO);
+        map.put(ROLE, userDTO.getRole());
+        Integer expiration = userDTO.getRemember() ? REMEMBEREXPIRATION : EXPIRATIO;
+        log.info("过期时长:"+expiration);
         return Jwts.builder()
-                .signWith(SignatureAlgorithm.HS512, SECRET)
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
+                .setId(userDTO.getId().toString()) //用户ID
+                .signWith(SignatureAlgorithm.HS512, SECRET) //签名算法、密钥
+                .setSubject(userDTO.getUsername())
+                .setIssuedAt(new Date()) //签发时间
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))//过期时间
+                .claim("authorities", JSON.toJSONString(userDTO.getAuthorities()))// 自定义其他属性，如用户组织机构ID，用户所拥有的角色，用户权限信息等
+                .claim("ip", userDTO.getIp())
                 .compact();
     }
 
     /**
-     * token规则
+     * 保存Token信息到Redis中
      *
-     * @param token
-     * @return
+     * @param token    Token信息
+     * @param username 用户名
+     * @param ip       IP
      */
-    public static Claims generateToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET)
-                .parseClaimsJws(token)
-                .getBody();
+    public static void setTokenInfo(String token, String username, String ip) {
+        if (StringUtils.isNotEmpty(token)) {
+            // 去除JWT前缀
+//            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
+
+            Integer refreshTime = JwtTokenUtils.REFRESH_EXPIRATION;
+            LocalDateTime localDateTime = LocalDateTime.now();
+            log.info("保存token到redis:" + username + "---username----refreshTime:---" + refreshTime);
+            RedisUtils.hset(token, "username", username, refreshTime);
+            RedisUtils.hset(token, "ip", ip, refreshTime);
+            RedisUtils.hset(token, "refreshTime",
+                    df.format(localDateTime.plus(JwtTokenUtils.REFRESH_EXPIRATION, ChronoUnit.MILLIS)), refreshTime);
+            RedisUtils.hset(token, "expiration", df.format(localDateTime.plus(JwtTokenUtils.EXPIRATIO, ChronoUnit.MILLIS)),
+                    refreshTime);
+        }
     }
 
     /**
-     * 获取用户名
+     * 刷新Token
      *
-     * @param token
+     * @param oldToken 过期但未超过刷新时间的Token
      * @return
      */
-    public static String getUserName(String token) {
-        return generateToken(token).getSubject();
+    public static String refreshAccessToken(String oldToken) {
+        String username = JwtTokenUtils.getUserNameByToken(oldToken);
+        ManageUserDetails userInfo = (ManageUserDetails) jwtTokenUtils.manageUserDetailService.loadUserByUsername(username);
+        userInfo.setIp(JwtTokenUtils.getIpByToken(oldToken));
+        return createToken(userInfo);
     }
 
     /**
@@ -122,32 +181,193 @@ public class JwtTokenUtils {
      * @param token
      * @return
      */
-    private static Claims getTokenBody(String token) {
-        Claims claims = null;
+    public static ManageUserDetails parseTokenBody(String token) {
+        ManageUserDetails detailsDTO = null;
         try {
-            claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
-        } catch (ExpiredJwtException e) {
-            e.printStackTrace();
-        } catch (UnsupportedJwtException e) {
-            e.printStackTrace();
-        } catch (MalformedJwtException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
+            log.info("解析token:"+token);
+            // 去除JWT前缀
+            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
+
+            Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
+            detailsDTO = new ManageUserDetails();
+            log.info("Long.parseLong(claims.getId())----"+Long.parseLong(claims.getId()));
+            detailsDTO.setId(Long.parseLong(claims.getId()));
+            detailsDTO.setUsername(claims.getSubject());
+            detailsDTO.setRole("admin");
+            // 获取角色
+            Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+            String authority = claims.get("authorities").toString();
+            if (StringUtils.isNotEmpty(authority)) {
+                List<Map<String, String>> authorityList = JSON.parseObject(authority,
+                        new TypeReference<List<Map<String, String>>>() {
+                        });
+                for (Map<String, String> role : authorityList) {
+                    if (!role.isEmpty()) {
+                        authorities.add(new SimpleGrantedAuthority(role.get("authority")));
+                    }
+                }
+            }
+            detailsDTO.setAuthorities(authorities);
+            detailsDTO.setIp(claims.get("ip").toString());
+        } catch (Exception e) {
+            log.error("解析token失败");
             e.printStackTrace();
         }
-        return claims;
+        return detailsDTO;
     }
 
+    /**
+     * 是否过期
+     *
+     * @param expiration 过期时间，字符串
+     * @return 过期返回True，未过期返回false
+     */
+    public static boolean isExpiration(String expiration) {
+        LocalDateTime expirationTime = LocalDateTime.parse(expiration, df);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        if (localDateTime.compareTo(expirationTime) > 0) {
+            return true;
+        }
+        return false;
+    }
     //是否已过期
-    public static boolean isExpiration(String token) {
-        try {
-            return getTokenBody(token).getExpiration().before(new Date());
-        } catch (Exception e) {
-            log.info("校验报错");
-            e.printStackTrace();
+//    public static boolean isExpiration(String token) {
+//        try {
+//            return parseTokenBody(token).get().before(new Date());
+//        } catch (Exception e) {
+//            log.info("校验报错");
+//            e.printStackTrace();
+//        }
+//        return true;
+//    }
+
+    /**
+     * 是否有效
+     *
+     * @param refreshTime 刷新时间，字符串
+     * @return 有效返回True，无效返回false
+     */
+    public static boolean isValid(String refreshTime) {
+        LocalDateTime validTime = LocalDateTime.parse(refreshTime, df);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        if (localDateTime.compareTo(validTime) > 0) {
+            return false;
         }
         return true;
+    }
+
+    /**
+     * 检查Redis中是否存在Token
+     *
+     * @param token Token信息
+     * @return
+     */
+    public static boolean hasToken(String token) {
+        if (StringUtils.isNotEmpty(token)) {
+            // 去除JWT前缀
+            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
+            return RedisUtils.hasKey(token);
+        }
+        return false;
+    }
+
+    /**
+     * 从Redis中获取用户名
+     *
+     * @param token Token信息
+     * @return
+     */
+    public static String getUserNameByToken(String token) {
+        if (StringUtils.isNotEmpty(token)) {
+            // 去除JWT前缀
+            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
+            return RedisUtils.hget(token, "username").toString();
+        }
+        return null;
+    }
+
+    /**
+     * 从Redis中获取过期时间
+     *
+     * @param token Token信息
+     * @return 过期时间，字符串
+     */
+    public static String getExpirationByToken(String token) {
+        if (StringUtils.isNotEmpty(token)) {
+            // 去除JWT前缀
+            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
+            return RedisUtils.hget(token, "expiration").toString();
+        }
+        return null;
+    }
+
+    /**
+     * 从Redis中获取IP
+     *
+     * @param token Token信息
+     * @return
+     */
+    public static String getIpByToken(String token) {
+        if (StringUtils.isNotEmpty(token)) {
+            // 去除JWT前缀
+            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
+            return RedisUtils.hget(token, "ip").toString();
+        }
+        return null;
+    }
+
+    /**
+     * 判断当前Token是否在黑名单中
+     *
+     * @param token Token信息
+     */
+    public static boolean isBlackList(String token) {
+        if (StringUtils.isNotEmpty(token)) {
+            // 去除JWT前缀
+            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
+            return RedisUtils.hasKey("blackList", token);
+        }
+        return false;
+    }
+
+    /**
+     * 将Token放到黑名单中
+     *
+     * @param token Token信息
+     */
+    public static void addBlackList(String token) {
+        if (StringUtils.isNotEmpty(token)) {
+            // 去除JWT前缀
+            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
+            RedisUtils.hset("blackList", token, df.format(LocalDateTime.now()));
+        }
+    }
+
+    /**
+     * 从Redis中获取刷新时间
+     *
+     * @param token Token信息
+     * @return 刷新时间，字符串
+     */
+    public static String getRefreshTimeByToken(String token) {
+        if (StringUtils.isNotEmpty(token)) {
+            // 去除JWT前缀
+            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
+            return RedisUtils.hget(token, "refreshTime").toString();
+        }
+        return null;
+    }
+
+    /**
+     * Redis中删除Token
+     *
+     * @param token Token信息
+     */
+    public static void deleteRedisToken(String token) {
+        if (StringUtils.isNotEmpty(token)) {
+            // 去除JWT前缀
+            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
+            RedisUtils.deleteKey(token);
+        }
     }
 }
