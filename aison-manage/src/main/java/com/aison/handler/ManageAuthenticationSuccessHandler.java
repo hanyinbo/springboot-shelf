@@ -40,18 +40,21 @@ public class ManageAuthenticationSuccessHandler implements AuthenticationSuccess
         userDTO.setIp(ip);
         userDTO.setRole("admin");
         userDTO.setRemember(false);
-        String token = jwtTokenUtils.createToken(userDTO);
-        // 保存Token信息到Redis中
-        JwtTokenUtils.setTokenInfo(token, userDTO.getUsername(), ip);
-        // 返回创建成功的token
-        // 但是这里创建的token只是单纯的token
-        // 按照jwt的规定，最后请求的格式应该是 `Bearer token`
-        response.setHeader("token", JwtTokenUtils.TOKEN_PREFIX + token);
-        response.setContentType("application/json;charset=utf-8");
-        response.setStatus(HttpServletResponse.SC_OK);
-        Map<String, String> tokenMap = new HashMap<>();
-        tokenMap.put("token", token);
-        ResponseUtils.responseJson(response, ResponseUtils.response(200, "登录成功", tokenMap));
+        try{
+            String token = jwtTokenUtils.createToken(userDTO);
+            // 保存Token信息到Redis中
+            JwtTokenUtils.setTokenInfo(token, userDTO.getUsername(), ip);
+            // 返回创建成功的token
+            // 但是这里创建的token只是单纯的token
+            // 按照jwt的规定，最后请求的格式应该是 `Bearer token`
+            response.setHeader("token", JwtTokenUtils.TOKEN_PREFIX + token);
+            response.setContentType("application/json;charset=utf-8");
+            response.setStatus(HttpServletResponse.SC_OK);
+            Map<String, String> tokenMap = new HashMap<>();
+            tokenMap.put("token", token);
+            ResponseUtils.responseJson(response, ResponseUtils.response(200, "登录成功", tokenMap));
+        }catch (Exception e){
+            ResponseUtils.responseJson(response, ResponseUtils.response(501, "登录失败,Redis服务异常", null));
+        }
     }
-
 }
