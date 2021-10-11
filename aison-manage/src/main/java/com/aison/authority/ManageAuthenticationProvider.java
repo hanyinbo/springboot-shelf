@@ -2,6 +2,7 @@ package com.aison.authority;
 
 import com.aison.common.Msg;
 import com.aison.exception.LoginFailException;
+import com.aison.utils.PasswordAESUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -23,15 +24,19 @@ import org.springframework.stereotype.Component;
 public class ManageAuthenticationProvider implements AuthenticationProvider {
 
     private ManageUserDetailServiceImpl manageUserDetailService;
+
+    private PasswordAESUtil passwordAESUtil;
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public  Authentication authenticate(Authentication authentication) throws AuthenticationException {
         //表单输入的用户名
         String loginName = (String) authentication.getPrincipal();
         //表单输入的密码
         String password = (String) authentication.getCredentials();
         ManageUserDetails userInfo = manageUserDetailService.loadUserByUsername(loginName);
         log.info("ManageAuthenticationProvider监听密码："+password +"   数据库密码:"+userInfo.getPassword());
-        boolean matches = new BCryptPasswordEncoder().matches(password, userInfo.getPassword());
+        String aesPwd = PasswordAESUtil.decryptAES2(password);
+        log.info("前端登录密码解密后："+aesPwd);
+        boolean matches = new BCryptPasswordEncoder().matches(aesPwd, userInfo.getPassword());
         if (!matches) {
             throw new LoginFailException(Msg.TEXT_LOGIN_FAIL);
         }

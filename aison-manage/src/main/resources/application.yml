@@ -27,3 +27,5 @@ jwt:
   expiration: 3000
   role: role
   refreshExpiraton: 7
+pwd:
+  aesKey: aisonnsyydszxdl8
