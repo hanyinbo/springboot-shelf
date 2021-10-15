@@ -34,7 +34,7 @@ public class ManageAuthenticationProvider implements AuthenticationProvider {
         String password = (String) authentication.getCredentials();
         ManageUserDetails userInfo = manageUserDetailService.loadUserByUsername(loginName);
         log.info("ManageAuthenticationProvider监听密码："+password +"   数据库密码:"+userInfo.getPassword());
-        String aesPwd = PasswordAESUtil.decryptAES2(password);
+        String aesPwd = PasswordAESUtil.decryptedDES(password);
         log.info("前端登录密码解密后："+aesPwd);
         boolean matches = new BCryptPasswordEncoder().matches(aesPwd, userInfo.getPassword());
         if (!matches) {
