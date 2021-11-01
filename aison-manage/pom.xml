@@ -6,18 +6,18 @@
         <dependency>
             <groupId>com.aison</groupId>
             <artifactId>aison-service</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.aison</groupId>
             <artifactId>aison-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
     <parent>
         <artifactId>springboot-shelf</artifactId>
         <groupId>com.aison</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>aison-manage</artifactId>

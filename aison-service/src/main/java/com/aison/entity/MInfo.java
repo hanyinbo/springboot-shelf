@@ -1,14 +1,17 @@
 package com.aison.entity;
 
-import com.aison.bean.BaseEntity;
+
+import com.aison.common.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "m_info")//指定表名
 @ApiModel(value="MInfo对象",description="测试主表MInfo")
 public class MInfo extends BaseEntity {
