@@ -15,11 +15,11 @@ spring:
   activiti:
     database-schema-update: false #是否每次都更新数据库
     # 自动部署验证设置:true-开启（默认）、false-关闭
-    check-process-definitions: false # activti是否自动部署
+    check-process-definitions: true # activti是否自动部署
     process-definition-location-prefix: classpath:/processes/
     #process-definition-location-suffixes: .bpmn
     history-level: full
-    #db-history-used: true
+    db-history-used: true
     db-identity-used: false
   main:
     allow-bean-definition-overriding: true
@@ -39,7 +39,6 @@ jwt:
   remembeExpiraton: 7800
   tokenPrefix: Bearer
   expiration: 3000
-  role: role
   refreshExpiraton: 7
 pwd:
   aesKey: a5h*jos&fj18oico

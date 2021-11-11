@@ -7,11 +7,13 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.management.relation.Role;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @TableName(value = "t_user")
 @Data
-@ApiModel(value="用户表",description="系统用户表")
+@ApiModel(value = "用户表", description = "系统用户表")
 public class TUser {
     @TableField(value = "id")
     @TableId
@@ -31,7 +33,7 @@ public class TUser {
     private String mobile;
     @TableField(value = "del_flag")
     @ApiModelProperty(value = "0-正常，1-删除")
-    private Boolean  delFlag;
+    private Integer delFlag;
     @TableField(value = "creator")
     @ApiModelProperty(value = "创建人")
     private String creator;
@@ -44,10 +46,10 @@ public class TUser {
     @TableField(value = "updatime")
     @ApiModelProperty(value = "修改时间")
     private LocalDateTime updatime;
-    @TableField(value = "role")
-    @ApiModelProperty(value = "修改时间")
-    private String role;
     @TableField(value = "ip")
     @ApiModelProperty(value = "用户IP")
-    private String ip;
+    private Long ip;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "角色")
+    private List<TRole> roles;
 }

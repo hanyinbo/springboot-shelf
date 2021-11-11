@@ -1,6 +1,9 @@
 package com.aison.authority;
 
+import com.aison.entity.TRole;
 import com.aison.entity.TUser;
+import com.aison.entity.TUserRole;
+import com.aison.service.TRoleService;
 import com.aison.service.TUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * TODO
@@ -26,7 +30,8 @@ import java.util.Set;
 @Component
 public class ManageUserDetailServiceImpl implements UserDetailsService {
 
-    private TUserService tUserService;
+    private final  TUserService tUserService;
+    private final TRoleService tRoleService;
 
     @Override
     public ManageUserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
@@ -36,7 +41,7 @@ public class ManageUserDetailServiceImpl implements UserDetailsService {
         if (ObjectUtils.isEmpty(tUser)) {
             throw new UsernameNotFoundException("用户[" + loginName + "]不存在");
         }
-        if(tUser.getDelFlag()){
+        if(tUser.getDelFlag().intValue()==1){
             throw new UsernameNotFoundException("用户[" + loginName + "]不存在");
         }
         userInfo.setId(tUser.getId());
@@ -44,9 +49,8 @@ public class ManageUserDetailServiceImpl implements UserDetailsService {
         userInfo.setUsername(loginName);
         userInfo.setPassword(tUser.getPassword());
         Set<SimpleGrantedAuthority> authoritiesSet = new HashSet<>();
-//        List<UserRole> userRoles = roleService.findAllByUserId(user.getId());
-//        List<String> roleNames = userRoles.stream().map(UserRole::getRole).collect(Collectors.toList()).stream().map(Role::getRoleName).collect(Collectors.toList());
-          List<String> roleNames =  Arrays.asList("admin");
+        List<TRole> userRoles = tRoleService.findRoleByUserId(tUser.getId());
+        List<String> roleNames = userRoles.stream().map(TRole::getRoleName).collect(Collectors.toList());
         for (String roleName : roleNames) {
             //用户拥有的角色
             SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(roleName);

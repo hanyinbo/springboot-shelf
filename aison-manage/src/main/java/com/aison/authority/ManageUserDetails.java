@@ -23,9 +23,8 @@ public class ManageUserDetails implements UserDetails {
     public Long id;
     private String username;
     private String password;
+    private Long ip;
     private Set<? extends GrantedAuthority> authorities;
-
-
 
     public ManageUserDetails() {
 
@@ -35,7 +34,7 @@ public class ManageUserDetails implements UserDetails {
         this.id = loginUser.getId();
         this.username = loginUser.getUsername();
         this.password = loginUser.getPassword();
-
+        this.ip = loginUser.getIp();
     }
 
     /**

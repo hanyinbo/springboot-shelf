@@ -78,7 +78,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 ManageUserDetails manageUserDetails = JwtTokenUtils.parseTokenBody(token);
                 if (Objects.nonNull(manageUserDetails)) {
                     // 校验IP
-                    if (!StringUtils.equals(ip, manageUserDetails.getIp())) {
+                    if (!StringUtils.equals(ip, manageUserDetails.getIp().toString())) {
                         log.info("用户{}请求IP与Token中IP信息不一致", username);
                         // 加入黑名单
                         JwtTokenUtils.addBlackList(token);

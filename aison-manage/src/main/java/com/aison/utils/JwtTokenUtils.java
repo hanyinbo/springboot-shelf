@@ -76,10 +76,10 @@ public class JwtTokenUtils {
      */
     public static Integer REFRESH_EXPIRATION;
 
-    /**
-     * 权限
-     */
-    public static String ROLE;
+//    /**
+//     * 权限
+//     */
+//    public static String ROLE;
 
     @Value("${jwt.tokenHeader}")
     public void setTokenHeader(String tokenHeader) {
@@ -105,11 +105,11 @@ public class JwtTokenUtils {
     public void setREMEMBEREXPIRATION(Integer REMEMBEREXPIRATION) {
         JwtTokenUtils.REMEMBEREXPIRATION = REMEMBEREXPIRATION;
     }
-
-    @Value("${jwt.role}")
-    public void setROLE(String ROLE) {
-        JwtTokenUtils.ROLE = ROLE;
-    }
+//
+//    @Value("${jwt.role}")
+//    public void setROLE(String ROLE) {
+//        JwtTokenUtils.ROLE = ROLE;
+//    }
 
     @Value("${jwt.refreshExpiraton}")
     public void setRefreshExpiration(Integer refreshExpiraton) {
@@ -123,16 +123,19 @@ public class JwtTokenUtils {
      * @return
      */
     public static String createToken(ManageUserDetails userDTO) {
-        HashMap<Object, Object> map = new HashMap<>();
-        map.put(ROLE, userDTO.getRole());
-        Integer expiration = userDTO.getRemember() ? REMEMBEREXPIRATION : EXPIRATIO;
-        log.info("过期时长:"+expiration);
+//        HashMap<Object, Object> map = new HashMap<>();
+        //map.put(ROLE, userDTO.getRole());
+        Map<String, Object> claims = new HashMap<>();
+        //获取用户名, 使用sub作为key和设置subject是一样的
+        //claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
+        //Integer expiration = userDTO.getRemember() ? REMEMBEREXPIRATION : EXPIRATIO;
+        log.info("过期时长:"+REMEMBEREXPIRATION);
         return Jwts.builder()
                 .setId(userDTO.getId().toString()) //用户ID
                 .signWith(SignatureAlgorithm.HS512, SECRET) //签名算法、密钥
                 .setSubject(userDTO.getUsername())
                 .setIssuedAt(new Date()) //签发时间
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))//过期时间
+                .setExpiration(new Date(System.currentTimeMillis() + REMEMBEREXPIRATION))//过期时间
                 .claim("authorities", JSON.toJSONString(userDTO.getAuthorities()))// 自定义其他属性，如用户组织机构ID，用户所拥有的角色，用户权限信息等
                 .claim("ip", userDTO.getIp())
                 .compact();
@@ -171,7 +174,7 @@ public class JwtTokenUtils {
     public static String refreshAccessToken(String oldToken) {
         String username = JwtTokenUtils.getUserNameByToken(oldToken);
         ManageUserDetails userInfo = (ManageUserDetails) jwtTokenUtils.manageUserDetailService.loadUserByUsername(username);
-        userInfo.setIp(JwtTokenUtils.getIpByToken(oldToken));
+        //userInfo.setIp(JwtTokenUtils.getIpByToken(oldToken));
         return createToken(userInfo);
     }
 
@@ -193,7 +196,7 @@ public class JwtTokenUtils {
             log.info("Long.parseLong(claims.getId())----"+Long.parseLong(claims.getId()));
             detailsDTO.setId(Long.parseLong(claims.getId()));
             detailsDTO.setUsername(claims.getSubject());
-            detailsDTO.setRole("admin");
+            //detailsDTO.setRole("admin");
             // 获取角色
             Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
             String authority = claims.get("authorities").toString();
@@ -208,7 +211,7 @@ public class JwtTokenUtils {
                 }
             }
             detailsDTO.setAuthorities(authorities);
-            detailsDTO.setIp(claims.get("ip").toString());
+            //detailsDTO.setIp(claims.get("ip").toString());
         } catch (Exception e) {
             log.error("解析token失败");
             e.printStackTrace();
