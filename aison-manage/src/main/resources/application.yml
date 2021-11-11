@@ -15,7 +15,7 @@ spring:
   activiti:
     database-schema-update: false #是否每次都更新数据库
     # 自动部署验证设置:true-开启（默认）、false-关闭
-    check-process-definitions: true # activti是否自动部署
+    check-process-definitions: false # activti是否自动部署
     process-definition-location-prefix: classpath:/processes/
     #process-definition-location-suffixes: .bpmn
     history-level: full

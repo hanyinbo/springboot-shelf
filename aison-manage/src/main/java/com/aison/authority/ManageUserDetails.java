@@ -3,11 +3,9 @@ package com.aison.authority;
 import com.aison.entity.TUser;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -25,14 +23,9 @@ public class ManageUserDetails implements UserDetails {
     public Long id;
     private String username;
     private String password;
-    private String ip;
-    private String role;
-    /**
-     * 是否记住密码
-     */
-    private Boolean remember;
-
     private Set<? extends GrantedAuthority> authorities;
+
+
 
     public ManageUserDetails() {
 
@@ -42,9 +35,7 @@ public class ManageUserDetails implements UserDetails {
         this.id = loginUser.getId();
         this.username = loginUser.getUsername();
         this.password = loginUser.getPassword();
-        this.ip=loginUser.getIp();
-        this.role= loginUser.getRole();
-        authorities = Collections.singleton(new SimpleGrantedAuthority(loginUser.getRole()));
+
     }
 
     /**

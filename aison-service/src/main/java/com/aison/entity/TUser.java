@@ -36,7 +36,7 @@ public class TUser {
     @ApiModelProperty(value = "创建人")
     private String creator;
     @TableField(value = "creatime")
-    @ApiModelProperty(value = "密码")
+    @ApiModelProperty(value = "创建时间")
     private LocalDateTime creatime;
     @TableField(value = "updator")
     @ApiModelProperty(value = "修改人")
@@ -45,7 +45,9 @@ public class TUser {
     @ApiModelProperty(value = "修改时间")
     private LocalDateTime updatime;
     @TableField(value = "role")
+    @ApiModelProperty(value = "修改时间")
     private String role;
     @TableField(value = "ip")
+    @ApiModelProperty(value = "用户IP")
     private String ip;
 }
