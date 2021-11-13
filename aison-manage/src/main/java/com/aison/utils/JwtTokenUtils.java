@@ -122,22 +122,21 @@ public class JwtTokenUtils {
      * @param
      * @return
      */
-    public static String createToken(ManageUserDetails userDTO) {
-//        HashMap<Object, Object> map = new HashMap<>();
-        //map.put(ROLE, userDTO.getRole());
-        Map<String, Object> claims = new HashMap<>();
-        //获取用户名, 使用sub作为key和设置subject是一样的
-        //claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
-        //Integer expiration = userDTO.getRemember() ? REMEMBEREXPIRATION : EXPIRATIO;
+    public static String createToken(ManageUserDetails userDetails) {
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+        StringBuffer stringBuffer = new StringBuffer();
+        for (GrantedAuthority authority : authorities) {
+            stringBuffer.append(authority.getAuthority()).append(",");
+        }
         log.info("过期时长:"+REMEMBEREXPIRATION);
         return Jwts.builder()
-                .setId(userDTO.getId().toString()) //用户ID
+                .setId(userDetails.getId().toString()) //用户ID
                 .signWith(SignatureAlgorithm.HS512, SECRET) //签名算法、密钥
-                .setSubject(userDTO.getUsername())
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date()) //签发时间
                 .setExpiration(new Date(System.currentTimeMillis() + REMEMBEREXPIRATION))//过期时间
-                .claim("authorities", JSON.toJSONString(userDTO.getAuthorities()))// 自定义其他属性，如用户组织机构ID，用户所拥有的角色，用户权限信息等
-                .claim("ip", userDTO.getIp())
+                .claim("authorities", stringBuffer)// 自定义其他属性，如用户组织机构ID，用户所拥有的角色，用户权限信息等
+                .claim("ip", userDetails.getIp())
                 .compact();
     }
 
@@ -151,8 +150,7 @@ public class JwtTokenUtils {
     public static void setTokenInfo(String token, String username, String ip) {
         if (StringUtils.isNotEmpty(token)) {
             // 去除JWT前缀
-//            token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
-
+//          token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
             Integer refreshTime = JwtTokenUtils.REFRESH_EXPIRATION;
             LocalDateTime localDateTime = LocalDateTime.now();
             log.info("保存token到redis:" + username + "---username----refreshTime:---" + refreshTime);
@@ -196,7 +194,6 @@ public class JwtTokenUtils {
             log.info("Long.parseLong(claims.getId())----"+Long.parseLong(claims.getId()));
             detailsDTO.setId(Long.parseLong(claims.getId()));
             detailsDTO.setUsername(claims.getSubject());
-            //detailsDTO.setRole("admin");
             // 获取角色
             Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
             String authority = claims.get("authorities").toString();

@@ -37,9 +37,7 @@ public class ManageAuthenticationSuccessHandler implements AuthenticationSuccess
         ManageUserDetails userDTO = (ManageUserDetails)authentication.getPrincipal();
         // 获得请求IP
         String ip = AccessAddressUtils.getIpAddress(request);
-//        userDTO.setIp(ip);
-//        userDTO.setRole("admin");
-//        userDTO.setRemember(false);
+        userDTO.setIp(ip);
         try{
             String token = jwtTokenUtils.createToken(userDTO);
             // 保存Token信息到Redis中

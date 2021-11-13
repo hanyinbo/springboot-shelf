@@ -8,11 +8,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Security配置类
@@ -23,13 +25,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 //@EnableGlobalMethodSecurity(prePostEnabled = true)//只有加了@EnableGlobalMethodSecurity(prePostEnabled=true) 那么在上面使用的 @PreAuthorize(“hasAuthority(‘admin’)”)才会生效
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private ObjectMapper objectMapper;
-
     private ManageAccessDeniedHandler manageAccessDeniedHandler;
 
     private ManageLogoutSuccessHandler manageLogoutSuccessHandler;
 
     private ManageAuthenticationEntryPoint manageAuthenticationEntryPoint;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -47,8 +48,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticated() //必须授权才能访问.
                 .and()
                 .addFilter(new JWTAuthorizationFilter(authenticationManager()))
-                .csrf()
-                .disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -81,6 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         JWTAuthenticationFilter filter = new JWTAuthenticationFilter();
         filter.setAuthenticationSuccessHandler(new ManageAuthenticationSuccessHandler());
         filter.setAuthenticationFailureHandler(new ManageAuthenticationFailureHandler());
+        //filter.setA
         filter.setFilterProcessesUrl("/auth/login");
         //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
         filter.setAuthenticationManager(authenticationManagerBean());

@@ -23,8 +23,16 @@ public class ManageUserDetails implements UserDetails {
     public Long id;
     private String username;
     private String password;
-    private Long ip;
+    private String ip;
     private Set<? extends GrantedAuthority> authorities;
+
+    public Set<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
+    }
 
     public ManageUserDetails() {
 

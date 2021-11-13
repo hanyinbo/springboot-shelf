@@ -57,7 +57,6 @@ public class ManageUserDetailServiceImpl implements UserDetailsService {
             authoritiesSet.add(simpleGrantedAuthority);
         }
         userInfo.setAuthorities(authoritiesSet);
-
         return userInfo;
     }
 }

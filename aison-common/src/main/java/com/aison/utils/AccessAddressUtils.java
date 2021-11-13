@@ -3,6 +3,8 @@ package com.aison.utils;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * TODO
@@ -17,8 +19,10 @@ public class AccessAddressUtils {
      * @param request
      * @return
      */
-    public static String getIpAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
+    public static String getIpAddress(HttpServletRequest request) throws UnknownHostException {
+//        String ip = request.getHeader("x-forwarded-for");
+        InetAddress addr = InetAddress.getLocalHost();
+        String ip = addr.getHostAddress();
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }

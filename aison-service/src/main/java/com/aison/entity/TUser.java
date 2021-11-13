@@ -48,7 +48,7 @@ public class TUser {
     private LocalDateTime updatime;
     @TableField(value = "ip")
     @ApiModelProperty(value = "用户IP")
-    private Long ip;
+    private String ip;
     @TableField(exist = false)
     @ApiModelProperty(value = "角色")
     private List<TRole> roles;
