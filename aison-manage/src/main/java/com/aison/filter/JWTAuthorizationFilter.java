@@ -1,16 +1,22 @@
 package com.aison.filter;
 
 import com.aison.authority.ManageUserDetails;
+import com.aison.service.TUserService;
 import com.aison.utils.AccessAddressUtils;
 import com.aison.utils.JwtTokenUtils;
 import com.aison.utils.ResponseUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -26,14 +32,17 @@ import java.util.Objects;
  * @author hyb
  * @date 2021/9/23 10:18
  */
+@Component
 @Slf4j
-public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
+public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     @Autowired
     public JwtTokenUtils jwtTokenUtils;
 
-    public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
-        super(authenticationManager);
+    private UserDetailsService userDetailsService;
+
+    public JWTAuthorizationFilter(@Qualifier("userDetailService") UserDetailsService userDetailsService) {
+        this.userDetailsService=userDetailsService;
     }
 
     @Override
@@ -85,8 +94,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                         ResponseUtils.responseJson(response, ResponseUtils.response(505, "Token已过期", "可能存在IP伪造风险"));
                         return;
                     }
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            manageUserDetails, manageUserDetails.getId(), manageUserDetails.getAuthorities());
+
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(
+                            manageUserDetails,token, manageUserDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }

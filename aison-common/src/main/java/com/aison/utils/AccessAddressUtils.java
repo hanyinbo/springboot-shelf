@@ -20,7 +20,6 @@ public class AccessAddressUtils {
      * @return
      */
     public static String getIpAddress(HttpServletRequest request) throws UnknownHostException {
-//        String ip = request.getHeader("x-forwarded-for");
         InetAddress addr = InetAddress.getLocalHost();
         String ip = addr.getHostAddress();
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {

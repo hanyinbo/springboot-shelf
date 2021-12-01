@@ -43,3 +43,7 @@ jwt:
 pwd:
   aesKey: a5h*jos&fj18oico
 
+default:
+  redis:
+    key: aison
+

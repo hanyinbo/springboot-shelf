@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @date 2021/9/18 11:21
  */
 @AllArgsConstructor
-@Component
+@Component("userDetailService")
 public class ManageUserDetailServiceImpl implements UserDetailsService {
 
     private final  TUserService tUserService;

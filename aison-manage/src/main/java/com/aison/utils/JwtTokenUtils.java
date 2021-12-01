@@ -105,11 +105,6 @@ public class JwtTokenUtils {
     public void setREMEMBEREXPIRATION(Integer REMEMBEREXPIRATION) {
         JwtTokenUtils.REMEMBEREXPIRATION = REMEMBEREXPIRATION;
     }
-//
-//    @Value("${jwt.role}")
-//    public void setROLE(String ROLE) {
-//        JwtTokenUtils.ROLE = ROLE;
-//    }
 
     @Value("${jwt.refreshExpiraton}")
     public void setRefreshExpiration(Integer refreshExpiraton) {
@@ -365,7 +360,9 @@ public class JwtTokenUtils {
      */
     public static void deleteRedisToken(String token) {
         if (StringUtils.isNotEmpty(token)) {
-            // 去除JWT前缀
+            //
+
+
             token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
             RedisUtils.deleteKey(token);
         }
