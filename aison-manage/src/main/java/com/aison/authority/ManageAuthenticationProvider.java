@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 /**
  * TODO
  * 登录验证类
+ *
  * @author hyb
  * @date 2021/9/18 15:19
  */
@@ -26,19 +27,20 @@ public class ManageAuthenticationProvider implements AuthenticationProvider {
     private ManageUserDetailServiceImpl manageUserDetailService;
 
     @Override
-    public  Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         //表单输入的用户名
         String loginName = (String) authentication.getPrincipal();
         //表单输入的密码
         String password = (String) authentication.getCredentials();
         ManageUserDetails userInfo = manageUserDetailService.loadUserByUsername(loginName);
-        log.info("ManageAuthenticationProvider监听密码："+password +"   数据库密码:"+userInfo.getPassword());
+        log.info("ManageAuthenticationProvider监听密码：" + password + "   数据库密码:" + userInfo.getPassword());
         String aesPwd = PasswordAESUtil.decryptedDES(password);
-        log.info("前端登录密码解密后："+aesPwd);
+        log.info("前端登录密码解密后：" + aesPwd);
         boolean matches = new BCryptPasswordEncoder().matches(aesPwd, userInfo.getPassword());
         if (!matches) {
             throw new LoginFailException(Msg.TEXT_LOGIN_FAIL);
         }
+        System.out.println("权限："+userInfo.getAuthorities());
         return new UsernamePasswordAuthenticationToken(userInfo, userInfo.getPassword(), userInfo.getAuthorities());
     }
 
@@ -50,7 +52,7 @@ public class ManageAuthenticationProvider implements AuthenticationProvider {
     public static void main(String[] args) {
 
         String password = new BCryptPasswordEncoder().encode("123");
-        log.info("密码长度："+password.length());
-        log.info("加密密码"+password);
+        log.info("密码长度：" + password.length());
+        log.info("加密密码" + password);
     }
 }
