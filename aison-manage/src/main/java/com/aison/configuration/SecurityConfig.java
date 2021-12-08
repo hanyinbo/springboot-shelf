@@ -47,11 +47,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private ManageAccessDecisionManager manageAccessDecisionManager;
 
-    private RedisService redisService;
-
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.exceptionHandling().accessDeniedHandler(manageAccessDeniedHandler);
+        http.antMatcher("/**").authorizeRequests().anyRequest().authenticated()
+                .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+                    @Override
+                    public <O extends FilterSecurityInterceptor> O postProcess(O o){
+                       // o.setSecurityMetadataSource(fi);
+                        o.setAccessDecisionManager(manageAccessDecisionManager);
+                        return o;
+                    }
+                });
         http
                 .formLogin()
                 .permitAll()
@@ -69,18 +76,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers( "/swagger-resources", "/swagger-ui.html/**")
                 .permitAll()
-                //其他全部拦截
-                .anyRequest().authenticated()
-        .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
-            @Override
-            public <O extends FilterSecurityInterceptor> O postProcess(O o) {
-                //动态获取url权限配置
-//                o.setSecurityMetadataSource(filterInvocationSecurityMetadataSource);
-                //权限判断
-                o.setAccessDecisionManager(manageAccessDecisionManager);
-                return o;
-            }
-        })
+//                //其他全部拦截
+//                .anyRequest().authenticated().accessDecisionManager(manageAccessDecisionManager)
                 //无权访问异常处理器
                 .and().exceptionHandling().accessDeniedHandler(manageAccessDeniedHandler)
                 //用户未登录处理
@@ -101,7 +98,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public JWTAuthenticationFilter jWTAuthenticationFilter() throws Exception {
-        JWTAuthenticationFilter filter = new JWTAuthenticationFilter(redisService);
+        JWTAuthenticationFilter filter = new JWTAuthenticationFilter();
         filter.setAuthenticationSuccessHandler(manageAuthenticationSuccessHandler);
         filter.setAuthenticationFailureHandler(manageAuthenticationFailureHandler);
         filter.setFilterProcessesUrl("/auth/login");

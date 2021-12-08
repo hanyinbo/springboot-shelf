@@ -1,6 +1,8 @@
 package com.aison.filter;
 
+import com.aison.entity.TUser;
 import com.aison.service.RedisService;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -8,6 +10,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 
 /**
  * TODO
@@ -18,11 +21,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final RedisService redisService;
-
-    public JWTAuthenticationFilter(RedisService redisService) {
-        this.redisService = redisService;
-    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {

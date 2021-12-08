@@ -39,12 +39,6 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     @Autowired
     public JwtTokenUtils jwtTokenUtils;
 
-    private UserDetailsService userDetailsService;
-
-    public JWTAuthorizationFilter(@Qualifier("userDetailService") UserDetailsService userDetailsService) {
-        this.userDetailsService=userDetailsService;
-    }
-
     @Override
     public void doFilterInternal(HttpServletRequest request,
                                  HttpServletResponse response,

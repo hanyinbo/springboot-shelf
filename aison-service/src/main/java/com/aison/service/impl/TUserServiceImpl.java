@@ -34,7 +34,6 @@ public class TUserServiceImpl extends ServiceImpl<TUserMapper, TUser> implements
             wrapper.eq(TUser::getUsername,username).eq(TUser::getDelFlag,false);
         }
         TUser tu  = tUserMapper.selectOne(wrapper);
-//        log.info(tu.getUsername()+"密码："+tu.getPassword());
         return tUserMapper.selectOne(wrapper);
     }
 }

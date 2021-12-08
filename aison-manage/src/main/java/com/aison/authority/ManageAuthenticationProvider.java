@@ -25,7 +25,6 @@ public class ManageAuthenticationProvider implements AuthenticationProvider {
 
     private ManageUserDetailServiceImpl manageUserDetailService;
 
-    private PasswordAESUtil passwordAESUtil;
     @Override
     public  Authentication authenticate(Authentication authentication) throws AuthenticationException {
         //表单输入的用户名
