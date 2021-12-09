@@ -1,20 +1,15 @@
 package com.aison.filter;
 
 import com.aison.authority.ManageUserDetails;
-import com.aison.service.TUserService;
 import com.aison.utils.AccessAddressUtils;
 import com.aison.utils.JwtTokenUtils;
 import com.aison.utils.ResponseUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -44,6 +39,11 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                                  HttpServletResponse response,
                                  FilterChain chain) throws IOException, ServletException {
         String token = request.getHeader(JwtTokenUtils.TOKEN_HEADER);
+        if (StringUtils.isEmpty(token) || !token.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         if (token != null && token.startsWith(JwtTokenUtils.TOKEN_PREFIX)) {
             // 是否在黑名单中
             if (JwtTokenUtils.isBlackList(token)) {
@@ -88,7 +88,6 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                         ResponseUtils.responseJson(response, ResponseUtils.response(505, "Token已过期", "可能存在IP伪造风险"));
                         return;
                     }
-
                     Authentication authentication = new UsernamePasswordAuthenticationToken(
                             manageUserDetails,token, manageUserDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);

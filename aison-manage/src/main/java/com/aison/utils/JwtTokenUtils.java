@@ -108,7 +108,7 @@ public class JwtTokenUtils {
 
     @Value("${jwt.refreshExpiraton}")
     public void setRefreshExpiration(Integer refreshExpiraton) {
-        JwtTokenUtils.REFRESH_EXPIRATION = refreshExpiraton * 24 * 60 * 60 * 1000;
+        JwtTokenUtils.REFRESH_EXPIRATION = refreshExpiraton * 24 * 60 * 60 ;
     }
 
     /**

@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,12 +27,21 @@ public class ManageAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication authentication, Object o, Collection<ConfigAttribute> collection) throws AccessDeniedException, InsufficientAuthenticationException {
         log.debug("当前用户所用有的角色 = {} ", collection);
-        // 当前用户所具有的权限
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         for (ConfigAttribute configAttribute : collection) {
             // 当前请求需要的权限
             String needRole = configAttribute.getAttribute();
+            if ("role_login".equals(needRole)) {
+                if (authentication instanceof AnonymousAuthenticationToken) {
+                    throw new BadCredentialsException("未登录!");
+                } else {
+                    throw new AccessDeniedException("未授权该url！");
+                }
+            }
+            // 当前用户所具有的权限
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
             log.debug("当前资源所需权限={}", authorities);
+
             for (GrantedAuthority grantedAuthority : authorities) {
                 if (grantedAuthority.getAuthority().equals(needRole)) {
                     return;
