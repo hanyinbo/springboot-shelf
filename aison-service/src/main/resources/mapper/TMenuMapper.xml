@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aison.mapper.TMenuMapper">
+
+    <!-- 根据roleId查询菜单 -->
+    <select id="getListMenuByRoleId" resultMap="BaseResultMap">
+       select a.menu_id  ,a.menu_name ,a.parent_id ,a.path,a.icon,a.sort,a.type ,b.role_id
+        from t_menu a left join t_role_menu b on a.menu_id=b.menu_id
+        <where>
+            del_flag=0
+            <if test="roleId != null">
+              and b.role_id= #{role_id}
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="BaseResultMap" type="com.aison.vo.TMenuRoleVO">
+        <result property="roleId" column="role_id"></result>
+        <result property="menuId" column="menu_id"></result>
+        <result property="menuName" column="menu_name"></result>
+        <result property="parentId" column="parent_id"></result>
+        <result property="path" column="path"></result>
+        <result property="icon" column="icon"></result>
+        <result property="sort" column="sort"></result>
+        <result property="type" column="type"></result>
+    </resultMap>
+
+</mapper>

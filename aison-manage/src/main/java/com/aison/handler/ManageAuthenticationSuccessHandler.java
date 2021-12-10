@@ -34,6 +34,7 @@ public class ManageAuthenticationSuccessHandler implements AuthenticationSuccess
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.debug("登录成功");
+        System.out.println(authentication.getPrincipal());
         ManageUserDetails userDTO = (ManageUserDetails)authentication.getPrincipal();
         // 获得请求IP
         String ip = AccessAddressUtils.getIpAddress(request);

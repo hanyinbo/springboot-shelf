@@ -1,37 +1,40 @@
 package com.aison.entity;
 
-import com.aison.common.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
-/**
- * TODO
- *
- * @author hyb
- * @date 2021/9/18 10:35
- */
-@TableName(value = "t_role")
+@TableName(value = "t_menu")
 @Data
-@ApiModel(value="角色表",description="系统角色表")
-@EqualsAndHashCode(callSuper = true)
-public class TRole extends BaseEntity {
-    @TableField(value = "role_id")
+@ApiModel(value="菜单表",description="系统菜单表")
+public class TMenu {
+    @TableField(value = "menu_id")
     @TableId
-    @ApiModelProperty(value = "角色表主键")
-    private Long roleId;
-    @TableField(value = "role_name")
-    @ApiModelProperty(value = "角色名称")
-    private String roleName;
-    @TableField(value = "role_code")
-    @ApiModelProperty(value = "角色编码")
-    private String roleCode;
+    @ApiModelProperty(value = "菜单表主键")
+    private Long menuId;
+    @TableField(value = "menu_name")
+    @ApiModelProperty(value = "菜单名称")
+    private String menuName;
+    @TableField(value = "sort")
+    @ApiModelProperty(value = "排序")
+    private Integer sort;
+    @TableField(value = "type")
+    @ApiModelProperty(value = "类型 0：菜单  1：按钮")
+    private String type;
+    @TableField(value = "parent_id")
+    @ApiModelProperty(value = "父项ID")
+    private Long parentId;
+    @TableField(value = "path")
+    @ApiModelProperty(value = "路径")
+    private String path;
+    @TableField(value = "icon")
+    @ApiModelProperty(value = "图标")
+    private Long icon;
     @TableField(value = "del_flag")
     @ApiModelProperty(value = "0-正常，1-删除")
     private Integer  delFlag;
@@ -47,4 +50,5 @@ public class TRole extends BaseEntity {
     @TableField(value = "updatime")
     @ApiModelProperty(value = "修改时间")
     private LocalDateTime updatime;
+
 }

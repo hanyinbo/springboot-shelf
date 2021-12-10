@@ -98,7 +98,7 @@ public class JwtTokenUtils {
 
     @Value("${jwt.expiration}")
     public void setEXPIRATIO(Integer EXPIRATIO) {
-        JwtTokenUtils.EXPIRATIO = EXPIRATIO * 1000;
+        JwtTokenUtils.EXPIRATIO = EXPIRATIO * 10000;
     }
 
     @Value("${jwt.remembeExpiraton}")
@@ -108,7 +108,7 @@ public class JwtTokenUtils {
 
     @Value("${jwt.refreshExpiraton}")
     public void setRefreshExpiration(Integer refreshExpiraton) {
-        JwtTokenUtils.REFRESH_EXPIRATION = refreshExpiraton * 24 * 60 * 60 ;
+        JwtTokenUtils.REFRESH_EXPIRATION = refreshExpiraton * 24 * 60 * 60* 1000 ;
     }
 
     /**
@@ -118,19 +118,19 @@ public class JwtTokenUtils {
      * @return
      */
     public static String createToken(ManageUserDetails userDetails) {
-        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-        StringBuffer stringBuffer = new StringBuffer();
-        for (GrantedAuthority authority : authorities) {
-            stringBuffer.append(authority.getAuthority()).append(",");
-        }
-        log.info("过期时长:"+REMEMBEREXPIRATION);
+//        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+////        StringBuffer stringBuffer = new StringBuffer();
+////        for (GrantedAuthority authority : authorities) {
+////            stringBuffer.append(authority.getAuthority()).append(",");
+////        }
+//        log.info("过期时长:"+REMEMBEREXPIRATION);
         return Jwts.builder()
                 .setId(userDetails.getId().toString()) //用户ID
                 .signWith(SignatureAlgorithm.HS512, SECRET) //签名算法、密钥
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date()) //签发时间
-                .setExpiration(new Date(System.currentTimeMillis() + REMEMBEREXPIRATION))//过期时间
-                .claim("authorities", stringBuffer)// 自定义其他属性，如用户组织机构ID，用户所拥有的角色，用户权限信息等
+                .setExpiration(new Date(System.currentTimeMillis() + REMEMBEREXPIRATION * 1000))//过期时间
+                .claim("authorities", userDetails.getAuthorities())// 自定义其他属性，如用户组织机构ID，用户所拥有的角色，用户权限信息等
                 .claim("ip", userDetails.getIp())
                 .compact();
     }
@@ -167,7 +167,7 @@ public class JwtTokenUtils {
     public static String refreshAccessToken(String oldToken) {
         String username = JwtTokenUtils.getUserNameByToken(oldToken);
         ManageUserDetails userInfo = (ManageUserDetails) jwtTokenUtils.manageUserDetailService.loadUserByUsername(username);
-        //userInfo.setIp(JwtTokenUtils.getIpByToken(oldToken));
+        userInfo.setIp(JwtTokenUtils.getIpByToken(oldToken));
         return createToken(userInfo);
     }
 

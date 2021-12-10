@@ -12,8 +12,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-
 /**
  * TODO
  * 登录验证类
@@ -42,11 +40,6 @@ public class ManageAuthenticationProvider implements AuthenticationProvider {
         if (!matches) {
             throw new LoginFailException(Msg.TEXT_LOGIN_FAIL);
         }
-        System.out.println("权限："+userInfo.getAuthorities().size());
-        if(userInfo.getAuthorities().size()==0){
-            return new UsernamePasswordAuthenticationToken(userInfo,null,new ArrayList<>());
-        }
-        System.out.println("权限："+userInfo.getAuthorities());
         return new UsernamePasswordAuthenticationToken(userInfo, userInfo.getPassword(), userInfo.getAuthorities());
     }
 
