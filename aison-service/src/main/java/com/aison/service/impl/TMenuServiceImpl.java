@@ -20,4 +20,9 @@ public class TMenuServiceImpl extends ServiceImpl<TMenuMapper, TMenu> implements
     public List<TMenuRoleVO> getListMenuByRoleId(Long roleId) {
         return baseMapper.getListMenuByRoleId(roleId);
     }
+
+    @Override
+    public List<String> findAllRoleNameByPath(String path) {
+        return baseMapper.findAllRoleNameByPath(path);
+    }
 }

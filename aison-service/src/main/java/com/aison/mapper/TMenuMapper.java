@@ -13,4 +13,6 @@ import java.util.List;
 @Mapper
 public interface TMenuMapper extends BaseMapper<TMenu> {
     List<TMenuRoleVO> getListMenuByRoleId(Long roleId);
+
+    List<String> findAllRoleNameByPath(String path);
 }

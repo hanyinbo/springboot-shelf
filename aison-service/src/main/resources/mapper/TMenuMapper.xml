@@ -26,4 +26,15 @@
         <result property="type" column="type"></result>
     </resultMap>
 
+    <!-- 根据path查询菜单 -->
+    <select id="findAllRoleNameByPath" resultMap="java.lang.String">
+        select distinct b.role_id
+        from t_menu a left join t_role_menu b on a.menu_id=b.menu_id
+        <where>
+            del_flag=0
+            <if test="path != null">
+                and a.path= #{path}
+            </if>
+        </where>
+    </select>
 </mapper>

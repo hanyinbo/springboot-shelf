@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface TMenuService extends IService<TMenu> {
     List<TMenuRoleVO> getListMenuByRoleId(Long roleId);
+
+    List<String> findAllRoleNameByPath(String path);
 }

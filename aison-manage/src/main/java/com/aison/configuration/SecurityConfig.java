@@ -2,6 +2,7 @@ package com.aison.configuration;
 
 import com.aison.authority.ManageAccessDecisionManager;
 import com.aison.authority.ManageAuthenticationProvider;
+import com.aison.authority.ManageFilterInvocationSecurityMetadataSource;
 import com.aison.filter.JWTAuthenticationFilter;
 import com.aison.filter.JWTLoginFilter;
 import com.aison.handler.*;
@@ -27,6 +28,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 //@EnableGlobalMethodSecurity(prePostEnabled = true)
 // 只有加了@EnableGlobalMethodSecurity(prePostEnabled=true) 那么在上面使用的 @PreAuthorize(“hasAuthority(‘admin’)”)才会生效
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private ManageFilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
     private ManageAuthenticationProvider mallAuthenticationProvider;
 
     private ManageAccessDeniedHandler manageAccessDeniedHandler;
@@ -61,7 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     @Override
                     public <O extends FilterSecurityInterceptor> O postProcess(O o) {
                         //动态获取url权限配置
-//                o.setSecurityMetadataSource(filterInvocationSecurityMetadataSource);
+                        o.setSecurityMetadataSource(filterInvocationSecurityMetadataSource);
                         //权限判断
                         o.setAccessDecisionManager(manageAccessDecisionManager);
                         return o;
