@@ -2,7 +2,6 @@ package com.aison.authority;
 
 import com.aison.entity.TRole;
 import com.aison.entity.TUser;
-import com.aison.entity.TUserRole;
 import com.aison.service.TRoleService;
 import com.aison.service.TUserService;
 import lombok.AllArgsConstructor;
@@ -10,9 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,12 +35,12 @@ public class ManageUserDetailServiceImpl implements UserDetailsService {
         ManageUserDetails userInfo = new ManageUserDetails();
 
         TUser tUser = tUserService.findUserByUserName(loginName);
-        if (ObjectUtils.isEmpty(tUser)) {
-            throw new UsernameNotFoundException("用户[" + loginName + "]不存在");
-        }
-        if(tUser.getDelFlag().intValue()==1){
-            throw new UsernameNotFoundException("用户[" + loginName + "]不存在");
-        }
+//        if (ObjectUtils.isEmpty(tUser)) {
+//            throw new UsernameNotFoundException("用户[" + loginName + "]不存在");
+//        }
+//        if(tUser.getDelFlag().intValue()==1){
+//            throw new UsernameNotFoundException("用户[" + loginName + "]不存在");
+//        }
         userInfo.setId(tUser.getId());
         //登录用户名
         userInfo.setUsername(loginName);

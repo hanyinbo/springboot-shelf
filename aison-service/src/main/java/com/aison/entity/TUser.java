@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.management.relation.Role;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class TUser {
     private String mobile;
     @TableField(value = "del_flag")
     @ApiModelProperty(value = "0-正常，1-删除")
-    private Integer delFlag;
+    private Boolean delFlag;
     @TableField(value = "creator")
     @ApiModelProperty(value = "创建人")
     private String creator;

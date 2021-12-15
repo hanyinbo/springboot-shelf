@@ -50,14 +50,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // 无权访问异常处理
-        http.exceptionHandling().authenticationEntryPoint(manageAuthenticationEntryPoint).accessDeniedHandler(manageAccessDeniedHandler);
-        http.formLogin()
+        http.exceptionHandling().authenticationEntryPoint(manageAuthenticationEntryPoint)
+                .accessDeniedHandler(manageAccessDeniedHandler);
+        http.formLogin().loginProcessingUrl("/auth/login")
                 .and().logout().logoutUrl("logout")
                 .logoutSuccessHandler(manageLogoutSuccessHandler).permitAll()
                 .and().cors()
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().authorizeRequests().antMatchers("/swagger-resources", "/swagger-ui.html/**", "/login").permitAll()
+                .and().authorizeRequests().antMatchers("/swagger-resources", "/swagger-ui.html/**").permitAll()
 //                //其他全部拦截
                 .anyRequest().authenticated()
                 .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {

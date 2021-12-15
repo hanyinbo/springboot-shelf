@@ -33,7 +33,6 @@ public class TUserServiceImpl extends ServiceImpl<TUserMapper, TUser> implements
         if (StringUtils.isNotEmpty(username)) {
             wrapper.eq(TUser::getUsername,username).eq(TUser::getDelFlag,false);
         }
-        TUser tu  = tUserMapper.selectOne(wrapper);
         return tUserMapper.selectOne(wrapper);
     }
 }

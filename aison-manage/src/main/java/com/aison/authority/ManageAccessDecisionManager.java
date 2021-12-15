@@ -24,22 +24,12 @@ import java.util.Collection;
 public class ManageAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication authentication, Object o, Collection<ConfigAttribute> collection) throws AccessDeniedException, InsufficientAuthenticationException {
-        log.debug("当前用户所用有的角色 = {} ", collection);
+            log.info("当前用户所用有的角色 = {} ", collection);
         for (ConfigAttribute configAttribute : collection) {
             // 当前请求需要的权限
             String needRole = configAttribute.getAttribute();
-//            if ("role_login".equals(needRole)) {
-//                if (authentication instanceof AnonymousAuthenticationToken) {
-//                    throw new BadCredentialsException("未登录!");
-//                } else {
-//                    throw new AccessDeniedException("未授权该url！");
-//                }
-//            }
             // 当前用户所具有的权限
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-
-            log.debug("当前资源所需权限={}", authorities);
-
             for (GrantedAuthority grantedAuthority : authorities) {
                 if (grantedAuthority.getAuthority().equals(needRole)) {
                     return;

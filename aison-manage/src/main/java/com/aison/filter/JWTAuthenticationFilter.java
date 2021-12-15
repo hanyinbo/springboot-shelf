@@ -39,13 +39,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                                  HttpServletResponse response,
                                  FilterChain chain) throws IOException, ServletException {
         String token = request.getHeader(JwtTokenUtils.TOKEN_HEADER);
-//        if (StringUtils.isEmpty(token) || !token.startsWith("Bearer ")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
+        if (StringUtils.isEmpty(token) || !token.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
+        }
 //        String authToken = httpServletRequest.getHeader(jwtProperties.getHeader());
 //        String stuId = jwtTokenUtils.getUsernameFromToken(authToken);
-        SecurityContextHolder.getContext().getAuthentication();
         if (token != null && token.startsWith(JwtTokenUtils.TOKEN_PREFIX)) {
             // 是否在黑名单中
             if (JwtTokenUtils.isBlackList(token)) {
@@ -96,6 +95,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         }
-        chain.doFilter(request, response);
+        super.doFilter(request, response,chain);
     }
 }
