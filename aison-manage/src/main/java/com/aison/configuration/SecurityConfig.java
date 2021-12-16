@@ -58,9 +58,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().cors()
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
                 .and().authorizeRequests().antMatchers("/swagger-resources", "/swagger-ui.html/**").permitAll()
-//                //其他全部拦截
-                .anyRequest().authenticated()
+                //                //其他全部拦截
+                .and().authorizeRequests().anyRequest().authenticated()
+
                 .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
                     @Override
                     public <O extends FilterSecurityInterceptor> O postProcess(O o) {
