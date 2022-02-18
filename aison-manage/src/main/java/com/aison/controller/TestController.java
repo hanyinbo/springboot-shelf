@@ -1,6 +1,5 @@
 package com.aison.controller;
 
-import com.aison.authority.ManageUserDetailServiceImpl;
 import com.aison.dto.MInfoDto;
 import com.aison.dto.MInfoUnionQuery;
 import com.aison.entity.MInfo;
@@ -29,8 +28,6 @@ import java.util.List;
 @Slf4j
 public class TestController {
 
-    private JwtTokenUtils jwtTokenUtils;
-
     private MInfoService mInfoService;
 
     private MInfoServices mInfoServices;
@@ -38,8 +35,6 @@ public class TestController {
     private MInfoMapper mInfoMapper;
 
     private TUserServiceImpl tUserServiceImpl;
-
-    private ManageUserDetailServiceImpl  manageUserDetailService;
 
     @ApiOperation("测试项目搭建启动")
     @GetMapping(value = "test1")

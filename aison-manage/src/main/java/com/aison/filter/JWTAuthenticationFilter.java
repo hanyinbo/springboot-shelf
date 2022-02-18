@@ -1,9 +1,11 @@
 package com.aison.filter;
 
 import com.aison.authority.ManageUserDetails;
+import com.aison.common.Msg;
 import com.aison.utils.AccessAddressUtils;
 import com.aison.utils.JwtTokenUtils;
 import com.aison.utils.ResponseUtils;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +45,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-//        String authToken = httpServletRequest.getHeader(jwtProperties.getHeader());
-//        String stuId = jwtTokenUtils.getUsernameFromToken(authToken);
+
         if (token != null && token.startsWith(JwtTokenUtils.TOKEN_PREFIX)) {
             // 是否在黑名单中
             if (JwtTokenUtils.isBlackList(token)) {
@@ -82,7 +83,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 ManageUserDetails manageUserDetails = JwtTokenUtils.parseTokenBody(token);
                 if (Objects.nonNull(manageUserDetails)) {
                     // 校验IP
-                    if (!StringUtils.equals(ip, manageUserDetails.getIp().toString())) {
+                    if (!StringUtils.equals(ip, manageUserDetails.getIp())) {
                         log.info("用户{}请求IP与Token中IP信息不一致", username);
                         // 加入黑名单
                         JwtTokenUtils.addBlackList(token);
@@ -94,7 +95,15 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
+            super.doFilter(request, response,chain);
         }
-        super.doFilter(request, response,chain);
+
+
+        response.reset();
+        //设置编码格式
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(JSONObject.toJSONString(430, Integer.parseInt(Msg.TEXT_TOKEN_INVALID_FAIL)));
     }
+
 }

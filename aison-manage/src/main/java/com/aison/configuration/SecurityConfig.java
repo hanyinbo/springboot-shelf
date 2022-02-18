@@ -49,10 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // 无权访问异常处理
-        http.exceptionHandling().authenticationEntryPoint(manageAuthenticationEntryPoint)
-                .accessDeniedHandler(manageAccessDeniedHandler);
-        http.formLogin().loginProcessingUrl("/auth/login")
+
+        http.formLogin().permitAll()
                 .and().logout().logoutUrl("logout")
                 .logoutSuccessHandler(manageLogoutSuccessHandler).permitAll()
                 .and().cors()
@@ -62,7 +60,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().authorizeRequests().antMatchers("/swagger-resources", "/swagger-ui.html/**").permitAll()
                 //                //其他全部拦截
                 .and().authorizeRequests().anyRequest().authenticated()
-
                 .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
                     @Override
                     public <O extends FilterSecurityInterceptor> O postProcess(O o) {
@@ -72,13 +69,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         o.setAccessDecisionManager(manageAccessDecisionManager);
                         return o;
                     }
-                });
+                })
+                // 无权访问异常处理
+                .and().exceptionHandling().authenticationEntryPoint(manageAuthenticationEntryPoint)
+                .accessDeniedHandler(manageAccessDeniedHandler);;
         // 禁用缓存
         http.headers().cacheControl();
+        //        // 添加JWT filter
+        http.addFilterBefore(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class);
         //添加登录 filter
         http.addFilterAt(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-//        // 添加JWT filter
-        http.addFilterBefore(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class);
+
     }
 
     @Bean
@@ -91,4 +92,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         filter.setAuthenticationManager(authenticationManagerBean());
         return filter;
     }
+
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+////        auth.inMemoryAuthentication().
+////                withUser("msj").password(passwordEncoder().encode("msj")).roles("student");
+//        auth.userDetailsService(userService);
+//    }
 }

@@ -14,7 +14,7 @@ import java.util.Collection;
 /**
  * 角色控制类
  *
- * @author Zhenfeng Li
+ * @author hyb
  * @version 1.0.0
  * @date 2019-11-01 15:13:01
  */
