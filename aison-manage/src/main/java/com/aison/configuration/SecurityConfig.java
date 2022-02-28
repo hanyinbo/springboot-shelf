@@ -75,13 +75,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(manageAccessDeniedHandler);;
         // 禁用缓存
         http.headers().cacheControl();
-        //        // 添加JWT filter
-        http.addFilterBefore(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class);
-        //添加登录 filter
-        http.addFilterAt(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+       // 添加JWT filter
+        //将token验证添加在密码验证前面
+        http.addFilterBefore(getJwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtLoginFilter(), JWTAuthenticationFilter.class);
+
 
     }
-
+    @Bean
+    public JWTAuthenticationFilter getJwtAuthenticationTokenFilter() throws Exception {
+        return new JWTAuthenticationFilter();
+    }
     @Bean
     public JWTLoginFilter jwtLoginFilter() throws Exception {
         JWTLoginFilter filter = new JWTLoginFilter();

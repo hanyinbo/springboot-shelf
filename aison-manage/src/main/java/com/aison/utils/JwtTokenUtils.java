@@ -98,7 +98,7 @@ public class JwtTokenUtils {
 
     @Value("${jwt.expiration}")
     public void setEXPIRATIO(Integer EXPIRATIO) {
-        JwtTokenUtils.EXPIRATIO = EXPIRATIO * 10000;
+        JwtTokenUtils.EXPIRATIO = EXPIRATIO * 1000;
     }
 
     @Value("${jwt.remembeExpiraton}")
@@ -108,7 +108,7 @@ public class JwtTokenUtils {
 
     @Value("${jwt.refreshExpiraton}")
     public void setRefreshExpiration(Integer refreshExpiraton) {
-        JwtTokenUtils.REFRESH_EXPIRATION = refreshExpiraton * 24 * 60 * 60* 1000 ;
+        JwtTokenUtils.REFRESH_EXPIRATION = refreshExpiraton * 24 * 60 * 60* 100 ;
     }
 
     /**
@@ -118,12 +118,6 @@ public class JwtTokenUtils {
      * @return
      */
     public static String createToken(ManageUserDetails userDetails) {
-//        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-////        StringBuffer stringBuffer = new StringBuffer();
-////        for (GrantedAuthority authority : authorities) {
-////            stringBuffer.append(authority.getAuthority()).append(",");
-////        }
-//        log.info("过期时长:"+REMEMBEREXPIRATION);
         return Jwts.builder()
                 .setId(userDetails.getId().toString()) //用户ID
                 .signWith(SignatureAlgorithm.HS512, SECRET) //签名算法、密钥
@@ -203,7 +197,6 @@ public class JwtTokenUtils {
                 }
             }
             detailsDTO.setAuthorities(authorities);
-            //detailsDTO.setIp(claims.get("ip").toString());
         } catch (Exception e) {
             log.error("解析token失败");
             e.printStackTrace();
@@ -211,30 +204,30 @@ public class JwtTokenUtils {
         return detailsDTO;
     }
 
-    /**
-     * 是否过期
-     *
-     * @param expiration 过期时间，字符串
-     * @return 过期返回True，未过期返回false
-     */
-    public static boolean isExpiration(String expiration) {
-        LocalDateTime expirationTime = LocalDateTime.parse(expiration, df);
-        LocalDateTime localDateTime = LocalDateTime.now();
-        if (localDateTime.compareTo(expirationTime) > 0) {
-            return true;
-        }
-        return false;
-    }
-    //是否已过期
-//    public static boolean isExpiration(String token) {
-//        try {
-//            return parseTokenBody(token).get().before(new Date());
-//        } catch (Exception e) {
-//            log.info("校验报错");
-//            e.printStackTrace();
+//    /**
+//     * 是否过期
+//     *
+//     * @param expiration 过期时间，字符串
+//     * @return 过期返回True，未过期返回false
+//     */
+//    public static boolean isExpiration(String expiration) {
+//        LocalDateTime expirationTime = LocalDateTime.parse(expiration, df);
+//        LocalDateTime localDateTime = LocalDateTime.now();
+//        if (localDateTime.compareTo(expirationTime) > 0) {
+//            return true;
 //        }
-//        return true;
+//        return false;
 //    }
+    //是否已过期
+    public static boolean isExpiration(String token) {
+        try {
+            return getTokenBody(token).getExpiration().before(new Date());
+        } catch (Exception e) {
+            log.info("校验报错");
+            e.printStackTrace();
+        }
+        return true;
+    }
 
     /**
      * 是否有效
@@ -360,12 +353,15 @@ public class JwtTokenUtils {
      */
     public static void deleteRedisToken(String token) {
         if (StringUtils.isNotEmpty(token)) {
-            //
-
-
             token = token.substring(JwtTokenUtils.TOKEN_PREFIX.length());
             RedisUtils.deleteKey(token);
         }
     }
 
+    private static Claims getTokenBody(String token) {
+        return Jwts.parser()
+                .setSigningKey(JwtTokenUtils.SECRET)
+                .parseClaimsJws(token)
+                .getBody();
+    }
 }
