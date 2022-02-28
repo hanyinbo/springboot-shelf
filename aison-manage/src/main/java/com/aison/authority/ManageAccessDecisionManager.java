@@ -24,7 +24,7 @@ import java.util.Collection;
 public class ManageAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication authentication, Object o, Collection<ConfigAttribute> collection) throws AccessDeniedException, InsufficientAuthenticationException {
-            log.info("当前用户所用有的角色 = {} ", collection);
+        log.info("当前用户所用有的角色 = {} ", collection);
         for (ConfigAttribute configAttribute : collection) {
             // 当前请求需要的权限
             String needRole = configAttribute.getAttribute();

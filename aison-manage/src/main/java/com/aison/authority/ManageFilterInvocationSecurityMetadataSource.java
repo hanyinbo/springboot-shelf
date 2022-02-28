@@ -18,12 +18,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 资源控制类
- *
- * @author Zhenfeng Li
- * @version 1.0.0
- * @date 2019-11-01 15:13:01
- */
+  *  资源控制类
+  * @author hyb
+　* @date 2022/2/28 14:07
+  */
 @Component
 @Slf4j
 public class ManageFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
@@ -52,6 +50,7 @@ public class ManageFilterInvocationSecurityMetadataSource implements FilterInvoc
                 });
             }
         });
+        log.debug("请求menuUrl", menuUrl);
         if(CollectionUtils.isEmpty(menuUrl)){
             SecurityConfig securityConfig = new SecurityConfig("ROLE_LOGIN");
             set.add(securityConfig);
