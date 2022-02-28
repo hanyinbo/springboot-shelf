@@ -9,6 +9,7 @@ import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -40,7 +41,6 @@ public class ManageFilterInvocationSecurityMetadataSource implements FilterInvoc
         String requestUrl = ((FilterInvocation) o).getHttpRequest().getServletPath();
         log.debug("请求URI = {} ", requestUrl);
         List<String> menuUrl = menuService.list().stream().map(TMenu::getPath).collect(Collectors.toList());
-      // List<String> menuUrl = menuService.findAll().stream().map(Menu::getUrl).collect(Collectors.toList());
         menuUrl.parallelStream().forEach(url ->
         {
             if (antPathMatcher.match(url, requestUrl)) {
@@ -52,6 +52,10 @@ public class ManageFilterInvocationSecurityMetadataSource implements FilterInvoc
                 });
             }
         });
+        if(CollectionUtils.isEmpty(menuUrl)){
+            SecurityConfig securityConfig = new SecurityConfig("ROLE_LOGIN");
+            set.add(securityConfig);
+        }
         return set;
     }
 
