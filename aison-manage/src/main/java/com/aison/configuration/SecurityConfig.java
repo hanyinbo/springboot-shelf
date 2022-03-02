@@ -9,13 +9,11 @@ import com.aison.handler.*;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
 /**
  * Security配置类
@@ -47,23 +45,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.authorizeRequests()
                 .anyRequest().authenticated()
-                .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
-                    @Override
-                    public <O extends FilterSecurityInterceptor> O postProcess(O o) {
-                        //权限判断
-                        o.setAccessDecisionManager(manageAccessDecisionManager);
-                        //动态获取url权限配置
-                        o.setSecurityMetadataSource(filterInvocationSecurityMetadataSource);
-                        return o;
-                    }
-                })
+//                .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+//                    @Override
+//                    public <O extends FilterSecurityInterceptor> O postProcess(O o) {
+//                        //权限判断
+//                        o.setAccessDecisionManager(manageAccessDecisionManager);
+//                        //动态获取url权限配置
+//                        o.setSecurityMetadataSource(filterInvocationSecurityMetadataSource);
+//                        return o;
+//                    }
+//                })
                 .and().httpBasic().authenticationEntryPoint(manageAuthenticationEntryPoint)
                 .and().formLogin().permitAll()
-//                .successHandler(manageAuthenticationSuccessHandler)
-//                .failureHandler(manageAuthenticationFailureHandler)
                 .and().logout().logoutUrl("/logout").logoutSuccessHandler(manageLogoutSuccessHandler).permitAll()
                 .and().exceptionHandling().accessDeniedHandler(manageAccessDeniedHandler)
                 .and().cors()
