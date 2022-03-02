@@ -53,9 +53,9 @@ public class ManageUserDetailServiceImpl implements UserDetailsService {
             SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(roleName);
             authoritiesSet.add(simpleGrantedAuthority);
         }
-        if(authoritiesSet.size()<=0){
-            authoritiesSet.add(new SimpleGrantedAuthority("ROLE_NO_USER"));
-        }
+//        if(authoritiesSet.size()<=0){
+//            authoritiesSet.add(new SimpleGrantedAuthority("ROLE_NO_USER"));
+//        }
         userInfo.setAuthorities(authoritiesSet);
         return userInfo;
     }
