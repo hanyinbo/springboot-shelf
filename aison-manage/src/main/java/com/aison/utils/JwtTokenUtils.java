@@ -195,6 +195,8 @@ public class JwtTokenUtils {
                         authorities.add(new SimpleGrantedAuthority(role.get("authority")));
                     }
                 }
+            }else {
+                authorities=null;
             }
             detailsDTO.setAuthorities(authorities);
         } catch (Exception e) {
