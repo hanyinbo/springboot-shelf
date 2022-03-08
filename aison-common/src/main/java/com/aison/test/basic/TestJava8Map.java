@@ -13,5 +13,12 @@ public class TestJava8Map {
                new Person("爱德华",20,"理发师"),
                new Person("刘德华",19,"歌手")).distinct().forEach(System.out::println);
     }
+
+
+    public static String getFixAssetsValue(String appId, String appSecret, String timestamp, Integer tenantId) {
+        return "AppId=" + appId + "&appSecret=" + appSecret + "&Timestamp=" + timestamp + "&TenantId=" + tenantId;
+    }
+
+
 }
 
