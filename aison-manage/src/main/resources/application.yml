@@ -47,3 +47,11 @@ default:
   redis:
     key: aison
 
+minio:
+  # 地址
+  endpoint: http://139.224.248.1:9000
+  # 账号
+  accessKey: minioadmin
+  # 密码
+  secretKey: minioadmin
+
