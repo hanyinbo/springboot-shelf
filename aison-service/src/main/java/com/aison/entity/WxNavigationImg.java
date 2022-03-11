@@ -10,10 +10,10 @@ import lombok.Data;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@TableName(value = "wx_swiper_img")
+@TableName(value = "wx_navigation_img")
 @Data
-@ApiModel(value = "轮播图表", description = "轮播图表")
-public class WxSwiperImg implements Serializable {
+@ApiModel(value = "导航图表", description = "导航图表")
+public class WxNavigationImg implements Serializable {
     @TableField(value = "id")
     @TableId
     @ApiModelProperty(value = "用户表主键")
@@ -32,5 +32,4 @@ public class WxSwiperImg implements Serializable {
     private LocalDateTime updateTime;
     @ApiModelProperty(value = "修改人")
     private String updator;
-
 }
