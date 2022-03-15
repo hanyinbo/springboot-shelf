@@ -8,9 +8,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 @TableName(value = "wx_navigation_img")
 @Data
 @ApiModel(value = "导航图表", description = "导航图表")
