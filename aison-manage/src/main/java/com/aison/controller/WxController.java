@@ -2,13 +2,13 @@ package com.aison.controller;
 
 import com.aison.common.Result;
 import com.aison.dto.WxCompanyDto;
-import com.aison.entity.WxCompany;
-import com.aison.entity.WxNavigationImg;
-import com.aison.entity.WxSwiperImg;
-import com.aison.service.WxCompanyService;
-import com.aison.service.WxNavigationImgService;
-import com.aison.service.WxSwiperImgService;
+import com.aison.entity.*;
+import com.aison.service.*;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +28,10 @@ public class WxController {
     private WxNavigationImgService wxNavigationImgService;
     @Autowired
     private WxCompanyService wxCompanyService;
+    @Autowired
+    private WxCompanyDetailImgService wxCompanyDetailImgService;
+    @Autowired
+    private WxPositionService wxPositionService;
 
     @GetMapping(value = "/getSwiperImgList")
     public Result<List<WxSwiperImg>> getSwiperImgList(){
@@ -38,6 +42,30 @@ public class WxController {
     public Result<List<WxNavigationImg>> getNavigationImgList(){
         return Result.buildOk(wxNavigationImgService.list());
     }
+    @GetMapping(value = "/getCompanyDetailById")
+    public Result<WxCompany> getCompanyDetailById(Long companyId){
+        WxCompany company = wxCompanyService.getById(companyId);
+        QueryWrapper<WxCompanyDetailImg> detailImgQueryWrapper = new QueryWrapper<>();
+        detailImgQueryWrapper.eq("company_id",company.getId());
+        List<WxCompanyDetailImg> detailList = wxCompanyDetailImgService.list(detailImgQueryWrapper);
+        QueryWrapper<WxPosition> positionQueryWrapper = new QueryWrapper<>();
+        positionQueryWrapper.eq("company_id",company.getId());
+        List<WxPosition> wxPositionList = wxPositionService.list(positionQueryWrapper);
+        company.setWxPositionList(wxPositionList);
+        company.setCompanyDetailImgs(detailList);
+        log.info("获取公司明细；"+JSONObject.toJSONString(company));
+        return Result.buildOk(company);
+    }
+
+    @GetMapping(value = "/getCompanyDetailByName")
+    public Result<List<WxCompany>> getCompanyDetailByName(String companyName){
+        QueryWrapper<WxCompany> wxCompanyQueryWrapper = new QueryWrapper<>();
+        wxCompanyQueryWrapper.like("company_name",companyName);
+        List<WxCompany> companyList = wxCompanyService.list(wxCompanyQueryWrapper);
+        log.info("获取公司；"+JSONObject.toJSONString(companyList));
+        return Result.buildOk(companyList);
+    }
+
 
     @GetMapping(value = "/getCompanyList")
     public Result<List<WxCompanyDto>> getCompanyList(){
@@ -49,5 +77,20 @@ public class WxController {
         dto.setCompanyList(companyList);
         dtoList.add(dto);
         return Result.buildOk(dtoList);
+    }
+
+    @GetMapping(value = "/page/getCompanyPages")
+    public Result<Page<WxCompany>> getCompanyPages(Page page, WxCompany wxCompany){
+        LambdaQueryWrapper<WxCompany> wrappers = new QueryWrapper(wxCompany).lambda();
+        if(wxCompany.getCompanyName() != null){
+            wrappers.eq(WxCompany::getCompanyName, wxCompany.getCompanyName());
+        }
+        if(wxCompany.getRegion() != null ){
+            wrappers.eq(WxCompany::getPosition, wxCompany.getRegion());
+        }
+
+        Page page1 = wxCompanyService.page(page,wrappers);
+        log.info("企业列表："+ JSONObject.toJSONString(page1));
+        return Result.buildOk(page1);
     }
 }
