@@ -8,11 +8,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
-
 @TableName(value = "wx_company")
 @Data
-@ApiModel(value = "公司信息表", description = "公司信息表")
+@ApiModel(value = "公司详细表", description = "公司详细表")
 public class WxCompany extends BaseEntity {
     @TableField(value = "id")
     @TableId
@@ -22,8 +20,6 @@ public class WxCompany extends BaseEntity {
     private String companyName;
     @ApiModelProperty(value = "公司地址")
     private String address;
-    @ApiModelProperty(value = "面试地址")
-    private String interviewAddress;
     @ApiModelProperty(value = "公司行业")
     private String industry;
     @ApiModelProperty(value = "公司区域")
@@ -42,11 +38,4 @@ public class WxCompany extends BaseEntity {
     private String jobRequire;
     @ApiModelProperty(value = "公司图片URL")
     private String companyImgUrl;
-    @TableField(exist = false)
-    @ApiModelProperty(value = "公司轮播图")
-    private List<WxCompanyDetailImg> companyDetailImgs;
-    @TableField(exist = false)
-    @ApiModelProperty(value = "招聘岗位")
-    private List<WxPosition> wxPositionList;
-
 }
