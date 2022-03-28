@@ -10,6 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -28,28 +30,31 @@ import java.util.Set;
  * @author hyb
  * @date 2021/9/23 10:18
  */
+@Component
 @Slf4j
-public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
+public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
-        super(authenticationManager);
-    }
     @Autowired
     public JwtTokenUtils jwtTokenUtils;
+
+//    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
+//        super(authenticationManager);
+//    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                  HttpServletResponse response,
                                  FilterChain chain) throws IOException, ServletException {
         String token = request.getHeader(JwtTokenUtils.TOKEN_HEADER);
+        System.out.println("jwt123");
         if (StringUtils.isEmpty(token) || !token.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
         }
         //有token，校验token
-        UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        chain.doFilter(request, response);
+//        UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        chain.doFilter(request, response);
 
 
 //        UsernamePasswordAuthenticationToken authentication = getAuthentication(request, response);

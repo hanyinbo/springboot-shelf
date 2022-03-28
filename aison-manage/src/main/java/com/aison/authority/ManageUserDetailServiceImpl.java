@@ -1,5 +1,6 @@
 package com.aison.authority;
 
+import cn.hutool.core.util.StrUtil;
 import com.aison.entity.TRole;
 import com.aison.entity.TUser;
 import com.aison.service.TRoleService;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,30 +34,27 @@ public class ManageUserDetailServiceImpl implements UserDetailsService {
 
     @Override
     public ManageUserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
+        if(StrUtil.isEmpty(loginName)){
+            throw  new RuntimeException("用户名不能为空");
+        }
         ManageUserDetails userInfo = new ManageUserDetails();
 
         TUser tUser = tUserService.findUserByUserName(loginName);
-//        if (ObjectUtils.isEmpty(tUser)) {
-//            throw new UsernameNotFoundException("用户[" + loginName + "]不存在");
-//        }
-//        if(tUser.getDelFlag().intValue()==1){
-//            throw new UsernameNotFoundException("用户[" + loginName + "]不存在");
-//        }
+        if (tUser == null) {
+            throw new UsernameNotFoundException(String.format("%s这个用户不存在",loginName));
+        }
         userInfo.setId(tUser.getId());
         //登录用户名
         userInfo.setUsername(loginName);
         userInfo.setPassword(tUser.getPassword());
         Set<SimpleGrantedAuthority> authoritiesSet = new HashSet<>();
         List<TRole> userRoles = tRoleService.findRoleByUserId(tUser.getId());
-        List<String> roleNames = userRoles.stream().map(TRole::getRoleName).collect(Collectors.toList());
-        for (String roleName : roleNames) {
+        List<String> roleCodeList = userRoles.stream().map(TRole::getRoleCode).collect(Collectors.toList());
+        for (String roleCode : roleCodeList) {
             //用户拥有的角色
-            SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(roleName);
+            SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(roleCode);
             authoritiesSet.add(simpleGrantedAuthority);
         }
-//        if(authoritiesSet.size()<=0){
-//            authoritiesSet.add(new SimpleGrantedAuthority("ROLE_NO_USER"));
-//        }
         userInfo.setAuthorities(authoritiesSet);
         return userInfo;
     }

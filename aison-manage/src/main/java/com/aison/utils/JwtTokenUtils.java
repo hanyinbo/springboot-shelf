@@ -186,18 +186,18 @@ public class JwtTokenUtils {
             // 获取角色
             Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
             String authority = claims.get("authorities").toString();
-            if (StringUtils.isNotEmpty(authority)) {
-                List<Map<String, String>> authorityList = JSON.parseObject(authority,
-                        new TypeReference<List<Map<String, String>>>() {
-                        });
-                for (Map<String, String> role : authorityList) {
-                    if (!role.isEmpty()) {
-                        authorities.add(new SimpleGrantedAuthority(role.get("authority")));
-                    }
-                }
-            }else {
-                authorities=null;
-            }
+//            if (StringUtils.isNotEmpty(authority)) {
+//                List<Map<String, String>> authorityList = JSON.parseObject(authority,
+//                        new TypeReference<List<Map<String, String>>>() {
+//                        });
+//                for (Map<String, String> role : authorityList) {
+//                    if (!role.isEmpty()) {
+//                        authorities.add(new SimpleGrantedAuthority(role.get("authority")));
+//                    }
+//                }
+//            }else {
+//                authorities=null;
+//            }
             detailsDTO.setAuthorities(authorities);
         } catch (Exception e) {
             log.error("解析token失败");

@@ -59,11 +59,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.activiti</groupId>-->
-<!--            <artifactId>activiti-spring-boot-starter-basic</artifactId>-->
-<!--            <version>${activiti-version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.activiti</groupId>-->
+        <!--            <artifactId>activiti-spring-boot-starter-basic</artifactId>-->
+        <!--            <version>${activiti-version}</version>-->
+        <!--        </dependency>-->
         <!--activiti基础包-->
         <dependency>
             <groupId>org.activiti</groupId>
@@ -76,7 +76,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-<!--        &lt;!&ndash;整合activiti的 druid 要求的版本为0.2.16 或 1.0.9，百度上说是官方的bug&ndash;&gt;-->
+        <!--        &lt;!&ndash;整合activiti的 druid 要求的版本为0.2.16 或 1.0.9，百度上说是官方的bug&ndash;&gt;-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
@@ -128,12 +128,11 @@
             <artifactId>minio</artifactId>
             <version>${minio.version}</version>
         </dependency>
-
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-s3</artifactId>
-                <version>${aws.version}</version>
-            </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>${aws.version}</version>
+        </dependency>
 
         <!-- LOMBOCK-->
         <dependency>
@@ -167,11 +166,11 @@
             <version>${swagger-version}</version>
         </dependency>
         <!-- DEVTOOLS-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-devtools</artifactId>-->
-<!--            <scope>runtime</scope>-->
-<!--            <optional>true</optional>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-devtools</artifactId>-->
+        <!--            <scope>runtime</scope>-->
+        <!--            <optional>true</optional>-->
+        <!--        </dependency>-->
     </dependencies>
 </project>
