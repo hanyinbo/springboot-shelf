@@ -57,6 +57,22 @@ public class WxController {
         dtoList.add(dto);
         return Result.buildOk(dtoList);
     }
+    /*
+    *获取所有公司列表
+     */
+    @GetMapping(value = "/getAllCompanyList")
+    public Result<List<WxCompany>> getAllCompanyList(){
+
+        List<WxCompany> companyList = wxCompanyService.list();
+
+        return Result.buildOk(companyList);
+    }
+
+    /**
+     * 根据ID获取公司详情
+     * @param companyId
+     * @return
+     */
     @GetMapping(value = "/getCompanyDetailById")
     public Result<WxCompany> getCompanyDetailById(Long companyId){
         WxCompany company = wxCompanyService.getById(companyId);
@@ -72,6 +88,11 @@ public class WxController {
         return Result.buildOk(company);
     }
 
+    /**
+     * 根据公司名称查询公司详情
+     * @param companyName
+     * @return
+     */
     @GetMapping(value = "/getCompanyDetailByName")
     public Result<List<WxCompany>> getCompanyDetailByName(String companyName){
         QueryWrapper<WxCompany> wxCompanyQueryWrapper = new QueryWrapper<>();
@@ -81,6 +102,12 @@ public class WxController {
         return Result.buildOk(companyList);
     }
 
+    /**
+     * 分页获取公司
+     * @param page
+     * @param wxCompany
+     * @return
+     */
     @GetMapping(value = "/page/getCompanyPages")
     public Result<Page<WxCompany>> getCompanyPages(Page page, WxCompany wxCompany){
         LambdaQueryWrapper<WxCompany> wrappers = new QueryWrapper(wxCompany).lambda();
@@ -95,7 +122,13 @@ public class WxController {
         log.info("企业列表："+ JSONObject.toJSONString(page1));
         return Result.buildOk(page1);
     }
-    //分页获取用户信息
+
+    /**
+     * 分页获取用户信息
+     * @param page
+     * @param wxUser
+     * @return
+     */
     @GetMapping(value = "/getWxUerPage")
     public Result<IPage<WxUser>> getWxUerPage(Page page,WxUser wxUser){
         LambdaQueryWrapper<WxUser> wrappers = new QueryWrapper(wxUser).lambda();
@@ -104,6 +137,12 @@ public class WxController {
         log.info("分页获取的对象："+JSONObject.toJSONString(data));
         return Result.buildOk(data);
     }
+
+    /**
+     * 获取用户列表
+     * @param wxUser
+     * @return
+     */
     @GetMapping(value = "/getWxUerList")
     public Result<List<WxUser>> getWxUerList(WxUser wxUser){
         LambdaQueryWrapper<WxUser> wrappers = new QueryWrapper(wxUser).lambda();
