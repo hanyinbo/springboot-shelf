@@ -11,10 +11,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +34,27 @@ public class WxController {
     private WxCompanyDetailImgService wxCompanyDetailImgService;
     @Autowired
     private WxPositionService wxPositionService;
+    @Autowired
+    private WxRecommendService wxRecommendService;
 
+    /**
+     * 获取首页轮播图
+     * @return
+     */
     @GetMapping(value = "/getSwiperImgList")
     public Result<List<WxSwiperImg>> getSwiperImgList(){
         return Result.buildOk(wxSwiperImgService.list());
     }
+
+    /**
+     * 获取公司轮播图片
+     * @return
+     */
+    @GetMapping(value = "/getCompanySwiperImgList")
+    public Result<List<WxCompanyDetailImg>> getCompanySwiperImgList(){
+        return Result.buildOk(wxCompanyDetailImgService.list());
+    }
+
 
     @GetMapping(value = "/getNavigationImgList")
     public Result<List<WxNavigationImg>> getNavigationImgList(){
@@ -57,8 +72,8 @@ public class WxController {
         dtoList.add(dto);
         return Result.buildOk(dtoList);
     }
-    /*
-    *获取所有公司列表
+    /**
+     * 获取所有公司列表
      */
     @GetMapping(value = "/getAllCompanyList")
     public Result<List<WxCompany>> getAllCompanyList(){
@@ -149,5 +164,25 @@ public class WxController {
         wrappers.eq(WxUser::getDelFlag, 0);
         List<WxUser> list = wxUserService.list(wrappers);
         return Result.buildOk(list);
+    }
+
+    /**
+     * 获取报备列表
+     * @param wxRecommend
+     * @return
+     */
+    @GetMapping(value = "/getRecommendList")
+    public Result<List<WxRecommend>> getRecommendList(WxRecommend wxRecommend){
+        return Result.buildOk(wxRecommendService.list());
+    }
+
+    /**
+     * 删除公司
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/delCompanyById/{id}")
+    public Result<Boolean> delCompanyById(@PathVariable("id") Long id){
+        return Result.buildOk(wxCompanyService.removeById(id));
     }
 }
