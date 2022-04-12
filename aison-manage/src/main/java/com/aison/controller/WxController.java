@@ -14,7 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -77,6 +79,68 @@ public class WxController {
     }
 
     /**
+     * 删除公司
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/delCompanyById/{id}")
+    public Result<Boolean> delCompanyById(@PathVariable("id") Integer id){
+        WxCompany company = wxCompanyService.getById(id);
+        if (company == null || company.getId() ==null){
+            return Result.build(310,"公司不存在");
+        }
+        return Result.buildOk(wxCompanyService.removeById(id));
+    }
+
+    /**
+     * 新增公司
+     * @param wxCompany
+     * @return
+     */
+    @PostMapping("/addCompany")
+    public Result addCompany(@RequestBody WxCompany wxCompany){
+        if(wxCompany == null || wxCompany.getCompanyName()==null || wxCompany.getIntroduce()==null){
+            return Result.build(301,"业务参数不能为空");
+        }
+        QueryWrapper<WxCompany> companyWrapper = new QueryWrapper<>();
+        companyWrapper.eq("company_name",wxCompany.getCompanyName());
+        List<WxCompany> companyList = wxCompanyService.list(companyWrapper);
+
+        if(companyList !=null || companyList.size()>0){
+            return Result.build(311,"公司名称不允许重复");
+        }
+        wxCompany.setCompanyCode("2001");
+        wxCompany.setDelFlag(0);
+        wxCompany.setCreatime(LocalDateTime.now());
+        wxCompany.setCreator("hyb");
+       return Result.buildOk(wxCompanyService.saveOrUpdate(wxCompany));
+    }
+
+    /**
+     * 更新公司信息
+     * @param wxCompany
+     * @return
+     */
+    @PutMapping("/updateCompany")
+    public Result updateCompany(@RequestBody WxCompany wxCompany){
+        if(wxCompany == null || wxCompany.getId()==null ||  wxCompany.getCompanyName()==null || wxCompany.getIntroduce()==null){
+            return Result.build(301,"业务参数不能为空");
+        }
+        WxCompany company = wxCompanyService.getById(wxCompany.getId());
+        if (company == null || company.getId()== null){
+            return Result.build(310,"公司不存在");
+        }
+        QueryWrapper<WxCompany> companyWrapper = new QueryWrapper<>();
+        companyWrapper.eq("company_name",wxCompany.getCompanyName());
+        List<WxCompany> companyList = wxCompanyService.list(companyWrapper);
+        if(companyList !=null || companyList.size()>0){
+            return Result.build(311,"公司名称不允许重复");
+        }
+        wxCompany.setUpdatime(LocalDateTime.now());
+        wxCompany.setUpdator("hyb");
+        return Result.buildOk(wxCompanyService.saveOrUpdate(wxCompany));
+    }
+    /**
      * 获取推荐企业招聘列表
      * @return
      */
@@ -96,9 +160,7 @@ public class WxController {
      */
     @GetMapping(value = "/getAllRecruitList")
     public Result<List<WxRecruitInfo>> getAllRecruitList(){
-
         List<WxRecruitInfo> companyList = wxRecruitInfoService.list();
-
         return Result.buildOk(companyList);
     }
 
@@ -108,7 +170,7 @@ public class WxController {
      * @return
      */
     @GetMapping(value = "/getRecruitInfoById")
-    public Result<WxRecruitInfo> getCompanyDetailById(Long companyId){
+    public Result<WxRecruitInfo> getRecruitInfoById(Long companyId){
         WxRecruitInfo company = wxRecruitInfoService.getById(companyId);
         QueryWrapper<WxCompanyDetailImg> detailImgQueryWrapper = new QueryWrapper<>();
         detailImgQueryWrapper.eq("company_id",company.getId());
@@ -127,8 +189,8 @@ public class WxController {
      * @param companyName
      * @return
      */
-    @GetMapping(value = "/getCompanyDetailByName")
-    public Result<List<WxRecruitInfo>> getCompanyDetailByName(String companyName){
+    @GetMapping(value = "/getRecruitInfoByName")
+    public Result<List<WxRecruitInfo>> getRecruitInfoByName(String companyName){
         QueryWrapper<WxRecruitInfo> wxCompanyQueryWrapper = new QueryWrapper<>();
         wxCompanyQueryWrapper.like("company_name",companyName);
         List<WxRecruitInfo> companyList = wxRecruitInfoService.list(wxCompanyQueryWrapper);
@@ -151,10 +213,19 @@ public class WxController {
         if(wxRecruitInfo.getRegion() != null ){
             wrappers.eq(WxRecruitInfo::getPosition, wxRecruitInfo.getRegion());
         }
-
         Page page1 = wxRecruitInfoService.page(page,wrappers);
         log.info("企业列表："+ JSONObject.toJSONString(page1));
         return Result.buildOk(page1);
+    }
+
+    /**
+     * 删除公司招聘信息
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/delRecruitById/{id}")
+    public Result<Boolean> delCompanyById(@PathVariable("id") Long id){
+        return Result.buildOk(wxRecruitInfoService.removeById(id));
     }
 
     /**
@@ -195,13 +266,4 @@ public class WxController {
         return Result.buildOk(wxRecommendService.list());
     }
 
-    /**
-     * 删除公司招聘信息
-     * @param id
-     * @return
-     */
-    @DeleteMapping("/delCompanyById/{id}")
-    public Result<Boolean> delCompanyById(@PathVariable("id") Long id){
-        return Result.buildOk(wxRecruitInfoService.removeById(id));
-    }
 }

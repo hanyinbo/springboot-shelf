@@ -28,13 +28,13 @@ public class WxCompany extends BaseEntity {
     @ApiModelProperty(value = "公司地址")
     @TableField(value = "address")
     private String address;
-    @ApiModelProperty(value = "所在行业")
+    @ApiModelProperty(value = "所属行业")
     @TableField(value = "industry")
     private String industry;
-    @ApiModelProperty(value = "所在区域")
+    @ApiModelProperty(value = "所属区域")
     @TableField(value = "region")
     private String region;
     @ApiModelProperty(value = "删除标识 0:未删除 1：已删除")
-    @TableField(value = "delFlag")
+    @TableField(value = "del_flag")
     private Integer delFlag;
 }
