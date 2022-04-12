@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +26,7 @@ public class WxController {
     @Autowired
     private WxNavigationImgService wxNavigationImgService;
     @Autowired
-    private WxCompanyService wxCompanyService;
+    private WxRecruitInfoService wxRecruitInfoService;
     @Autowired
     private WxUserService wxUserService;
     @Autowired
@@ -36,6 +35,8 @@ public class WxController {
     private WxPositionService wxPositionService;
     @Autowired
     private WxRecommendService wxRecommendService;
+    @Autowired
+    private WxCompanyService wxCompanyService;
 
     /**
      * 获取首页轮播图
@@ -55,42 +56,60 @@ public class WxController {
         return Result.buildOk(wxCompanyDetailImgService.list());
     }
 
-
+    /**
+     * 获取导航轮播图
+     * @return
+     */
     @GetMapping(value = "/getNavigationImgList")
     public Result<List<WxNavigationImg>> getNavigationImgList(){
         return Result.buildOk(wxNavigationImgService.list());
     }
 
+    /**
+     * 获取公司列表
+     * @return
+     */
     @GetMapping(value = "/getCompanyList")
-    public Result<List<WxCompanyDto>> getCompanyList(){
+    public Result<List<WxCompany>> getCompanyList(){
+        QueryWrapper<WxCompany> companyWrapper = new QueryWrapper<>();
+        companyWrapper.eq("del_flag",0);
+        return Result.buildOk(wxCompanyService.list(companyWrapper));
+    }
+
+    /**
+     * 获取推荐企业招聘列表
+     * @return
+     */
+    @GetMapping(value = "/getRecommendCompanyList")
+    public Result<List<WxCompanyDto>> getRecommendCompanyList(){
         List<WxCompanyDto> dtoList = new ArrayList<>();
         WxCompanyDto dto = new WxCompanyDto();
         dto.setType("推荐企业");
-        List<WxCompany> companyList = wxCompanyService.list();
+        List<WxRecruitInfo> companyList = wxRecruitInfoService.list();
         log.info("企业列表："+ JSONObject.toJSONString(companyList));
         dto.setCompanyList(companyList);
         dtoList.add(dto);
         return Result.buildOk(dtoList);
     }
     /**
-     * 获取所有公司列表
+     * 获取所有公司招聘信息列表
      */
-    @GetMapping(value = "/getAllCompanyList")
-    public Result<List<WxCompany>> getAllCompanyList(){
+    @GetMapping(value = "/getAllRecruitList")
+    public Result<List<WxRecruitInfo>> getAllRecruitList(){
 
-        List<WxCompany> companyList = wxCompanyService.list();
+        List<WxRecruitInfo> companyList = wxRecruitInfoService.list();
 
         return Result.buildOk(companyList);
     }
 
     /**
-     * 根据ID获取公司详情
+     * 根据ID获取公司招聘详情
      * @param companyId
      * @return
      */
-    @GetMapping(value = "/getCompanyDetailById")
-    public Result<WxCompany> getCompanyDetailById(Long companyId){
-        WxCompany company = wxCompanyService.getById(companyId);
+    @GetMapping(value = "/getRecruitInfoById")
+    public Result<WxRecruitInfo> getCompanyDetailById(Long companyId){
+        WxRecruitInfo company = wxRecruitInfoService.getById(companyId);
         QueryWrapper<WxCompanyDetailImg> detailImgQueryWrapper = new QueryWrapper<>();
         detailImgQueryWrapper.eq("company_id",company.getId());
         List<WxCompanyDetailImg> detailList = wxCompanyDetailImgService.list(detailImgQueryWrapper);
@@ -104,36 +123,36 @@ public class WxController {
     }
 
     /**
-     * 根据公司名称查询公司详情
+     * 根据公司名称查询公司招聘详情
      * @param companyName
      * @return
      */
     @GetMapping(value = "/getCompanyDetailByName")
-    public Result<List<WxCompany>> getCompanyDetailByName(String companyName){
-        QueryWrapper<WxCompany> wxCompanyQueryWrapper = new QueryWrapper<>();
+    public Result<List<WxRecruitInfo>> getCompanyDetailByName(String companyName){
+        QueryWrapper<WxRecruitInfo> wxCompanyQueryWrapper = new QueryWrapper<>();
         wxCompanyQueryWrapper.like("company_name",companyName);
-        List<WxCompany> companyList = wxCompanyService.list(wxCompanyQueryWrapper);
+        List<WxRecruitInfo> companyList = wxRecruitInfoService.list(wxCompanyQueryWrapper);
         log.info("获取公司；"+JSONObject.toJSONString(companyList));
         return Result.buildOk(companyList);
     }
 
     /**
-     * 分页获取公司
+     * 分页推荐企业招聘信息
      * @param page
-     * @param wxCompany
+     * @param wxRecruitInfo
      * @return
      */
-    @GetMapping(value = "/page/getCompanyPages")
-    public Result<Page<WxCompany>> getCompanyPages(Page page, WxCompany wxCompany){
-        LambdaQueryWrapper<WxCompany> wrappers = new QueryWrapper(wxCompany).lambda();
-        if(wxCompany.getCompanyName() != null){
-            wrappers.eq(WxCompany::getCompanyName, wxCompany.getCompanyName());
+    @GetMapping(value = "/page/getRecruitPages")
+    public Result<Page<WxRecruitInfo>> getRecruitPages(Page page, WxRecruitInfo wxRecruitInfo){
+        LambdaQueryWrapper<WxRecruitInfo> wrappers = new QueryWrapper(wxRecruitInfo).lambda();
+        if(wxRecruitInfo.getCompanyName() != null){
+            wrappers.eq(WxRecruitInfo::getCompanyName, wxRecruitInfo.getCompanyName());
         }
-        if(wxCompany.getRegion() != null ){
-            wrappers.eq(WxCompany::getPosition, wxCompany.getRegion());
+        if(wxRecruitInfo.getRegion() != null ){
+            wrappers.eq(WxRecruitInfo::getPosition, wxRecruitInfo.getRegion());
         }
 
-        Page page1 = wxCompanyService.page(page,wrappers);
+        Page page1 = wxRecruitInfoService.page(page,wrappers);
         log.info("企业列表："+ JSONObject.toJSONString(page1));
         return Result.buildOk(page1);
     }
@@ -177,12 +196,12 @@ public class WxController {
     }
 
     /**
-     * 删除公司
+     * 删除公司招聘信息
      * @param id
      * @return
      */
     @DeleteMapping("/delCompanyById/{id}")
     public Result<Boolean> delCompanyById(@PathVariable("id") Long id){
-        return Result.buildOk(wxCompanyService.removeById(id));
+        return Result.buildOk(wxRecruitInfoService.removeById(id));
     }
 }
