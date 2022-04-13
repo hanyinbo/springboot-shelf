@@ -75,6 +75,8 @@ public class WxController {
     public Result<List<WxCompany>> getCompanyList(){
         QueryWrapper<WxCompany> companyWrapper = new QueryWrapper<>();
         companyWrapper.eq("del_flag",0);
+        List<WxCompany> list = wxCompanyService.list(companyWrapper);
+        log.info("公司列表："+JSONObject.toJSONString(list));
         return Result.buildOk(wxCompanyService.list(companyWrapper));
     }
 
@@ -84,8 +86,10 @@ public class WxController {
      * @return
      */
     @DeleteMapping("/delCompanyById/{id}")
-    public Result<Boolean> delCompanyById(@PathVariable("id") Integer id){
-        WxCompany company = wxCompanyService.getById(id);
+    public Result<Boolean> delCompanyById(@PathVariable("id") long id){
+        QueryWrapper<WxCompany> companyWrapper = new QueryWrapper<>();
+        companyWrapper.eq("id",id);
+        WxCompany company = wxCompanyService.getOne(companyWrapper);
         if (company == null || company.getId() ==null){
             return Result.build(310,"公司不存在");
         }
@@ -106,14 +110,15 @@ public class WxController {
         companyWrapper.eq("company_name",wxCompany.getCompanyName());
         List<WxCompany> companyList = wxCompanyService.list(companyWrapper);
 
-        if(companyList !=null || companyList.size()>0){
+        if(companyList !=null && companyList.size()>0){
             return Result.build(311,"公司名称不允许重复");
         }
         wxCompany.setCompanyCode("2001");
         wxCompany.setDelFlag(0);
-        wxCompany.setCreatime(LocalDateTime.now());
-        wxCompany.setCreator("hyb");
-       return Result.buildOk(wxCompanyService.saveOrUpdate(wxCompany));
+        log.info("添加公司对象："+JSONObject.toJSONString(wxCompany));
+        wxCompanyService.save(wxCompany);
+        log.info("保持成功：");
+       return Result.buildOk();
     }
 
     /**
