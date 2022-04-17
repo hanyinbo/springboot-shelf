@@ -81,6 +81,20 @@ public class WxController {
     }
 
     /**
+     * 获取公司详情
+     * @return
+     */
+    @GetMapping(value = "/getCompanyInfo/{id}")
+    public Result getCompanyInfo(@PathVariable("id") Long id){
+        QueryWrapper<WxCompany> companyQuery = new QueryWrapper<>();
+        companyQuery.eq("id",id);
+        WxCompany company = wxCompanyService.getOne(companyQuery);
+        if (company == null || company.getId() ==null){
+            return Result.build(310,"公司不存在");
+        }
+        return Result.buildOk(company);
+    }
+    /**
      * 删除公司
      * @param id
      * @return
@@ -137,8 +151,9 @@ public class WxController {
         }
         QueryWrapper<WxCompany> companyWrapper = new QueryWrapper<>();
         companyWrapper.eq("company_name",wxCompany.getCompanyName());
+        companyWrapper.ne("id",wxCompany.getId());
         List<WxCompany> companyList = wxCompanyService.list(companyWrapper);
-        if(companyList !=null || companyList.size()>0){
+        if(companyList !=null && companyList.size()>0){
             return Result.build(311,"公司名称不允许重复");
         }
         wxCompany.setUpdatime(LocalDateTime.now());
