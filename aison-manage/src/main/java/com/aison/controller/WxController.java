@@ -2,10 +2,10 @@ package com.aison.controller;
 
 import com.aison.common.Result;
 import com.aison.dto.WxCompanyDto;
+import com.aison.dto.WxCompanyOfPageDto;
 import com.aison.entity.*;
 import com.aison.service.*;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -156,9 +155,19 @@ public class WxController {
         if(companyList !=null && companyList.size()>0){
             return Result.build(311,"公司名称不允许重复");
         }
-        wxCompany.setUpdatime(LocalDateTime.now());
-        wxCompany.setUpdator("hyb");
         return Result.buildOk(wxCompanyService.saveOrUpdate(wxCompany));
+    }
+
+    /**
+     * 分页获取公司列表
+     * @param page
+     * @return
+     */
+    @GetMapping("/getPageOfCompany")
+    public Result<List<WxCompany>> getPageOfCompany(WxCompanyOfPageDto page){
+        IPage<WxCompany> pageOfCompany = wxCompanyService.getPageOfCompany(page);
+        log.info("分页获取公司："+JSONObject.toJSONString(pageOfCompany));
+        return Result.buildOk(pageOfCompany.getRecords());
     }
     /**
      * 获取推荐企业招聘列表
@@ -274,6 +283,78 @@ public class WxController {
         wrappers.eq(WxUser::getDelFlag, 0);
         List<WxUser> list = wxUserService.list(wrappers);
         return Result.buildOk(list);
+    }
+
+    /**
+     * 删除用户
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/delUserById/{id}")
+    public Result<Boolean> delUserById(@PathVariable("id") long id){
+        QueryWrapper<WxUser> userWrapper = new QueryWrapper<>();
+        userWrapper.eq("id",id);
+        WxUser one = wxUserService.getOne(userWrapper);
+
+        if (one == null || one.getId() ==null){
+            return Result.build(310,"用户不存在");
+        }
+        return Result.buildOk(wxUserService.removeById(id));
+    }
+
+    @PutMapping("/updateUser")
+    public Result updateUser(@RequestBody WxUser wxUser){
+        if(wxUser == null || wxUser.getId()==null){
+            return Result.build(301,"业务参数不能为空");
+        }
+        WxUser user = wxUserService.getById(wxUser.getId());
+        if (user == null || user.getId()== null){
+            return Result.build(310,"用户不存在");
+        }
+        QueryWrapper<WxUser> userWrapper = new QueryWrapper<>();
+        userWrapper.eq("nick_name",wxUser.getNickName());
+        userWrapper.ne("id",wxUser.getId());
+        log.info("编辑用户："+wxUser.getId());
+        List<WxUser> userList = wxUserService.list(userWrapper);
+        if(userList !=null && userList.size()>0){
+            return Result.build(311,"用户昵称不允许重复");
+        }
+        return Result.buildOk(wxUserService.saveOrUpdate(wxUser));
+    }
+    /**
+     * 获取用户详情
+     * @return
+     */
+    @GetMapping(value = "/getUserInfo/{id}")
+    public Result getUserInfo(@PathVariable("id") Long id){
+        QueryWrapper<WxUser> userQuery = new QueryWrapper<>();
+        userQuery.eq("id",id);
+        WxUser user = wxUserService.getOne(userQuery);
+        if (user == null || user.getId() ==null){
+            return Result.build(310,"用户不存在");
+        }
+        return Result.buildOk(user);
+    }
+
+    /**
+     * 添加用户
+     * @param wxUser
+     * @return
+     */
+    @PostMapping("/addUser")
+    public Result addUser(@RequestBody WxUser wxUser){
+        if(wxUser == null || wxUser.getNickName()==null ){
+            return Result.build(301,"业务参数不能为空");
+        }
+        QueryWrapper<WxUser> userWrapper = new QueryWrapper<>();
+        userWrapper.eq("nick_name",wxUser.getNickName());
+        List<WxUser> userList = wxUserService.list(userWrapper);
+        if(userList !=null && userList.size()>0){
+            return Result.build(311,"用户昵称不允许重复");
+        }
+        wxUser.setDelFlag(0);
+        log.info("添加用户对象："+JSONObject.toJSONString(wxUser));
+        return Result.buildOk(wxUserService.save(wxUser));
     }
 
     /**

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aison.mapper.WxCompanyMapper">
+
+    <!-- 查找m_info信息 -->
+    <select id="listRoleByUserId" resultMap="BaseResultMap">
+       select r.* from t_role r, t_user_role ur where r.role_id=ur.role_id and ur.user_id IN(#{userId})
+    </select>
+
+    <resultMap id="BaseResultMap" type="com.aison.entity.TRole">
+        <result property="roleId" column="role_id"></result>
+        <result property="roleName" column="role_name"></result>
+        <result property="delFlag" column="del_flag"></result>
+        <result property="creator" column="creator"></result>
+        <result property="creatime" column="creatime"></result>
+        <result property="updator" column="updator"></result>
+        <result property="updatime" column="updatime"></result>
+    </resultMap>
+
+    <select id="getPageOfCompany" resultType="com.aison.entity.WxCompany">
+         select * from wx_company a where a.del_flag=0
+
+             <if test="pageDto.companyName != null  and pageDto.companyName !=''">
+               and a.company_name like CONCAT('%',#{pageDto.companyName},'%')
+             </if>
+             <if test="pageDto.companyCode != null and pageDto.companyCode !=''">
+                 and a.company_code=#{pageDto.companyCode}
+             </if>
+             <if test="pageDto.industry != null and pageDto.industry !=''">
+                 and a.industry like CONCAT('%',#{pageDto.industry},'%')
+             </if>
+             <if test="pageDto.region != null and pageDto.region !=''">
+                 and a.region like CONCAT('%',#{pageDto.region},'%')
+             </if>
+             <if test="pageDto.address != null and pageDto.address != ''">
+                 and a.address like CONCAT('%',#{pageDto.address},'%')
+             </if>
+
+    </select>
+</mapper>
