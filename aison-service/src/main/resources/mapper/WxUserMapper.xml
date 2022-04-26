@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aison.mapper.WxUserMapper">
+
+    <select id="getUserOfPage" resultType="com.aison.entity.WxUser">
+         select * from wx_user a where a.del_flag=0
+             <if test="wxUser.nickName != null  and wxUser.nickName !=''">
+               and a.nick_name like CONCAT('%',#{wxUser.nickName},'%')
+             </if>
+             <if test="wxUser.gender != null and wxUser.gender !=''">
+                 and a.gender=#{wxUser.gender}
+             </if>
+             <if test="wxUser.age != null and wxUser.age !=''">
+                  and a.age=#{wxUser.age}
+             </if>
+             <if test="wxUser.phone != null and wxUser.phone !=''">
+                 and a.phone like CONCAT('%',#{wxUser.phone},'%')
+             </if>
+             <if test="wxUser.address != null and wxUser.address !=''">
+                 and a.address like CONCAT('%',#{wxUser.address},'%')
+             </if>
+             <if test="wxUser.identity != null and wxUser.identity != ''">
+                 and a.identity like CONCAT('%',#{wxUser.identity},'%')
+             </if>
+             <if test="wxUser.activeCode != null and wxUser.activeCode != ''">
+                 and a.activeCode like CONCAT('%',#{wxUser.activeCode},'%')
+            </if>
+
+    </select>
+</mapper>

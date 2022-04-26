@@ -3,21 +3,6 @@
 
 <mapper namespace="com.aison.mapper.WxCompanyMapper">
 
-    <!-- 查找m_info信息 -->
-    <select id="listRoleByUserId" resultMap="BaseResultMap">
-       select r.* from t_role r, t_user_role ur where r.role_id=ur.role_id and ur.user_id IN(#{userId})
-    </select>
-
-    <resultMap id="BaseResultMap" type="com.aison.entity.TRole">
-        <result property="roleId" column="role_id"></result>
-        <result property="roleName" column="role_name"></result>
-        <result property="delFlag" column="del_flag"></result>
-        <result property="creator" column="creator"></result>
-        <result property="creatime" column="creatime"></result>
-        <result property="updator" column="updator"></result>
-        <result property="updatime" column="updatime"></result>
-    </resultMap>
-
     <select id="getPageOfCompany" resultType="com.aison.entity.WxCompany">
          select * from wx_company a where a.del_flag=0
 

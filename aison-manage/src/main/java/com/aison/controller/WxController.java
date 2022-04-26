@@ -264,12 +264,14 @@ public class WxController {
      * @return
      */
     @GetMapping(value = "/getWxUerPage")
-    public Result<IPage<WxUser>> getWxUerPage(Page page,WxUser wxUser){
+    public Result<List<WxUser>> getWxUerPage(Page page,WxUser wxUser){
         LambdaQueryWrapper<WxUser> wrappers = new QueryWrapper(wxUser).lambda();
         wrappers.eq(WxUser::getDelFlag, 0);
         Page data = wxUserService.pageMaps(page, wrappers);
-        log.info("分页获取的对象："+JSONObject.toJSONString(data));
-        return Result.buildOk(data);
+        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxUser));
+        IPage<WxUser> userOfPage = wxUserService.getUserOfPage(page, wxUser);
+        log.info("分页获取的对象："+JSONObject.toJSONString(data)+"长度："+userOfPage.getRecords().size());
+        return Result.buildOk(userOfPage.getRecords());
     }
 
     /**
