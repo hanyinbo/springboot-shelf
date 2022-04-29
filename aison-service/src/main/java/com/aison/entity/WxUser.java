@@ -4,10 +4,13 @@ import com.aison.common.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @TableName(value = "wx_user")
 @Data
 @ApiModel(value = "小程序用户表", description = "小程序用户表")
@@ -15,6 +18,7 @@ public class WxUser extends BaseEntity {
     @TableField(value = "id")
     @TableId
     @ApiModelProperty(value = "用户表主键")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
     @TableField(value = "nick_name")
     @ApiModelProperty(value = "昵称")

@@ -1,5 +1,6 @@
 package com.aison.entity;
 
+import com.aison.common.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @TableName(value = "t_menu")
 @Data
 @ApiModel(value="菜单表",description="系统菜单表")
-public class TMenu {
+public class TMenu extends BaseEntity {
     @TableField(value = "menu_id")
     @TableId
     @ApiModelProperty(value = "菜单表主键")
@@ -41,14 +42,14 @@ public class TMenu {
     @TableField(value = "creator")
     @ApiModelProperty(value = "创建人")
     private String creator;
-    @TableField(value = "creatime")
+    @TableField(value = "create_time")
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime creatime;
+    private LocalDateTime createTime;
     @TableField(value = "updator")
     @ApiModelProperty(value = "修改人")
     private String updator;
-    @TableField(value = "updatime")
+    @TableField(value = "update_time")
     @ApiModelProperty(value = "修改时间")
-    private LocalDateTime updatime;
+    private LocalDateTime updateTime;
 
 }

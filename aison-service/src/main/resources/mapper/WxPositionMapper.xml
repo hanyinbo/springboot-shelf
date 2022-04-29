@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aison.mapper.WxPositionMapper">
+
+    <select id="getPositionOfPage" resultType="com.aison.entity.WxPosition">
+         select * from wx_position a where a.del_flag=0
+             <if test="wxPosition.positionName != null  and wxPosition.positionName !=''">
+               and a.position_name like CONCAT('%',#{wxPosition.positionName},'%')
+             </if>
+             <if test="wxPosition.positionCode != null and wxPosition.positionCode !=''">
+                 and a.position_code like CONCAT('%',#{wxPosition.positionCode},'%')
+             </if>
+            order by a.create_time desc
+    </select>
+</mapper>

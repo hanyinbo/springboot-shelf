@@ -1,5 +1,6 @@
 package com.aison.entity;
 
+import com.aison.common.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -13,7 +14,7 @@ import java.util.List;
 @TableName(value = "t_user")
 @Data
 @ApiModel(value = "用户表", description = "系统用户表")
-public class TUser {
+public class TUser extends BaseEntity {
     @TableField(value = "id")
     @TableId
     @ApiModelProperty(value = "用户表主键")
@@ -33,18 +34,6 @@ public class TUser {
     @TableField(value = "del_flag")
     @ApiModelProperty(value = "0-正常，1-删除")
     private Boolean delFlag;
-    @TableField(value = "creator")
-    @ApiModelProperty(value = "创建人")
-    private String creator;
-    @TableField(value = "creatime")
-    @ApiModelProperty(value = "创建时间")
-    private LocalDateTime creatime;
-    @TableField(value = "updator")
-    @ApiModelProperty(value = "修改人")
-    private String updator;
-    @TableField(value = "updatime")
-    @ApiModelProperty(value = "修改时间")
-    private LocalDateTime updatime;
     @TableField(value = "ip")
     @ApiModelProperty(value = "用户IP")
     private String ip;

@@ -17,12 +17,12 @@ public class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = -3422432117328693716L;
 
-    @TableField(value = "creatime",fill = FieldFill.INSERT)
-    private LocalDateTime creatime;
+    @TableField(value = "create_time",fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
     @TableField(value = "creator",fill = FieldFill.INSERT)
     private String creator;
-    @TableField(value = "updatime",fill=FieldFill.UPDATE)
-    private LocalDateTime updatime;
+    @TableField(value = "update_time",fill=FieldFill.UPDATE)
+    private LocalDateTime updateTime;
     @TableField(value = "updator",fill=FieldFill.UPDATE)
     private String updator;
 }

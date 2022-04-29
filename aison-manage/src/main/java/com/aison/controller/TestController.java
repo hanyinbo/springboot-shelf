@@ -104,7 +104,7 @@ public class TestController {
         log.info("参数："+moid);
         LambdaQueryWrapper<MInfo> wrapper = new LambdaQueryWrapper<>();
         if (beginTime != null && endTime != null) {
-            wrapper.between(MInfo::getCreatime, beginTime, endTime);
+            wrapper.between(MInfo::getCreateTime, beginTime, endTime);
         }
         if (moid != null) {
             wrapper.like(MInfo::getMOid, moid);

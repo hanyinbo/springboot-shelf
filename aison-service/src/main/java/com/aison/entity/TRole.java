@@ -35,16 +35,4 @@ public class TRole extends BaseEntity {
     @TableField(value = "del_flag")
     @ApiModelProperty(value = "0-正常，1-删除")
     private Integer  delFlag;
-    @TableField(value = "creator")
-    @ApiModelProperty(value = "创建人")
-    private String creator;
-    @TableField(value = "creatime")
-    @ApiModelProperty(value = "创建时间")
-    private LocalDateTime creatime;
-    @TableField(value = "updator")
-    @ApiModelProperty(value = "修改人")
-    private String updator;
-    @TableField(value = "updatime")
-    @ApiModelProperty(value = "修改时间")
-    private LocalDateTime updatime;
 }

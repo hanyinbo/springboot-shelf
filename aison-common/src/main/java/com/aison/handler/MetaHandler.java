@@ -11,13 +11,13 @@ import java.util.Date;
 public class MetaHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
-        this.setFieldValByName("creatime", LocalDateTime.now(),metaObject);
+        this.setFieldValByName("createTime", LocalDateTime.now(),metaObject);
         this.setFieldValByName("creator","hyb",metaObject);
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        this.setFieldValByName("updatime",LocalDateTime.now(),metaObject);
+        this.setFieldValByName("updateTime",LocalDateTime.now(),metaObject);
         this.setFieldValByName("updator","hyb",metaObject);
     }
 }

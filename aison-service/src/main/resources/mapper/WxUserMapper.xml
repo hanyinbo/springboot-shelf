@@ -8,10 +8,10 @@
              <if test="wxUser.nickName != null  and wxUser.nickName !=''">
                and a.nick_name like CONCAT('%',#{wxUser.nickName},'%')
              </if>
-             <if test="wxUser.gender != null and wxUser.gender !=''">
+             <if test="wxUser.gender != null">
                  and a.gender=#{wxUser.gender}
              </if>
-             <if test="wxUser.age != null and wxUser.age !=''">
+             <if test="wxUser.age != null and wxUser.age !='' ">
                   and a.age=#{wxUser.age}
              </if>
              <if test="wxUser.phone != null and wxUser.phone !=''">
@@ -24,8 +24,8 @@
                  and a.identity like CONCAT('%',#{wxUser.identity},'%')
              </if>
              <if test="wxUser.activeCode != null and wxUser.activeCode != ''">
-                 and a.activeCode like CONCAT('%',#{wxUser.activeCode},'%')
+                 and a.active_code like CONCAT('%',#{wxUser.activeCode},'%')
             </if>
-
+            order by a.create_time desc
     </select>
 </mapper>

@@ -4,6 +4,7 @@ import com.aison.common.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
@@ -18,6 +19,7 @@ public class WxCompany extends BaseEntity {
     @TableId
     @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty(value = "公司表主键")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
     @ApiModelProperty(value = "公司名称")
     @TableField(value = "company_name")

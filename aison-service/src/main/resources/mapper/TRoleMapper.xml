@@ -13,9 +13,9 @@
         <result property="roleName" column="role_name"></result>
         <result property="delFlag" column="del_flag"></result>
         <result property="creator" column="creator"></result>
-        <result property="creatime" column="creatime"></result>
+        <result property="createTime" column="createTime"></result>
         <result property="updator" column="updator"></result>
-        <result property="updatime" column="updatime"></result>
+        <result property="updateTime" column="updateTime"></result>
     </resultMap>
 
 </mapper>

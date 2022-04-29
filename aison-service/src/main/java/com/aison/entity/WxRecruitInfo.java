@@ -23,6 +23,8 @@ public class WxRecruitInfo extends BaseEntity {
     private Long id;
     @ApiModelProperty(value = "公司名称")
     private String companyName;
+    @ApiModelProperty(value = "公司ID")
+    private String companyId;
     @ApiModelProperty(value = "公司地址")
     private String address;
     @ApiModelProperty(value = "公司行业")
@@ -49,5 +51,5 @@ public class WxRecruitInfo extends BaseEntity {
     private List<WxCompanyDetailImg> companyDetailImgs;
     @TableField(exist = false)
     @ApiModelProperty(value = "招聘岗位")
-    private List<WxPosition> wxPositionList;
+    private List<WxRecruitPosition> wxRecruitPositionList;
 }
