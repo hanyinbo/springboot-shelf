@@ -16,6 +16,7 @@ public class WxCompanyDetailImg {
     @TableField(value = "id")
     @TableId
     @ApiModelProperty(value = "主键")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
     @ApiModelProperty(value = "图片名称")
     private String imgName;

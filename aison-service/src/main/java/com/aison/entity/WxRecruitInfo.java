@@ -4,6 +4,7 @@ import com.aison.common.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class WxRecruitInfo extends BaseEntity {
     @TableField(value = "id")
     @TableId
     @ApiModelProperty(value = "招聘详情表主键")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
     @ApiModelProperty(value = "公司名称")
     private String companyName;
@@ -27,12 +29,17 @@ public class WxRecruitInfo extends BaseEntity {
     private String companyId;
     @ApiModelProperty(value = "公司地址")
     private String address;
+    @ApiModelProperty(value = "面试地址")
+    private String interviewAddress;
     @ApiModelProperty(value = "公司行业")
     private String industry;
     @ApiModelProperty(value = "公司区域")
     private String region;
     @ApiModelProperty(value = "招聘岗位")
     private String position;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "招聘岗位")
+    private List<String> workPositionList;
     @ApiModelProperty(value = "佣金")
     private Integer money;
     @ApiModelProperty(value = "招聘人数")

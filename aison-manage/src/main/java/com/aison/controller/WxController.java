@@ -12,11 +12,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/mini")
@@ -269,6 +272,105 @@ public class WxController {
         return Result.buildOk(wxRecruitInfoService.removeById(id));
     }
 
+    /**
+     * 新增公司招聘
+     * @param wxRecruitInfo
+     * @return
+     */
+    @PostMapping("/addRecruitInfo")
+    public Result<Boolean> addRecruitInfo(@RequestBody WxRecruitInfo wxRecruitInfo){
+        List<WxRecruitPosition> recruitPositionList = new ArrayList<>();
+        if(wxRecruitInfo == null || wxRecruitInfo.getCompanyName()==null || wxRecruitInfo.getWorkPositionList()==null ){
+            return Result.build(301,"业务参数不能为空");
+        }
+        String positionName = null;
+        for(String name: wxRecruitInfo.getWorkPositionList()){
+            if(StringUtils.isNotEmpty(positionName)){
+                positionName=name;
+            }else {
+                positionName=positionName+"/"+name;
+            }
+        }
+        wxRecruitInfo.setPosition(positionName);
+        boolean b = wxRecruitInfoService.saveOrUpdate(wxRecruitInfo);
+        if(b){
+            log.info("招聘表："+wxRecruitInfo.getId());
+            QueryWrapper<WxPosition> wrapper = new QueryWrapper();
+            wrapper.in("position_name",wxRecruitInfo.getWorkPositionList());
+            List<WxPosition> wxPositionList = wxPositionService.list(wrapper);
+            for(WxPosition wxPosition:wxPositionList){
+                WxRecruitPosition recruitPosition = new WxRecruitPosition();
+                recruitPosition.setPositionName(wxPosition.getPositionName());
+                recruitPosition.setRecruitId(wxRecruitInfo.getId());
+                recruitPositionList.add(recruitPosition);
+            }
+        }else {
+            return Result.build(302,"保存失败");
+        }
+        return Result.buildOk(wxRecruitPositionService.saveBatch(recruitPositionList));
+    }
+
+    /**
+     * 删除公司招聘信息
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/delRecruit/{id}")
+    public Result<Boolean> delRecruitInfo(@PathVariable("id") Long id){
+        QueryWrapper<WxRecruitInfo> recruitInfoWrapper =  new QueryWrapper<>();
+        recruitInfoWrapper.eq("id",id);
+        WxRecruitInfo one = wxRecruitInfoService.getOne(recruitInfoWrapper);
+        if(one==null || one.getId()==null){
+            return Result.build(310,"该公司未设置招聘");
+        }
+        QueryWrapper<WxRecruitPosition> wxRecruitPositionWrapper = new QueryWrapper<>();
+        wxRecruitPositionWrapper.eq("recruit_id",one.getId());
+
+        List<Long> idList = wxRecruitPositionService.list(wxRecruitPositionWrapper).stream().map(WxRecruitPosition::getId).collect(Collectors.toList());
+        boolean b = wxRecruitPositionService.removeByIds(idList);
+        if(!b){
+            return Result.build(312,"删除招聘信息失败");
+        }
+        return Result.buildOk( wxRecruitInfoService.removeById(id));
+    }
+
+    /**
+     * 修改招聘信息
+     * @param wxRecruitInfo
+     * @return
+     */
+    @PutMapping("/updateRecruitInfo")
+    public Result<Boolean> updateRecruitInfo(@RequestBody WxRecruitInfo wxRecruitInfo){
+        if(wxRecruitInfo == null || wxRecruitInfo.getId()==null || wxRecruitInfo.getWorkPositionList()==null ){
+            return Result.build(301,"业务参数不能为空");
+        }
+        QueryWrapper<WxRecruitInfo> recruitQueryWrapper = new QueryWrapper<>();
+        recruitQueryWrapper.eq("id",wxRecruitInfo.getId());
+        WxRecruitInfo one = wxRecruitInfoService.getOne(recruitQueryWrapper);
+        if(one==null || one.getId()==null){
+            return Result.build(301,"招聘信息不存在");
+        }
+        wxRecruitInfoService.saveOrUpdate(wxRecruitInfo);
+        QueryWrapper<WxRecruitPosition> recruitPositionQueryWrapper = new QueryWrapper<>();
+        recruitPositionQueryWrapper.eq("recruit_id",wxRecruitInfo.getId());
+        List<WxRecruitPosition> recruitPositionList = wxRecruitPositionService.list(recruitPositionQueryWrapper);
+        if(recruitPositionList !=null && recruitPositionList.size()>0){
+            List<WxRecruitPosition> wxRecruitPositionList = new ArrayList<>();
+            List<Long> idList = recruitPositionList.stream().map(WxRecruitPosition::getId).collect(Collectors.toList());
+            wxRecruitPositionService.removeByIds(idList);
+            QueryWrapper<WxPosition> queryWrapper = new QueryWrapper();
+            queryWrapper.in("position_name",wxRecruitInfo.getWorkPositionList());
+            List<WxPosition> wxPositionList = wxPositionService.list(queryWrapper);
+            for(WxPosition wxPosition:wxPositionList){
+                WxRecruitPosition recruitPosition = new WxRecruitPosition();
+                recruitPosition.setPositionName(wxPosition.getPositionName());
+                recruitPosition.setRecruitId(wxRecruitInfo.getId());
+                wxRecruitPositionList.add(recruitPosition);
+            }
+            wxRecruitPositionService.saveOrUpdateBatch(wxRecruitPositionList);
+        }
+        return Result.buildOk(Boolean.TRUE);
+    }
     /**
      * 分页获取用户信息
      * @param page

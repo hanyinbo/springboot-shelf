@@ -16,6 +16,7 @@ public class WxNavigationImg extends BaseEntity {
     @TableField(value = "id")
     @TableId
     @ApiModelProperty(value = "用户表主键")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
     @ApiModelProperty(value = "图片名称")
     private String imgName;
