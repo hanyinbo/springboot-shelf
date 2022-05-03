@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.List;
 /**
  * 公司招聘信息表
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @TableName(value = "wx_recruit_info")
 @Data
 @ApiModel(value = "招聘详情表", description = "招聘详情表")
@@ -26,26 +28,18 @@ public class WxRecruitInfo extends BaseEntity {
     @ApiModelProperty(value = "公司名称")
     private String companyName;
     @ApiModelProperty(value = "公司ID")
-    private String companyId;
-    @ApiModelProperty(value = "公司地址")
-    private String address;
+    private Long companyId;
     @ApiModelProperty(value = "面试地址")
     private String interviewAddress;
-    @ApiModelProperty(value = "公司行业")
-    private String industry;
-    @ApiModelProperty(value = "公司区域")
-    private String region;
     @ApiModelProperty(value = "招聘岗位")
     private String position;
     @TableField(exist = false)
     @ApiModelProperty(value = "招聘岗位")
-    private List<String> workPositionList;
+    private List<String> wxPositionList;
     @ApiModelProperty(value = "佣金")
     private Integer money;
     @ApiModelProperty(value = "招聘人数")
     private Integer number;
-    @ApiModelProperty(value = "公司简介")
-    private String companyIntroduce;
     @ApiModelProperty(value = "福利待遇")
     private String welfare;
     @ApiModelProperty(value = "招聘要求")

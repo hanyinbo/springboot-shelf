@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aison.mapper.WxRecruitInfoMapper">
+
+    <select id="getRecruitOfPage" resultType="com.aison.dto.WxRecruitQueryDto">
+        SELECT a.id,a.company_name,a.company_id,b.industry,b.region,
+        b.address,a.interview_address,a.money,a.number,a.welfare,
+        a.job_require,a.create_time FROM `wx_recruit_info` a
+        left join wx_company b
+        on a.company_id=b.id
+        where b.del_flag=0
+        <if test="dto.companyName != null  and dto.companyName !=''">
+             and a.company_name like CONCAT('%',#{dto.companyName},'%')
+         </if>
+         <if test="dto.industry != null and dto.industry !=''">
+             and b.industry like CONCAT('%',#{dto.industry},'%')
+         </if>
+         <if test="dto.region != null and dto.region !=''">
+             and b.region like CONCAT('%',#{dto.region},'%')
+         </if>
+        <if test="dto.address != null and dto.address !=''">
+            and b.address like CONCAT('%',#{dto.address},'%')
+        </if>
+        <if test="dto.interviewAddress != null and dto.interviewAddress !=''">
+            and a.interview_address like CONCAT('%',#{dto.interviewAddress},'%')
+        </if>
+        <if test="dto.money != null and dto.money !='' ">
+            and a.money =#{dto.money}
+        </if>
+        <if test="dto.number != null and dto.number !=''">
+            and a.number =#{dto.number}
+        </if>
+            order by a.create_time desc
+    </select>
+</mapper>
