@@ -8,7 +8,6 @@ import com.aison.dto.WxRecruitQueryDto;
 import com.aison.entity.*;
 import com.aison.service.*;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +38,7 @@ public class WxController {
     @Autowired
     private WxRecruitPositionService wxRecruitPositionService;
     @Autowired
-    private WxRecommendService wxRecommendService;
+    private WxRecommentService wxRecommentService;
     @Autowired
     private WxCompanyService wxCompanyService;
     @Autowired
@@ -177,15 +175,7 @@ public class WxController {
         log.info("分页获取公司："+JSONObject.toJSONString(pageOfCompany));
         return Result.buildOk(pageOfCompany.getRecords());
     }
-    /**
-     * 获取报备列表
-     * @param
-     * @return
-     */
-    @GetMapping(value = "/getRecommendList")
-    public Result<List<WxRecommend>> getRecommendList(){
-        return Result.buildOk(wxRecommendService.list());
-    }
+
     /**
      * 获取推荐企业招聘列表
      * @return
@@ -201,6 +191,108 @@ public class WxController {
         dtoList.add(dto);
         return Result.buildOk(dtoList);
     }
+
+    /**
+     * 获取报备列表
+     * @param
+     * @return
+     */
+    @GetMapping(value = "/getRecommentList")
+    public Result<List<WxRecomment>> getRecommentList(){
+        return Result.buildOk(wxRecommentService.list());
+    }
+
+    /**
+     * 获取推荐详情
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getRecommentById/{id}")
+    public Result<WxRecomment> getRecommentById(@PathVariable("id") Long id){
+        WxRecomment one = wxRecommentService.getById(id);
+        if(one ==null || one.getId() == null){
+            return Result.build(310,"未有报备信息");
+        }
+        return Result.buildOk(one);
+    }
+
+    /**
+     * 删除报备
+     * @param id
+     * @return
+     */
+    @DeleteMapping(value = "/delRecomment/{id}")
+    public Result<Boolean> delRecomment(@PathVariable("id") Long id){
+        WxRecomment one = wxRecommentService.getById(id);
+        if(one ==null || one.getId() == null){
+            return Result.build(310,"未有报备信息");
+        }
+        return Result.buildOk(wxRecommentService.removeById(id));
+    }
+
+    /**
+     * 修改报备
+     * @param wxRecomment
+     * @return
+     */
+    @PutMapping(value = "/updateRecomment")
+    public Result<Boolean> updateRecomment(@RequestBody WxRecomment wxRecomment){
+        log.info("修改招聘信息："+JSONObject.toJSONString(wxRecomment));
+        if(wxRecomment == null || wxRecomment.getId()==null || wxRecomment.getCustomName()==null ){
+            return Result.build(301,"业务参数不能为空");
+        }
+        WxRecomment one = wxRecommentService.getById(wxRecomment.getId());
+        if(one== null || one.getId()==null){
+            return Result.build(310,"未设置报备信息");
+        }
+        return Result.buildOk(wxRecommentService.updateById(wxRecomment));
+    }
+
+    /**
+     * 分页获取报备信息
+     * @param page
+     * @param wxRecomment
+     * @return
+     */
+    @GetMapping(value = "/getRecommentOfPage")
+    public Result<List<WxRecomment>> getRecommentOfPage(Page page, WxRecomment wxRecomment){
+        QueryWrapper<WxRecomment> queryWrapper = new QueryWrapper<>();
+        if( StringUtils.isNotEmpty(wxRecomment.getCustomName())){
+            queryWrapper.like("custom_name",wxRecomment.getCustomName());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getTelephone())){
+            queryWrapper.like("telephone", wxRecomment.getTelephone());
+        }
+        if(wxRecomment.getGender() != null ){
+            queryWrapper.eq("gender", wxRecomment.getGender());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getIntentionCompany())){
+            queryWrapper.like("intention_company", wxRecomment.getIntentionCompany());
+        }
+        if(wxRecomment.getStatus() !=null){
+            queryWrapper.eq("status", wxRecomment.getStatus());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getRecommentName())){
+            queryWrapper.like("recomment_name", wxRecomment.getRecommentName());
+        }
+        Page page1 = wxRecommentService.page(page, queryWrapper);
+        return Result.buildOk(page1.getRecords());
+    }
+
+    /**
+     * 根据公司名称查询公司招聘详情
+     * @param companyName
+     * @return
+     */
+    @GetMapping(value = "/getRecruitInfoByName")
+    public Result<List<WxRecruitInfo>> getRecruitInfoByName(String companyName){
+        QueryWrapper<WxRecruitInfo> wxCompanyQueryWrapper = new QueryWrapper<>();
+        wxCompanyQueryWrapper.like("company_name",companyName);
+        List<WxRecruitInfo> companyList = wxRecruitInfoService.list(wxCompanyQueryWrapper);
+        log.info("获取公司；"+JSONObject.toJSONString(companyList));
+        return Result.buildOk(companyList);
+    }
+
     /**
      * 获取所有公司招聘信息列表
      */
@@ -228,20 +320,6 @@ public class WxController {
         wxRecruitInfo.setCompanyDetailImgs(detailList);
         log.info("获取公司明细；"+JSONObject.toJSONString(wxRecruitInfo));
         return Result.buildOk(wxRecruitInfo);
-    }
-
-    /**
-     * 根据公司名称查询公司招聘详情
-     * @param companyName
-     * @return
-     */
-    @GetMapping(value = "/getRecruitInfoByName")
-    public Result<List<WxRecruitInfo>> getRecruitInfoByName(String companyName){
-        QueryWrapper<WxRecruitInfo> wxCompanyQueryWrapper = new QueryWrapper<>();
-        wxCompanyQueryWrapper.like("company_name",companyName);
-        List<WxRecruitInfo> companyList = wxRecruitInfoService.list(wxCompanyQueryWrapper);
-        log.info("获取公司；"+JSONObject.toJSONString(companyList));
-        return Result.buildOk(companyList);
     }
 
     /**

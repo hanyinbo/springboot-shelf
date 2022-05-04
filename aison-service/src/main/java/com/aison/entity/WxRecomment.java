@@ -7,14 +7,15 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.models.auth.In;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@TableName(value = "wx_recommend")
+@TableName(value = "wx_recomment")
 @Data
 @ApiModel(value="报备表")
-public class WxRecommend extends BaseEntity {
+public class WxRecomment extends BaseEntity {
     @TableField(value = "id")
     @TableId
     @ApiModelProperty(value = "主键")
@@ -27,26 +28,28 @@ public class WxRecommend extends BaseEntity {
     @ApiModelProperty(value = "手机号")
     private String telephone;
     @TableField(value = "gender")
-    @ApiModelProperty(value = "性别")
-    private String gender;
+    @ApiModelProperty(value = "性别 0：男 1：女")
+    private Integer gender;
     @TableField(value = "intention_company")
     @ApiModelProperty(value = "意向公司")
     private String intentionCompany;
     @TableField(value = "company_id")
     @ApiModelProperty(value = "意向公司ID")
-    private Integer companyId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long companyId;
     @TableField(value = "interview_time")
     @ApiModelProperty(value = "面试时间")
     private LocalDateTime interviewTime;
     @TableField(value = "status")
-    @ApiModelProperty(value = "客户状态")
-    private String status;
-    @TableField(value = "recommend_name")
+    @ApiModelProperty(value = "客户状态 0：待面试 1：已面试 2：已入职 3：已离职")
+    private Integer status;
+    @TableField(value = "recomment_name")
     @ApiModelProperty(value = "推荐人")
-    private String recommendName;
-    @TableField(value = "recommend_id")
+    private String recommentName;
+    @TableField(value = "recomment_id")
     @ApiModelProperty(value = "推荐人ID")
-    private Long recommendId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long recommentId;
     @TableField(value = "remark")
     @ApiModelProperty(value = "备注")
     private String remark;
