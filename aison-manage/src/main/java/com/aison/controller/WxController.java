@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -249,7 +250,7 @@ public class WxController {
     }
 
     /**
-     * 分页获取报备信息
+     * 分页获取全部报备信息
      * @param page
      * @param wxRecomment
      * @return
@@ -279,6 +280,174 @@ public class WxController {
         return Result.buildOk(page1.getRecords());
     }
 
+    /**
+     * 分页获取待面试报备信息
+     * @param page
+     * @param wxRecomment
+     * @return
+     */
+    @GetMapping(value = "/getRecommentNotInterview")
+    public Result<List<WxRecomment>> getRecommentNotInterview(Page page, WxRecomment wxRecomment){
+        QueryWrapper<WxRecomment> queryWrapper = new QueryWrapper<>();
+        if( StringUtils.isNotEmpty(wxRecomment.getCustomName())){
+            queryWrapper.like("custom_name",wxRecomment.getCustomName());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getTelephone())){
+            queryWrapper.like("telephone", wxRecomment.getTelephone());
+        }
+        if(wxRecomment.getGender() != null ){
+            queryWrapper.eq("gender", wxRecomment.getGender());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getIntentionCompany())){
+            queryWrapper.like("intention_company", wxRecomment.getIntentionCompany());
+        }
+        queryWrapper.eq("status", 0);
+        if(StringUtils.isNotEmpty(wxRecomment.getRecommentName())){
+            queryWrapper.like("recomment_name", wxRecomment.getRecommentName());
+        }
+        Page page1 = wxRecommentService.page(page, queryWrapper);
+        return Result.buildOk(page1.getRecords());
+    }
+
+    /**
+     * 分页获取已面试报备信息
+     * @param page
+     * @param wxRecomment
+     * @return
+     */
+    @GetMapping(value = "/getRecommentOkInterview")
+    public Result<List<WxRecomment>> getRecommentOkInterview(Page page,WxRecomment wxRecomment){
+        QueryWrapper<WxRecomment> queryWrapper = new QueryWrapper<>();
+        if( StringUtils.isNotEmpty(wxRecomment.getCustomName())){
+            queryWrapper.like("custom_name",wxRecomment.getCustomName());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getTelephone())){
+            queryWrapper.like("telephone", wxRecomment.getTelephone());
+        }
+        if(wxRecomment.getGender() != null ){
+            queryWrapper.eq("gender", wxRecomment.getGender());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getIntentionCompany())){
+            queryWrapper.like("intention_company", wxRecomment.getIntentionCompany());
+        }
+        queryWrapper.eq("status", 1);
+        if(StringUtils.isNotEmpty(wxRecomment.getRecommentName())){
+            queryWrapper.like("recomment_name", wxRecomment.getRecommentName());
+        }
+        Page page1 = wxRecommentService.page(page, queryWrapper);
+        return Result.buildOk(page1.getRecords());
+    }
+
+    /**
+     * 分页获取已入职报备信息
+     * @param page
+     * @param wxRecomment
+     * @return
+     */
+    @GetMapping(value = "/getRecommentInduction")
+    public Result<List<WxRecomment>> getRecommentInduction(Page page,WxRecomment wxRecomment){
+        QueryWrapper<WxRecomment> queryWrapper = new QueryWrapper<>();
+        if( StringUtils.isNotEmpty(wxRecomment.getCustomName())){
+            queryWrapper.like("custom_name",wxRecomment.getCustomName());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getTelephone())){
+            queryWrapper.like("telephone", wxRecomment.getTelephone());
+        }
+        if(wxRecomment.getGender() != null ){
+            queryWrapper.eq("gender", wxRecomment.getGender());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getIntentionCompany())){
+            queryWrapper.like("intention_company", wxRecomment.getIntentionCompany());
+        }
+        queryWrapper.eq("status", 2);
+        if(StringUtils.isNotEmpty(wxRecomment.getRecommentName())){
+            queryWrapper.like("recomment_name", wxRecomment.getRecommentName());
+        }
+        Page page1 = wxRecommentService.page(page, queryWrapper);
+        return Result.buildOk(page1.getRecords());
+    }
+    /**
+     * 分页获取已离职报备信息
+     * @param page
+     * @param wxRecomment
+     * @return
+     */
+    @GetMapping(value = "/getRecommentLeaveOffice")
+    public Result<List<WxRecomment>> getRecommentLeaveOffice(Page page,WxRecomment wxRecomment){
+        QueryWrapper<WxRecomment> queryWrapper = new QueryWrapper<>();
+        if( StringUtils.isNotEmpty(wxRecomment.getCustomName())){
+            queryWrapper.like("custom_name",wxRecomment.getCustomName());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getTelephone())){
+            queryWrapper.like("telephone", wxRecomment.getTelephone());
+        }
+        if(wxRecomment.getGender() != null ){
+            queryWrapper.eq("gender", wxRecomment.getGender());
+        }
+        if(StringUtils.isNotEmpty(wxRecomment.getIntentionCompany())){
+            queryWrapper.like("intention_company", wxRecomment.getIntentionCompany());
+        }
+        queryWrapper.eq("status", 3);
+        if(StringUtils.isNotEmpty(wxRecomment.getRecommentName())){
+            queryWrapper.like("recomment_name", wxRecomment.getRecommentName());
+        }
+        Page page1 = wxRecommentService.page(page, queryWrapper);
+        return Result.buildOk(page1.getRecords());
+    }
+
+    /**
+     * 变更面试时间
+     * @param ids
+     * @return
+     */
+    @PutMapping(value = "/changeInterviewStatus")
+    public Result<Boolean> changeInterviewStatus(@RequestBody List<Long> ids){
+        List<WxRecomment> recommentList = wxRecommentService.listByIds(ids);
+        if(recommentList ==null || recommentList.size()==0){
+            return Result.build(310,"报备信息不存在");
+        }
+        recommentList.forEach(recome ->{
+            recome.setStatus(1);
+            recome.setInterviewTime(LocalDateTime.now());
+        });
+       return Result.buildOk(wxRecommentService.updateBatchById(recommentList));
+    }
+
+    /**
+     * 变更入职状态
+     * @param ids
+     * @retur
+     */
+    @PutMapping(value = "/changeInductionStatus")
+    public Result<Boolean> changeInductionStatus(@RequestBody List<Long> ids){
+        List<WxRecomment> recommentList = wxRecommentService.listByIds(ids);
+        if(recommentList ==null || recommentList.size()==0){
+            return Result.build(310,"报备信息不存在");
+        }
+        recommentList.forEach(recome ->{
+            recome.setStatus(2);
+            recome.setInductionTime(LocalDateTime.now());
+        });
+        return Result.buildOk(wxRecommentService.updateBatchById(recommentList));
+    }
+
+    /**
+     * 变更离职状态
+     * @param ids
+     * @return
+     */
+    @PutMapping(value = "/changeLeaveOfficeStatus")
+    public Result<Boolean> changeLeaveOfficeStatus(@RequestBody List<Long> ids){
+        List<WxRecomment> recommentList = wxRecommentService.listByIds(ids);
+        if(recommentList ==null || recommentList.size()==0){
+            return Result.build(310,"报备信息不存在");
+        }
+        recommentList.forEach(recome ->{
+            recome.setLeaveOfficeTime(LocalDateTime.now());
+            recome.setStatus(3);
+        });
+        return Result.buildOk(wxRecommentService.updateBatchById(recommentList));
+    }
     /**
      * 根据公司名称查询公司招聘详情
      * @param companyName

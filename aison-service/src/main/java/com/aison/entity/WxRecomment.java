@@ -37,9 +37,18 @@ public class WxRecomment extends BaseEntity {
     @ApiModelProperty(value = "意向公司ID")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long companyId;
+    @TableField(value = "agree_interview_time")
+    @ApiModelProperty(value = "预约面试时间")
+    private LocalDateTime agreeInterviewTime;
     @TableField(value = "interview_time")
     @ApiModelProperty(value = "面试时间")
     private LocalDateTime interviewTime;
+    @TableField(value = "induction_time")
+    @ApiModelProperty(value = "入职时间")
+    private LocalDateTime inductionTime;
+    @TableField(value = "leave_office_time")
+    @ApiModelProperty(value = "离职时间")
+    private LocalDateTime leaveOfficeTime;
     @TableField(value = "status")
     @ApiModelProperty(value = "客户状态 0：待面试 1：已面试 2：已入职 3：已离职")
     private Integer status;
