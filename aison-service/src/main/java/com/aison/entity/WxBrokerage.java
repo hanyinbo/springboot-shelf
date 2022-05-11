@@ -7,43 +7,46 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.models.auth.In;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@TableName(value = "wx_recomment")
+@TableName(value = "wx_brokerage")
 @Data
-@ApiModel(value="报备表")
-public class WxRecomment extends BaseEntity {
+@ApiModel(value="佣金表")
+public class WxBrokerage extends BaseEntity {
     @TableField(value = "id")
     @TableId
     @ApiModelProperty(value = "主键")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
-    @TableField(value = "custom_name")
+    @TableField(value = "cus_name")
     @ApiModelProperty(value = "客户名称")
-    private String customName;
-    @TableField(value = "custom_id")
+    private String cusName;
+    @TableField(value = "cus_id")
     @ApiModelProperty(value = "客户ID")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private Long customId;
-    @TableField(value = "telephone")
-    @ApiModelProperty(value = "手机号")
-    private String telephone;
-    @TableField(value = "gender")
-    @ApiModelProperty(value = "性别 0：男 1：女")
-    private Integer gender;
-    @TableField(value = "intention_company")
-    @ApiModelProperty(value = "意向公司")
-    private String intentionCompany;
+    private Long cusId;
+    @TableField(value = "company_name")
+    @ApiModelProperty(value = "公司名称")
+    private String companyName;
     @TableField(value = "company_id")
     @ApiModelProperty(value = "意向公司ID")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long companyId;
-    @TableField(value = "agree_interview_time")
-    @ApiModelProperty(value = "预约面试时间")
-    private LocalDateTime agreeInterviewTime;
+    @TableField(value = "brokerage")
+    @ApiModelProperty(value = "总佣金")
+    private Integer brokerage;
+    @TableField(value = "is_settle")
+    @ApiModelProperty(value = "是否结佣")
+    private Boolean isSettle;
+    @TableField(value = "recomment_name")
+    @ApiModelProperty(value = "推荐人")
+    private String recommentName;
+    @TableField(value = "recomment_id")
+    @ApiModelProperty(value = "推荐人ID")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long recommentId;
     @TableField(value = "interview_time")
     @ApiModelProperty(value = "面试时间")
     private LocalDateTime interviewTime;
@@ -56,15 +59,7 @@ public class WxRecomment extends BaseEntity {
     @TableField(value = "status")
     @ApiModelProperty(value = "客户状态 0：待面试 1：已面试 2：已入职 3：已离职")
     private Integer status;
-    @TableField(value = "recomment_name")
-    @ApiModelProperty(value = "推荐人")
-    private String recommentName;
-    @TableField(value = "recomment_id")
-    @ApiModelProperty(value = "推荐人ID")
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private Long recommentId;
-    @TableField(value = "remark")
-    @ApiModelProperty(value = "备注")
-    private String remark;
-
+    @TableField(value = "del_flag")
+    @ApiModelProperty(value = "删除标识 0：未删除 1：已删除")
+    private Integer delFlag;
 }

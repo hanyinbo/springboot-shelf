@@ -54,8 +54,8 @@ public class WxUser extends BaseEntity {
     @ApiModelProperty(value = "激活码")
     private String activeCode;
     @TableField(value = "identity")
-    @ApiModelProperty(value = "身份")
-    private String identity;
+    @ApiModelProperty(value = "身份 0：游客 1：侍卫")
+    private Integer identity;
     @TableField(value = "del_flag")
     @ApiModelProperty(value = "删除标识")
     private Integer delFlag;

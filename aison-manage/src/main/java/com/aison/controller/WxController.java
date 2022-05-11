@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sun.rmi.runtime.Log;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,6 +45,10 @@ public class WxController {
     private WxCompanyService wxCompanyService;
     @Autowired
     private WxPositionService wxPositionService;
+    @Autowired
+    private WxCustomService wxCustomService;
+    @Autowired
+    private WxBrokerageService wxBrokerageService;
 
     /**
      * 获取首页轮播图
@@ -250,6 +255,26 @@ public class WxController {
     }
 
     /**
+     * 新增推荐
+     * @return
+     */
+    @PostMapping(value = "/addRecomment")
+    public Result<Boolean> addRecomment(WxRecomment wxRecomment){
+        log.info("新增报备信息："+JSONObject.toJSONString(wxRecomment));
+        if(wxRecomment == null || wxRecomment.getId()==null || wxRecomment.getCustomName()==null ){
+            return Result.build(301,"业务参数不能为空");
+        }
+        WxCustom custom = new WxCustom();
+        custom.setCusName(wxRecomment.getCustomName());
+        custom.setDelFlag(0);
+        custom.setGender(wxRecomment.getGender());
+        custom.setTelPhone(wxRecomment.getTelephone());
+        wxCustomService.save(custom);
+        wxRecomment.setCustomId(custom.getId());
+        return Result.buildOk(wxRecommentService.save(wxRecomment));
+    }
+
+    /**
      * 分页获取全部报备信息
      * @param page
      * @param wxRecomment
@@ -396,21 +421,36 @@ public class WxController {
     }
 
     /**
-     * 变更面试时间
+     * 变更面试状态
      * @param ids
      * @return
      */
     @PutMapping(value = "/changeInterviewStatus")
     public Result<Boolean> changeInterviewStatus(@RequestBody List<Long> ids){
         List<WxRecomment> recommentList = wxRecommentService.listByIds(ids);
+        List<WxRecruitInfo> recruitInfoList = wxRecruitInfoService.list();
         if(recommentList ==null || recommentList.size()==0){
             return Result.build(310,"报备信息不存在");
         }
         recommentList.forEach(recome ->{
             recome.setStatus(1);
             recome.setInterviewTime(LocalDateTime.now());
+            WxBrokerage brokerage = new WxBrokerage();
+            brokerage.setCusName(recome.getCustomName());
+            brokerage.setCusId(recome.getCustomId());
+            brokerage.setCompanyId(recome.getCompanyId());
+            brokerage.setCompanyName(recome.getIntentionCompany());
+            brokerage.setInterviewTime(LocalDateTime.now());
+            recruitInfoList.stream().filter(s-> s.getCompanyId()==recome.getCompanyId()).forEach(recruitInfo->{
+                brokerage.setBrokerage(recruitInfo.getMoney());
+            });
+            brokerage.setIsSettle(false);
+            brokerage.setRecommentId(recome.getRecommentId());
+            brokerage.setRecommentName(recome.getRecommentName());
+            brokerage.setStatus(recome.getStatus());
         });
-       return Result.buildOk(wxRecommentService.updateBatchById(recommentList));
+
+        return Result.buildOk(wxRecommentService.updateBatchById(recommentList));
     }
 
     /**
@@ -706,6 +746,20 @@ public class WxController {
     }
 
     /**
+     * 获取推荐人列表
+     * @return
+     */
+    @GetMapping(value = "/getRecommentUserList")
+    public Result<List<WxUser>> getRecommentUserList(){
+        QueryWrapper<WxUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("del_flag",0);
+        queryWrapper.eq("identity",1);
+        List<WxUser> list = wxUserService.list(queryWrapper);
+        return Result.buildOk(list);
+
+    }
+
+    /**
      * 删除用户
      * @param id
      * @return
@@ -881,5 +935,317 @@ public class WxController {
         log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxPosition));
         IPage<WxPosition> positionPage = wxPositionService.getPageOfPosition(page, wxPosition);
         return Result.buildOk(positionPage.getRecords());
+    }
+//    佣金
+
+    /**
+     * 获取佣金详情
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getWxBrokerageInfo/{id}")
+    public Result<WxBrokerage> getWxBrokerageInfo(@PathVariable("id") Long id){
+        WxBrokerage one = wxBrokerageService.getById(id);
+        if(one ==null || one.getId()==null){
+            return Result.build(310,"未生成佣金");
+        }
+        return Result.buildOk(one);
+    }
+
+    /**
+     * 根据推荐人获取所有佣金
+     * @return
+     */
+    @GetMapping(value = "/getWxBrokerageListByRecId/{recId}")
+    public Result<List<WxBrokerage>> getWxBrokerageListByRecId(@PathVariable("recId") Long recId){
+        QueryWrapper<WxBrokerage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("recomment_id",recId);
+        List<WxBrokerage> wxBrokerageList = wxBrokerageService.list(queryWrapper);
+        return Result.buildOk(wxBrokerageList);
+    }
+
+    /**
+     * 根据推荐人获取未结佣佣金
+     * @return
+     */
+    @GetMapping(value = "/getNotBrokerageListByRecId/{recId}")
+    public Result<List<WxBrokerage>> getNotBrokerageListByRecId(@PathVariable("recId") Long recId){
+        QueryWrapper<WxBrokerage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("recomment_id",recId);
+        queryWrapper.eq("is_settle",false);
+        List<WxBrokerage> wxBrokerageList = wxBrokerageService.list(queryWrapper);
+        return Result.buildOk(wxBrokerageList);
+    }
+
+    /**
+     * 根据推荐人获取已结佣佣金
+     * @return
+     */
+    @GetMapping(value = "/getOkBrokerageListByRecId/{recId}")
+    public Result<List<WxBrokerage>> getOkBrokerageListByRecId(@PathVariable("recId") Long recId){
+        QueryWrapper<WxBrokerage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("recomment_id",recId);
+        queryWrapper.eq("is_settle",true );
+        List<WxBrokerage> wxBrokerageList = wxBrokerageService.list(queryWrapper);
+        return Result.buildOk(wxBrokerageList);
+    }
+    /**
+     * 获取佣金列表
+     * @return
+     */
+    @GetMapping(value = "/getWxBrokerageList")
+    public Result<List<WxBrokerage>> getWxBrokerageList(){
+        QueryWrapper<WxBrokerage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.groupBy("recomment_id");
+        List<WxBrokerage> wxBrokerages = wxBrokerageService.list(queryWrapper);
+        return Result.buildOk(wxBrokerages);
+    }
+
+    /**
+     * 分页获取全部佣金
+     * @param page
+     * @param wxBrokerage
+     * @return
+     */
+    @GetMapping(value = "/getAllBrokeragePage")
+    public Result<List<WxBrokerage>> getAllBrokeragePage(Page page,WxBrokerage wxBrokerage){
+        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxBrokerage));
+        QueryWrapper<WxBrokerage> queryWrapper = new QueryWrapper<>();
+        if(wxBrokerage.getCusName()!=null){
+            queryWrapper.like("cus_name",wxBrokerage.getCusName());
+        }
+        if(wxBrokerage.getCusId() !=null){
+            queryWrapper.eq("cus_id",wxBrokerage.getCusId());
+        }
+        if(wxBrokerage.getCompanyName() != null){
+            queryWrapper.like("company_name",wxBrokerage.getCompanyName());
+        }
+        if(wxBrokerage.getCompanyId()!=null){
+            queryWrapper.eq("company_id",wxBrokerage.getCompanyId());
+        }
+        if(wxBrokerage.getRecommentId()!=null){
+            queryWrapper.eq("recomment_id",wxBrokerage.getRecommentId());
+        }
+        if(wxBrokerage.getRecommentName() !=null){
+            queryWrapper.like("recomment_name",wxBrokerage.getRecommentName());
+        }
+        if(wxBrokerage.getIsSettle() !=null){
+            queryWrapper.eq("is_settle",wxBrokerage.getIsSettle());
+        }
+        if(wxBrokerage.getStatus() != null){
+            queryWrapper.eq("status",wxBrokerage.getStatus());
+        }
+        Page page1 = wxBrokerageService.page(page, queryWrapper);
+        return Result.buildOk(page1.getRecords());
+    }
+
+    /**
+     * 分页获取未结佣
+     * @param page
+     * @param wxBrokerage
+     * @return
+     */
+    @GetMapping(value = "/getNotBrokeragePage")
+    public Result<List<WxBrokerage>> getNotBrokeragePage(Page page,WxBrokerage wxBrokerage){
+        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxBrokerage));
+        QueryWrapper<WxBrokerage> queryWrapper = new QueryWrapper<>();
+        if(wxBrokerage.getCusName()!=null){
+            queryWrapper.like("cus_name",wxBrokerage.getCusName());
+        }
+        if(wxBrokerage.getCusId() !=null){
+            queryWrapper.eq("cus_id",wxBrokerage.getCusId());
+        }
+        if(wxBrokerage.getCompanyName() != null){
+            queryWrapper.like("company_name",wxBrokerage.getCompanyName());
+        }
+        if(wxBrokerage.getCompanyId()!=null){
+            queryWrapper.eq("company_id",wxBrokerage.getCompanyName());
+        }
+        if(wxBrokerage.getRecommentId()!=null){
+            queryWrapper.eq("recomment_id",wxBrokerage.getRecommentId());
+        }
+        if(wxBrokerage.getRecommentName() !=null){
+            queryWrapper.like("recomment_name",wxBrokerage.getRecommentName());
+        }
+
+        queryWrapper.eq("is_settle",false);
+
+        Page page1 = wxBrokerageService.page(page, queryWrapper);
+        return Result.buildOk(page1.getRecords());
+    }
+
+    /**
+     * 分页获取已结佣
+     * @param page
+     * @param wxBrokerage
+     * @return
+     */
+    @GetMapping(value = "/getOkBrokeragePage")
+    public Result<List<WxBrokerage>> getOkBrokeragePage(Page page,WxBrokerage wxBrokerage){
+        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxBrokerage));
+        QueryWrapper<WxBrokerage> queryWrapper = new QueryWrapper<>();
+        if(wxBrokerage.getCusName()!=null){
+            queryWrapper.like("cus_name",wxBrokerage.getCusName());
+        }
+        if(wxBrokerage.getCusId() !=null){
+            queryWrapper.eq("cus_id",wxBrokerage.getCusId());
+        }
+        if(wxBrokerage.getCompanyName() != null){
+            queryWrapper.like("company_name",wxBrokerage.getCompanyName());
+        }
+        if(wxBrokerage.getCompanyId()!=null){
+            queryWrapper.eq("company_id",wxBrokerage.getCompanyName());
+        }
+        if(wxBrokerage.getRecommentId()!=null){
+            queryWrapper.eq("recomment_id",wxBrokerage.getRecommentId());
+        }
+        if(wxBrokerage.getRecommentName() !=null){
+            queryWrapper.like("recomment_name",wxBrokerage.getRecommentName());
+        }
+
+        queryWrapper.eq("is_settle",true);
+
+        Page page1 = wxBrokerageService.page(page, queryWrapper);
+        return Result.buildOk(page1.getRecords());
+    }
+    /**
+     * 删除佣金
+     * @param id
+     * @return
+     */
+    @DeleteMapping(value = "/delWxBrokerage/{id}")
+    public Result<Boolean> delWxBrokerage(@PathVariable("id") Long id){
+        WxBrokerage one = wxBrokerageService.getById(id);
+        if(one == null || one.getId() ==null){
+            return Result.build(310,"未生成佣金");
+        }
+        return Result.buildOk(wxCustomService.removeById(one.getId()));
+    }
+
+    /**
+     * 更新佣金
+     * @param wxBrokerage
+     * @return
+     */
+    @PutMapping(value = "/updateWxBrokerage")
+    public Result<Boolean> updateWxBrokerage(@RequestBody WxBrokerage wxBrokerage){
+        WxBrokerage one = wxBrokerageService.getById(wxBrokerage.getId());
+        if(one == null || one.getId() ==null){
+            return Result.build(310,"未生成佣金");
+        }
+        one.setDelFlag(0);
+        return Result.buildOk(wxBrokerageService.saveOrUpdate(wxBrokerage));
+    }
+
+    /**
+     * 结佣
+     * @param ids
+     * @return
+     */
+    @PutMapping(value = "/settleBrokerage")
+    public Result<Boolean> settleBrokerage(@RequestBody List<Long> ids){
+        List<WxBrokerage> wxBrokerageList = wxBrokerageService.listByIds(ids);
+        if(wxBrokerageList ==null || wxBrokerageList.size()==0){
+            return Result.build(310,"佣金信息不存在");
+        }
+        wxBrokerageList.forEach(brokerage->{
+            brokerage.setIsSettle(true);
+        });
+        return Result.buildOk(wxBrokerageService.updateBatchById(wxBrokerageList));
+    }
+
+//    客户
+
+    /**
+     * 获取客户详情
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getWxCustomInfo/{id}")
+    public Result<WxCustom> getWxCustomInfo(@PathVariable("id") Long id){
+        WxCustom one = wxCustomService.getById(id);
+        if(one == null || one.getId() ==null){
+            return Result.build(310,"客户不存在");
+        }
+        return Result.buildOk(one);
+    }
+
+    /**
+     * 删除客户
+     * @param id
+     * @return
+     */
+    @DeleteMapping(value = "/delWxCustom/{id}")
+    public Result<Boolean> delWxCustom(@PathVariable("id") Long id){
+        WxCustom one = wxCustomService.getById(id);
+        if(one == null || one.getId() ==null){
+            return Result.build(310,"客户不存在");
+        }
+        one.setDelFlag(1);
+        return Result.buildOk(wxCustomService.saveOrUpdate(one));
+    }
+
+    /**
+     * 修改客户信息
+     * @param wxCustom
+     * @return
+     */
+    @PutMapping(value = "/updateWxCustom")
+    public Result<Boolean> updateWxCustom(@RequestBody WxCustom wxCustom){
+        WxCustom one = wxCustomService.getById(wxCustom.getId());
+        if(one == null || one.getId() ==null){
+            return Result.build(310,"客户不存在");
+        }
+        return Result.buildOk(wxCustomService.updateById(wxCustom));
+    }
+
+    /**
+     * 新增客户
+     * @param wxCustom
+     * @return
+     */
+    @PostMapping(value = "/addWxCustom")
+    public Result<Boolean> addWxCustom(@RequestBody WxCustom wxCustom){
+        if(wxCustom == null || wxCustom.getCusName()==null ){
+            return Result.build(301,"业务参数不能为空");
+        }
+        wxCustom.setDelFlag(0);
+        return Result.buildOk(wxCustomService.saveOrUpdate(wxCustom));
+    }
+
+    /**
+     * 分页获取客户信息
+     * @param page
+     * @param wxCustom
+     * @return
+     */
+    @GetMapping(value = "/getWxCustomPage")
+    public Result<List<WxCustom>> getWxCustomPage(Page page,WxCustom wxCustom){
+        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxCustom));
+        QueryWrapper<WxCustom> queryWrapper = new QueryWrapper<>();
+        if(wxCustom.getCusName()!=null){
+            queryWrapper.like("cus_name",wxCustom.getCusName());
+        }
+        if(wxCustom.getGender() !=null){
+            queryWrapper.eq("gender",wxCustom.getGender());
+        }
+        if(wxCustom.getTelPhone() != null){
+            queryWrapper.like("telphone",wxCustom.getTelPhone());
+        }
+        queryWrapper.eq("del_flag",0);
+        Page page1 = wxCustomService.page(page, queryWrapper);
+        return Result.buildOk(page1.getRecords());
+    }
+
+    /**
+     * 获取客户列表
+     * @return
+     */
+    @GetMapping(value = "/getWxCustomList")
+    public Result<List<WxCustom>> getWxCustomList(){
+        QueryWrapper<WxCustom> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("del_flag",0);
+        List<WxCustom> customList = wxCustomService.list(queryWrapper);
+        return Result.buildOk(customList);
     }
 }
