@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import sun.rmi.runtime.Log;
 
@@ -259,9 +260,9 @@ public class WxController {
      * @return
      */
     @PostMapping(value = "/addRecomment")
-    public Result<Boolean> addRecomment(WxRecomment wxRecomment){
+    public Result<Boolean> addRecomment(@RequestBody WxRecomment wxRecomment){
         log.info("新增报备信息："+JSONObject.toJSONString(wxRecomment));
-        if(wxRecomment == null || wxRecomment.getId()==null || wxRecomment.getCustomName()==null ){
+        if(wxRecomment == null || wxRecomment.getCompanyId()==null || wxRecomment.getCustomName()==null || wxRecomment.getRecommentId()==null ){
             return Result.build(301,"业务参数不能为空");
         }
         WxCustom custom = new WxCustom();
@@ -271,6 +272,7 @@ public class WxController {
         custom.setTelPhone(wxRecomment.getTelephone());
         wxCustomService.save(custom);
         wxRecomment.setCustomId(custom.getId());
+        wxRecomment.setStatus(0);
         return Result.buildOk(wxRecommentService.save(wxRecomment));
     }
 
@@ -427,6 +429,7 @@ public class WxController {
      */
     @PutMapping(value = "/changeInterviewStatus")
     public Result<Boolean> changeInterviewStatus(@RequestBody List<Long> ids){
+        List<WxBrokerage> wxBrokerageList = new ArrayList<>();
         List<WxRecomment> recommentList = wxRecommentService.listByIds(ids);
         List<WxRecruitInfo> recruitInfoList = wxRecruitInfoService.list();
         if(recommentList ==null || recommentList.size()==0){
@@ -441,15 +444,22 @@ public class WxController {
             brokerage.setCompanyId(recome.getCompanyId());
             brokerage.setCompanyName(recome.getIntentionCompany());
             brokerage.setInterviewTime(LocalDateTime.now());
-            recruitInfoList.stream().filter(s-> s.getCompanyId()==recome.getCompanyId()).forEach(recruitInfo->{
-                brokerage.setBrokerage(recruitInfo.getMoney());
+
+            recruitInfoList.forEach(recruit->{
+               log.info("recruit："+recruit.getCompanyId());
+               log.info("recome:"+recome.getCompanyId());
+                if(recruit.getCompanyId().longValue()==recome.getCompanyId().longValue() && recruit.getId().longValue()==recome.getRecruitId().longValue()){
+                    log.info("佣金："+recruit.getMoney());
+                    brokerage.setBrokerage(recruit.getMoney());
+                }
             });
             brokerage.setIsSettle(false);
             brokerage.setRecommentId(recome.getRecommentId());
             brokerage.setRecommentName(recome.getRecommentName());
             brokerage.setStatus(recome.getStatus());
+            wxBrokerageList.add(brokerage);
         });
-
+         wxBrokerageService.saveBatch(wxBrokerageList);
         return Result.buildOk(wxRecommentService.updateBatchById(recommentList));
     }
 
@@ -543,9 +553,6 @@ public class WxController {
         if(wxRecruitInfo.getCompanyName() != null){
             wrappers.eq(WxRecruitInfo::getCompanyName, wxRecruitInfo.getCompanyName());
         }
-//        if(wxRecruitInfo.getRegion() != null ){
-//            wrappers.eq(WxRecruitInfo::getPosition, wxRecruitInfo.getRegion());
-//        }
         Page page1 = wxRecruitInfoService.page(page,wrappers);
         log.info("企业列表："+ JSONObject.toJSONString(page1));
         return Result.buildOk(page1);
@@ -574,7 +581,7 @@ public class WxController {
         }
         String positionName = null;
         for(String name: wxRecruitInfo.getWxPositionList()){
-            if(StringUtils.isNotEmpty(positionName)){
+            if(StringUtils.isEmpty(positionName)){
                 positionName=name;
             }else {
                 positionName=positionName+"/"+name;
@@ -590,6 +597,7 @@ public class WxController {
             for(WxPosition wxPosition:wxPositionList){
                 WxRecruitPosition recruitPosition = new WxRecruitPosition();
                 recruitPosition.setPositionName(wxPosition.getPositionName());
+                recruitPosition.setCompanyId(wxRecruitInfo.getCompanyId());
                 recruitPosition.setRecruitId(wxRecruitInfo.getId());
                 recruitPositionList.add(recruitPosition);
             }
@@ -924,6 +932,17 @@ public class WxController {
         return Result.buildOk(wxPositionService.saveOrUpdate(wxPosition));
     }
 
+    /**
+     * 根据公司ID获取招聘岗位
+     * @return
+     */
+    @GetMapping(value = "/getRecruitPositionByCompanyId/{companyId}")
+    public Result<List<WxRecruitPosition>> getRecruitPositionByCompanyId(@PathVariable("companyId") Long companyId){
+       QueryWrapper<WxRecruitPosition> queryWrapper = new QueryWrapper<>();
+       queryWrapper.eq("company_id",companyId);
+       List<WxRecruitPosition> recruitPositionList = wxRecruitPositionService.list(queryWrapper);
+       return Result.buildOk(recruitPositionList);
+    }
     /**
      * 分页获取职位信息
      * @param page

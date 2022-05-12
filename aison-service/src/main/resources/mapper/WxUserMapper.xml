@@ -20,8 +20,8 @@
              <if test="wxUser.address != null and wxUser.address !=''">
                  and a.address like CONCAT('%',#{wxUser.address},'%')
              </if>
-             <if test="wxUser.identity != null and wxUser.identity != ''">
-                 and a.identity like CONCAT('%',#{wxUser.identity},'%')
+             <if test="wxUser.identity != null">
+                 and a.identity=#{wxUser.identity}
              </if>
              <if test="wxUser.activeCode != null and wxUser.activeCode != ''">
                  and a.active_code like CONCAT('%',#{wxUser.activeCode},'%')

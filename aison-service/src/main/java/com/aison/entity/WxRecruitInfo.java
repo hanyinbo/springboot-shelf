@@ -28,6 +28,7 @@ public class WxRecruitInfo extends BaseEntity {
     @ApiModelProperty(value = "公司名称")
     private String companyName;
     @ApiModelProperty(value = "公司ID")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long companyId;
     @ApiModelProperty(value = "面试地址")
     private String interviewAddress;

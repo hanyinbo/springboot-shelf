@@ -41,6 +41,13 @@ public class WxRecomment extends BaseEntity {
     @ApiModelProperty(value = "意向公司ID")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long companyId;
+    @TableField(value = "position")
+    @ApiModelProperty(value = "面试岗位")
+    private String position;
+    @TableField(value = "position_id")
+    @ApiModelProperty(value = "岗位ID")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long positionId;
     @TableField(value = "agree_interview_time")
     @ApiModelProperty(value = "预约面试时间")
     private LocalDateTime agreeInterviewTime;
@@ -63,6 +70,10 @@ public class WxRecomment extends BaseEntity {
     @ApiModelProperty(value = "推荐人ID")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long recommentId;
+    @TableField(value = "recruit_id")
+    @ApiModelProperty(value = "招聘ID")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Long recruitId;
     @TableField(value = "remark")
     @ApiModelProperty(value = "备注")
     private String remark;
