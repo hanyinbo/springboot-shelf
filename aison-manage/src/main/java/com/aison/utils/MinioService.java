@@ -175,6 +175,15 @@ public class MinioService {
         minioClient.deleteObjectTags(DeleteObjectTagsArgs.builder().bucket(bucketName).object(objectName).build());
     }
 
+    public boolean deleteFile(String bucketName, String fileName) {
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(fileName).build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
     /**
      * 文件上传（已知文件大小）
      * @param bucketName  存储桶名称

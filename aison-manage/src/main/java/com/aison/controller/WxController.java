@@ -7,21 +7,29 @@ import com.aison.dto.WxRecruitDto;
 import com.aison.dto.WxRecruitQueryDto;
 import com.aison.entity.*;
 import com.aison.service.*;
+import com.aison.utils.MinioService;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sun.rmi.runtime.Log;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -50,6 +58,8 @@ public class WxController {
     private WxCustomService wxCustomService;
     @Autowired
     private WxBrokerageService wxBrokerageService;
+    @Autowired
+    private MinioService minioService;
 
     /**
      * 获取首页轮播图
@@ -1266,5 +1276,84 @@ public class WxController {
         queryWrapper.eq("del_flag",0);
         List<WxCustom> customList = wxCustomService.list(queryWrapper);
         return Result.buildOk(customList);
+    }
+
+    /**
+     * 上传小程序首页轮播图
+     * @param file
+     * @return
+     */
+    @PostMapping(value = "/uploadHomeSwiper")
+    public Result uploadHomeSwiper(@RequestParam(name = "file",required = false) MultipartFile file) throws IOException {
+        if(file.isEmpty() ){
+            return Result.build(320,"文件不能为空");
+        }
+        List<String> fileList = minioService.listObjectNames("swiper");
+        log.info("上传图片名称："+file.getOriginalFilename());
+
+        if(fileList.size()>3){
+            return Result.build(320,"轮播图不能超过3张");
+        }
+        boolean b = minioService.putObject("swiper", file.getOriginalFilename(), file.getInputStream());
+        if(!b){
+            return Result.build(320,"上传失败");
+        }
+        WxSwiperImg wxSwiperImg = new WxSwiperImg();
+        wxSwiperImg.setImgName(file.getOriginalFilename());
+        wxSwiperImg.setImgUrl("http://139.224.248.1:9000/swiper/"+file.getOriginalFilename());
+        return Result.buildOk(wxSwiperImgService.saveOrUpdate(wxSwiperImg));
+    }
+
+    /**
+     * 删除小程序首页轮播图
+     * @param id
+     * @return
+     */
+    @DeleteMapping(value = "/deleteHomeSwiper/{id}")
+    public Result<Boolean> deleteHomeSwiper(@PathVariable("id") Long id){
+        WxSwiperImg one = wxSwiperImgService.getById(id);
+        Boolean isSuccess = false;
+        if(one==null){
+            return Result.build(310,"轮播图不存在");
+        }
+        boolean b = wxSwiperImgService.removeById(id);
+        if(!b){
+            return Result.build(320,"删除轮播图失败");
+        }else {
+            isSuccess = minioService.deleteFile("swiper", one.getImgName());
+        }
+        return Result.buildOk(isSuccess);
+    }
+
+    /**
+     * 修改轮播图
+     * @param wxSwiperImg
+     * @return
+     */
+    @PutMapping(value = "/updateHomeSwiper")
+    public Result<Boolean> updateHomeSwiper(@RequestBody WxSwiperImg wxSwiperImg){
+        if(wxSwiperImg.getId()==null){
+            return Result.build(301,"参数不能为空");
+        }
+        WxSwiperImg one = wxSwiperImgService.getById(wxSwiperImg.getId());
+        if(one == null || one.getId()==null){
+            return Result.build(310,"获取轮播图不存在");
+        }
+        one.setNavigatorUrl(wxSwiperImg.getNavigatorUrl());
+        return Result.buildOk(wxSwiperImgService.saveOrUpdate(wxSwiperImg));
+    }
+
+    /**
+     * 获取轮播图详情
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "getSwiperImgInfo/{id}")
+    public Result<WxSwiperImg> getSwiperImgInfo(@PathVariable("id") Long id){
+        WxSwiperImg one = wxSwiperImgService.getById(id);
+        if(one==null){
+            return Result.build(310,"轮播图不存在");
+        }
+        return Result.buildOk(one);
     }
 }

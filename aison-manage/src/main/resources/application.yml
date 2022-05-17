@@ -23,6 +23,10 @@ spring:
     db-identity-used: false
   main:
     allow-bean-definition-overriding: true
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
 mybatis-plus:
   mapper-locations: classpath*:mapper/*.xml
   type-aliases-package: com.aison.entity
