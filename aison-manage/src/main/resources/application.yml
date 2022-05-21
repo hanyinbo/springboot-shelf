@@ -7,7 +7,8 @@ spring:
     password: Custom@2.
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
-    host: 127.0.0.1
+    host: 139.224.248.1
+    password: Custom@1.
     port: 6379
   # activiti default configuration
   #在activiti的默认配置中，process-definition-location-prefix 是指定activiti流程描述文件的前缀（即路径），

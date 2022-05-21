@@ -445,6 +445,20 @@ public class MinioService {
     }
 
     /**
+     * 获取永久文件地址
+     */
+    @SneakyThrows
+    public String getForeverObjectUrl(String bucketName,String fileName) throws Exception {
+        String url = minioClient.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                        .method(Method.GET)
+                        .bucket(bucketName)
+                        .object(fileName)
+                        .build());
+        return url;
+    }
+
+    /**
      * 获取对象的元数据
      * @param bucketName 存储桶名称
      * @param objectName 存储桶里的对象名称

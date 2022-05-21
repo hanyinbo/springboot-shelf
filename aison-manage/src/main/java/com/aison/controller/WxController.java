@@ -1284,13 +1284,11 @@ public class WxController {
      * @return
      */
     @PostMapping(value = "/uploadHomeSwiper")
-    public Result uploadHomeSwiper(@RequestParam(name = "file",required = false) MultipartFile file) throws IOException {
+    public Result uploadHomeSwiper(@RequestParam(name = "file",required = false) MultipartFile file) throws Exception {
         if(file.isEmpty() ){
             return Result.build(320,"文件不能为空");
         }
         List<String> fileList = minioService.listObjectNames("swiper");
-        log.info("上传图片名称："+file.getOriginalFilename());
-
         if(fileList.size()>3){
             return Result.build(320,"轮播图不能超过3张");
         }
@@ -1298,10 +1296,12 @@ public class WxController {
         if(!b){
             return Result.build(320,"上传失败");
         }
+        String foreverObjectUrl = minioService.getForeverObjectUrl("swiper", file.getOriginalFilename());
         WxSwiperImg wxSwiperImg = new WxSwiperImg();
         wxSwiperImg.setImgName(file.getOriginalFilename());
-        wxSwiperImg.setImgUrl("http://139.224.248.1:9000/swiper/"+file.getOriginalFilename());
+        wxSwiperImg.setImgUrl(foreverObjectUrl);
         return Result.buildOk(wxSwiperImgService.saveOrUpdate(wxSwiperImg));
+
     }
 
     /**
