@@ -62,33 +62,6 @@ public class WxController {
     private MinioService minioService;
 
     /**
-     * 获取首页轮播图
-     * @return
-     */
-    @GetMapping(value = "/getSwiperImgList")
-    public Result<List<WxSwiperImg>> getSwiperImgList(){
-        return Result.buildOk(wxSwiperImgService.list());
-    }
-
-    /**
-     * 获取公司轮播图片
-     * @return
-     */
-    @GetMapping(value = "/getCompanySwiperImgList")
-    public Result<List<WxCompanyDetailImg>> getCompanySwiperImgList(){
-        return Result.buildOk(wxCompanyDetailImgService.list());
-    }
-
-    /**
-     * 获取导航轮播图
-     * @return
-     */
-    @GetMapping(value = "/getNavigationImgList")
-    public Result<List<WxNavigationImg>> getNavigationImgList(){
-        return Result.buildOk(wxNavigationImgService.list());
-    }
-
-    /**
      * 获取公司列表
      * @return
      */
@@ -1277,14 +1250,41 @@ public class WxController {
         List<WxCustom> customList = wxCustomService.list(queryWrapper);
         return Result.buildOk(customList);
     }
-
+    /**
+     * 获取首页轮播图
+     * @return
+     */
+    @GetMapping(value = "/getCarouselImgList")
+    public Result<List<WxSwiperImg>> getCarouselImgList(){
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("img_type","0");
+        return Result.buildOk(wxSwiperImgService.list(queryWrapper));
+    }
+    /**
+     * 获取小程序导航图
+     * @return
+     */
+    @GetMapping(value = "/getNavImgList")
+    public Result<List<WxSwiperImg>> getNavImgList(){
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("img_type","1");
+        return Result.buildOk(wxSwiperImgService.list(queryWrapper));
+    }
+    /**
+     * 获取公司轮播图片
+     * @return
+     */
+    @GetMapping(value = "/getCompanySwiperImgList")
+    public Result<List<WxCompanyDetailImg>> getCompanySwiperImgList(){
+        return Result.buildOk(wxCompanyDetailImgService.list());
+    }
     /**
      * 上传小程序首页轮播图
      * @param file
      * @return
      */
-    @PostMapping(value = "/uploadHomeSwiper")
-    public Result uploadHomeSwiper(@RequestParam(name = "file",required = false) MultipartFile file) throws Exception {
+    @PostMapping(value = "/uploadMiniCarouselImg")
+    public Result uploadMiniCarouselImg(@RequestParam(name = "file",required = false) MultipartFile file) throws Exception {
         if(file.isEmpty() ){
             return Result.build(320,"文件不能为空");
         }
@@ -1298,19 +1298,46 @@ public class WxController {
         }
         String foreverObjectUrl = minioService.getForeverObjectUrl("swiper", file.getOriginalFilename());
         WxSwiperImg wxSwiperImg = new WxSwiperImg();
+        wxSwiperImg.setImgType("0");
         wxSwiperImg.setImgName(file.getOriginalFilename());
         wxSwiperImg.setImgUrl(foreverObjectUrl);
         return Result.buildOk(wxSwiperImgService.saveOrUpdate(wxSwiperImg));
 
     }
+    /**
+     * 上传小程序首页导航图
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    @PostMapping(value = "/uploadMiniNavImg")
+    public Result uploadMiniNavImg(@RequestParam(name = "file",required = false) MultipartFile file) throws Exception {
+        if(file.isEmpty() ){
+            return Result.build(320,"文件不能为空");
+        }
+        List<String> fileList = minioService.listObjectNames("nav");
+        if(fileList.size()>4){
+            return Result.build(320,"不能超过4张");
+        }
+        boolean b = minioService.putObject("nav", file.getOriginalFilename(), file.getInputStream());
+        if(!b){
+            return Result.build(320,"上传失败");
+        }
+        String foreverObjectUrl = minioService.getForeverObjectUrl("swiper", file.getOriginalFilename());
+        WxSwiperImg wxSwiperImg = new WxSwiperImg();
+        wxSwiperImg.setImgType("1");
+        wxSwiperImg.setImgName(file.getOriginalFilename());
+        wxSwiperImg.setImgUrl(foreverObjectUrl);
+        return Result.buildOk(wxSwiperImgService.saveOrUpdate(wxSwiperImg));
 
+    }
     /**
      * 删除小程序首页轮播图
      * @param id
      * @return
      */
-    @DeleteMapping(value = "/deleteHomeSwiper/{id}")
-    public Result<Boolean> deleteHomeSwiper(@PathVariable("id") Long id){
+    @DeleteMapping(value = "/deleteMiniCarouselImg/{id}")
+    public Result<Boolean> deleteMiniCarouselImg(@PathVariable("id") Long id){
         WxSwiperImg one = wxSwiperImgService.getById(id);
         Boolean isSuccess = false;
         if(one==null){
@@ -1324,14 +1351,33 @@ public class WxController {
         }
         return Result.buildOk(isSuccess);
     }
-
+    /**
+     * 删除小程序首页轮播图
+     * @param id
+     * @return
+     */
+    @DeleteMapping(value = "/deleteMiniNavImg/{id}")
+    public Result<Boolean> deleteMiniNavImg(@PathVariable("id") Long id){
+        WxSwiperImg one = wxSwiperImgService.getById(id);
+        Boolean isSuccess = false;
+        if(one==null){
+            return Result.build(310,"轮播图不存在");
+        }
+        boolean b = wxSwiperImgService.removeById(id);
+        if(!b){
+            return Result.build(320,"删除轮播图失败");
+        }else {
+            isSuccess = minioService.deleteFile("nav", one.getImgName());
+        }
+        return Result.buildOk(isSuccess);
+    }
     /**
      * 修改轮播图
      * @param wxSwiperImg
      * @return
      */
-    @PutMapping(value = "/updateHomeSwiper")
-    public Result<Boolean> updateHomeSwiper(@RequestBody WxSwiperImg wxSwiperImg){
+    @PutMapping(value = "/updateCarouselOrNavUrl")
+    public Result<Boolean> updateCarouselOrNavUrl(@RequestBody WxSwiperImg wxSwiperImg){
         if(wxSwiperImg.getId()==null){
             return Result.build(301,"参数不能为空");
         }
@@ -1342,14 +1388,13 @@ public class WxController {
         one.setNavigatorUrl(wxSwiperImg.getNavigatorUrl());
         return Result.buildOk(wxSwiperImgService.saveOrUpdate(wxSwiperImg));
     }
-
     /**
      * 获取轮播图详情
      * @param id
      * @return
      */
-    @GetMapping(value = "getSwiperImgInfo/{id}")
-    public Result<WxSwiperImg> getSwiperImgInfo(@PathVariable("id") Long id){
+    @GetMapping(value = "getCarouselOrNavImgInfo/{id}")
+    public Result<WxSwiperImg> getCarouselOrNavImgInfo(@PathVariable("id") Long id){
         WxSwiperImg one = wxSwiperImgService.getById(id);
         if(one==null){
             return Result.build(310,"轮播图不存在");
