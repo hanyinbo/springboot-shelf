@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @TableName(value = "wx_company")
 @Data
 @ApiModel(value = "公司表", description = "公司表")
@@ -39,6 +41,9 @@ public class WxCompany extends BaseEntity {
     @ApiModelProperty(value = "所属区域")
     @TableField(value = "region")
     private String region;
+    @ApiModelProperty(value = "公司图片ID")
+    @TableField(exist = false)
+    private List<Long> companyImgIdList;
     @ApiModelProperty(value = "删除标识 0:未删除 1：已删除")
     @TableField(value = "del_flag")
     private Integer delFlag;

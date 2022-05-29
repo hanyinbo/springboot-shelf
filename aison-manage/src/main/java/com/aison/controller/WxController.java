@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +61,10 @@ public class WxController {
     private WxBrokerageService wxBrokerageService;
     @Autowired
     private MinioService minioService;
+    @Autowired
+    private NzUploadFileService nzUploadFileService;
+    @Autowired
+    private WxCompanyFileService wxCompanyFileService;
 
     /**
      * 获取公司列表
@@ -88,6 +93,17 @@ public class WxController {
         }
         return Result.buildOk(company);
     }
+
+    /**
+     * 获取公司图片
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getCompanyImgList/{id}")
+    public Result getCompanyImgList(@PathVariable("id") Long id){
+        List<NzUploadFile> companyImgList = nzUploadFileService.getCompanyImgList(id);
+        return Result.buildOk(companyImgList);
+    }
     /**
      * 删除公司
      * @param id
@@ -111,7 +127,7 @@ public class WxController {
      */
     @PostMapping("/addCompany")
     public Result addCompany(@RequestBody WxCompany wxCompany){
-        if(wxCompany == null || wxCompany.getCompanyName()==null || wxCompany.getIntroduce()==null){
+        if(wxCompany == null || StringUtils.isEmpty(wxCompany.getCompanyName()) || StringUtils.isEmpty(wxCompany.getIntroduce())){
             return Result.build(301,"业务参数不能为空");
         }
         QueryWrapper<WxCompany> companyWrapper = new QueryWrapper<>();
@@ -123,10 +139,24 @@ public class WxController {
         }
         wxCompany.setCompanyCode("2001");
         wxCompany.setDelFlag(0);
-        log.info("添加公司对象："+JSONObject.toJSONString(wxCompany));
-        wxCompanyService.save(wxCompany);
-        log.info("保持成功：");
-       return Result.buildOk();
+        boolean saveCompany = wxCompanyService.save(wxCompany);
+        if(!saveCompany){
+            nzUploadFileService.removeByIds(wxCompany.getCompanyImgIdList());
+            return Result.build(340,"新增公司失败");
+        }
+        List<NzUploadFile> uploadFileList = nzUploadFileService.listByIds(wxCompany.getCompanyImgIdList());
+
+        List<WxCompanyFile> wxCompanyFileList = new ArrayList<>();
+        for(Long imgId: wxCompany.getCompanyImgIdList()){
+            WxCompanyFile companyFile = new WxCompanyFile();
+            companyFile.setCompanyId(wxCompany.getId());
+            uploadFileList.stream().filter(img->img.getId().longValue() == imgId).forEach(companyImg->{
+                companyFile.setFileId(imgId);
+            });
+            wxCompanyFileList.add(companyFile);
+        }
+        wxCompanyFileService.saveOrUpdateBatch(wxCompanyFileList);
+        return Result.buildOk();
     }
 
     /**
@@ -152,7 +182,6 @@ public class WxController {
         }
         return Result.buildOk(wxCompanyService.saveOrUpdate(wxCompany));
     }
-
 
     /**
      * 分页获取公司列表
@@ -1268,6 +1297,7 @@ public class WxController {
     public Result<List<WxSwiperImg>> getNavImgList(){
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("img_type","1");
+        queryWrapper.orderByAsc("sort");
         return Result.buildOk(wxSwiperImgService.list(queryWrapper));
     }
     /**
@@ -1323,13 +1353,49 @@ public class WxController {
         if(!b){
             return Result.build(320,"上传失败");
         }
-        String foreverObjectUrl = minioService.getForeverObjectUrl("swiper", file.getOriginalFilename());
+        String foreverObjectUrl = minioService.getForeverObjectUrl("nav", file.getOriginalFilename());
         WxSwiperImg wxSwiperImg = new WxSwiperImg();
         wxSwiperImg.setImgType("1");
         wxSwiperImg.setImgName(file.getOriginalFilename());
+        wxSwiperImg.setSort(fileList.size()+1);
         wxSwiperImg.setImgUrl(foreverObjectUrl);
         return Result.buildOk(wxSwiperImgService.saveOrUpdate(wxSwiperImg));
 
+    }
+
+    /**
+     * 上传公司轮播图
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    @PostMapping(value = "/uploadCompanyImg")
+    public Result uploadCompanyImg(@RequestParam(name = "file",required = false) MultipartFile file) throws Exception {
+        if(file.isEmpty() ){
+            return Result.build(320,"文件不能为空");
+        }
+        List<String> fileList = minioService.listObjectNames("company");
+        if(fileList.size()>4){
+            return Result.build(320,"不能超过4张");
+        }
+        for(String fileName: fileList){
+            if(fileName.equals(file.getOriginalFilename())){
+                return Result.build(340,"文件名不能重复");
+            }
+        }
+        boolean b = minioService.putObject("company", file.getOriginalFilename(), file.getInputStream());
+        if(!b){
+            return Result.build(320,"上传失败");
+        }
+        String foreverObjectUrl = minioService.getForeverObjectUrl("company", file.getOriginalFilename());
+
+        NzUploadFile uploadFile = new NzUploadFile();
+        uploadFile.setUid(file.getOriginalFilename());
+        uploadFile.setName(file.getOriginalFilename());
+        uploadFile.setUrl(foreverObjectUrl);
+        uploadFile.setStatus("done");
+        nzUploadFileService.saveOrUpdate(uploadFile);
+        return Result.buildOk(uploadFile);
     }
     /**
      * 删除小程序首页轮播图
@@ -1386,6 +1452,7 @@ public class WxController {
             return Result.build(310,"获取轮播图不存在");
         }
         one.setNavigatorUrl(wxSwiperImg.getNavigatorUrl());
+        one.setNavigatorName(wxSwiperImg.getNavigatorName());
         return Result.buildOk(wxSwiperImgService.saveOrUpdate(wxSwiperImg));
     }
     /**

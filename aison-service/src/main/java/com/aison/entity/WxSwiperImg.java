@@ -27,6 +27,10 @@ public class WxSwiperImg extends BaseEntity {
     private String imgUrl;
     @ApiModelProperty(value = "图片导航地址")
     private String navigatorUrl;
+    @ApiModelProperty(value = "导航名称")
+    private String navigatorName;
     @ApiModelProperty(value = "图片类型 0：轮播图 1：导航栏 ")
     private String imgType;
+    @ApiModelProperty(value = "排序")
+    private Integer sort;
 }

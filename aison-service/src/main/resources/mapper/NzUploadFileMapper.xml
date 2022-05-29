@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aison.mapper.NzUploadFileMapper">
+
+    <select id="getCompanyImgList" resultType="com.aison.entity.NzUploadFile">
+       select c.* from wx_company a
+       left join wx_company_file b
+       on a.id=b.company_id
+       left join nz_upload_file c
+       on b.file_id=c.id
+       <where>
+           <if test="companyId != null">
+                a.id = #{companyId}
+           </if>
+       </where>
+
+    </select>
+</mapper>

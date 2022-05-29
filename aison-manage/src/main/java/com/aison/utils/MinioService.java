@@ -457,6 +457,11 @@ public class MinioService {
                         .build());
         return url;
     }
+//    @SneakyThrows
+//    public String getObjectUrl(String bucketName,String fileName) throws Exception{
+//        String objectUrl = minioClient.getObjectUrl(bucketName, fileName);
+//        return objectUrl;
+//    }
 
     /**
      * 获取对象的元数据
