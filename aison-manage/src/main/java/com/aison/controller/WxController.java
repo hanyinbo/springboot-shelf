@@ -1,5 +1,6 @@
 package com.aison.controller;
 
+import cn.hutool.core.collection.CollUtil;
 import com.aison.common.Result;
 import com.aison.dto.WxCompanyDto;
 import com.aison.dto.WxCompanyOfPageDto;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -90,6 +92,11 @@ public class WxController {
         WxCompany company = wxCompanyService.getOne(companyQuery);
         if (company == null || company.getId() ==null){
             return Result.build(310,"公司不存在");
+        }
+        List<NzUploadFile> companyImgList = nzUploadFileService.getCompanyImgList(id);
+        if(CollUtil.isNotEmpty(companyImgList)){
+            List<Long> imgIgs = companyImgList.stream().map(NzUploadFile::getId).collect(Collectors.toList());
+            company.setCompanyImgIdList(imgIgs);
         }
         return Result.buildOk(company);
     }
