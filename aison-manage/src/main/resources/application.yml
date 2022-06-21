@@ -43,10 +43,8 @@ logging:
 jwt:
   secret: aisonjwt
   tokenHeader: Authorization
-  remembeExpiraton: 7800
-  tokenPrefix: Bearer
-  expiration: 3000
-  refreshExpiraton: 7
+  tokenHead: Bearer
+  expiration: 684888
 pwd:
   aesKey: a5h*jos&fj18oico
 

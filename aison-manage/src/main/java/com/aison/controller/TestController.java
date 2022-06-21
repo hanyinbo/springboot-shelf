@@ -127,11 +127,11 @@ public class TestController {
     public TUser testUser(String username){
         return tUserServiceImpl.findUserByUserName(username);
     }
-
-    @ApiOperation("测试@Value注解")
-    @GetMapping(value = "test9")
-    public Integer testValue(){
-        log.info("getTokenHeader--FEAF--:"+JwtTokenUtils.TOKEN_PREFIX.length());
-        return JwtTokenUtils.TOKEN_PREFIX.length();
-    }
+//
+//    @ApiOperation("测试@Value注解")
+//    @GetMapping(value = "test9")
+//    public Integer testValue(){
+//        log.info("getTokenHeader--FEAF--:"+JwtTokenUtils.TOKEN_PREFIX.length());
+//        return JwtTokenUtils.TOKEN_PREFIX.length();
+//    }
 }

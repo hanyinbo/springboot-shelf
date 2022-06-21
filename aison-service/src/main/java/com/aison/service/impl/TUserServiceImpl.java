@@ -24,14 +24,14 @@ public class TUserServiceImpl extends ServiceImpl<TUserMapper, TUser> implements
     private TUserMapper tUserMapper;
 
     /**
-     * 根据ID查询用户
+     * 根据用户名查询用户
      * @param username
      * @return  TUser
      */
     public TUser findUserByUserName(String username) {
         LambdaQueryWrapper<TUser> wrapper = new LambdaQueryWrapper<>();
         if (StringUtils.isNotEmpty(username)) {
-            wrapper.eq(TUser::getUsername,username).eq(TUser::getDelFlag,false);
+            wrapper.eq(TUser::getUsername,username).eq(TUser::getDelFlag,false).eq(TUser::getEnable,false);
         }
         return tUserMapper.selectOne(wrapper);
     }

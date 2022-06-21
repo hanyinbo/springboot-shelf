@@ -22,9 +22,8 @@ import java.io.IOException;
 public class ManageAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
-        log.debug("未登录拦截 = {}", e.getMessage());
         response.setContentType("application/json;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        ResponseUtils.responseJson(response, ResponseUtils.response(403, "未登录，TOKEN认证失败", e.getMessage()));
+        ResponseUtils.responseJson(response, ResponseUtils.response(401, "尚未登录，请登录", e.getMessage()));
     }
 }

@@ -2,16 +2,26 @@ package com.aison.configuration;
 
 import com.aison.authority.ManageAccessDecisionManager;
 import com.aison.authority.ManageFilterInvocationSecurityMetadataSource;
-import com.aison.filter.JWTAuthenticationFilter;
-import com.aison.filter.JWTLoginFilter;
+import com.aison.authority.ManageUserDetailServiceImpl;
+import com.aison.entity.TUser;
+//import com.aison.filter.JWTLoginFilter;
+//import com.aison.filter.JWTLoginFilter;
+import com.aison.filter.JWTAuthenticationTokenFilter;
 import com.aison.handler.*;
+import com.aison.service.LoginService;
+import com.aison.service.TUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -24,60 +34,90 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 // 只有加了@EnableGlobalMethodSecurity(prePostEnabled=true) 那么在上面使用的 @PreAuthorize(“hasAuthority(‘admin’)”)才会生效
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private ManageFilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
+//    private ManageFilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
 
     private ManageAccessDeniedHandler manageAccessDeniedHandler;
 
-    private ManageLogoutSuccessHandler manageLogoutSuccessHandler;
+//    private ManageLogoutSuccessHandler manageLogoutSuccessHandler;
 
     private ManageAuthenticationEntryPoint manageAuthenticationEntryPoint;
 
-    private ManageAuthenticationSuccessHandler manageAuthenticationSuccessHandler;
+//    private ManageAuthenticationSuccessHandler manageAuthenticationSuccessHandler;
 
-    private ManageAuthenticationFailureHandler manageAuthenticationFailureHandler;
+//    private ManageAuthenticationFailureHandler manageAuthenticationFailureHandler;
+//
+//    private JWTAuthenticationFilter jwtAuthenticationFilter;
 
-    private JWTAuthenticationFilter jwtAuthenticationFilter;
+    private TUserService tUserService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/sys-file/**", "/mini/**").permitAll()
-                .anyRequest().authenticated()
-//                .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
-//                    @Override
-//                    public <O extends FilterSecurityInterceptor> O postProcess(O o) {
-//                        //权限判断
-//                        o.setAccessDecisionManager(manageAccessDecisionManager);
-//                        //动态获取url权限配置
-//                        o.setSecurityMetadataSource(filterInvocationSecurityMetadataSource);
-//                        return o;
-//                    }
-//                })
-                .and().formLogin().permitAll()
-                .and().logout().logoutUrl("/logout").logoutSuccessHandler(manageLogoutSuccessHandler).permitAll()
-                .and().cors()
-                .and().csrf().disable();
-        http.exceptionHandling().accessDeniedHandler(manageAccessDeniedHandler).authenticationEntryPoint(manageAuthenticationEntryPoint);
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//        http.addFilterAt(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(jwtLoginFilter(),  UsernamePasswordAuthenticationFilter.class);
+        http.csrf()
+                .disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/login", "/logout")
+                .permitAll()
+//                除了上面，所有请求都要认证
+                .anyRequest()
+                .authenticated()
+                .and()
+                .headers()
+                .cacheControl();
+//        添加jwt,登录过滤器
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+//        添加自定义未授权未登录结果返回
+        http.exceptionHandling()
+                .accessDeniedHandler(manageAccessDeniedHandler)
+                .authenticationEntryPoint(manageAuthenticationEntryPoint);
     }
 
     @Bean
-    public JWTLoginFilter jwtLoginFilter() throws Exception {
-        JWTLoginFilter filter = new JWTLoginFilter();
-        filter.setAuthenticationSuccessHandler(manageAuthenticationSuccessHandler);
-        filter.setAuthenticationFailureHandler(manageAuthenticationFailureHandler);
-        filter.setFilterProcessesUrl("/auth/login");
-        //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
-        filter.setAuthenticationManager(authenticationManagerBean());
-        return filter;
-
+    public JWTAuthenticationTokenFilter jwtAuthenticationTokenFilter() {
+        return new JWTAuthenticationTokenFilter();
     }
 
 //    @Bean
-//    public JWTAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-//        JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(authenticationManager());
-//        return jwtAuthenticationFilter;
+//    public JWTLoginFilter jwtLoginFilter() throws Exception {
+//        JWTLoginFilter filter = new JWTLoginFilter();
+//        filter.setAuthenticationSuccessHandler(manageAuthenticationSuccessHandler);
+//        filter.setAuthenticationFailureHandler(manageAuthenticationFailureHandler);
+//        filter.setFilterProcessesUrl("/auth/login");
+//        //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
+//        filter.setAuthenticationManager(authenticationManagerBean());
+//        return filter;
+//
 //    }
+
+    @Bean
+    public JWTAuthenticationTokenFilter jwtAuthenticationFilter() throws Exception {
+        return new JWTAuthenticationTokenFilter();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService()).passwordEncoder(getPasswordEncoder());
+    }
+
+    @Override
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> {
+            TUser user = tUserService.findUserByUserName(username);
+            if (null != user) {
+                return user;
+            }
+            return null;
+        };
+
+    }
+
+    @Bean
+    public PasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+
 }

@@ -6,15 +6,15 @@ import com.aison.entity.TUser;
 import com.aison.service.TRoleService;
 import com.aison.service.TUserService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -30,14 +30,15 @@ import java.util.stream.Collectors;
 public class ManageUserDetailServiceImpl implements UserDetailsService {
 
     private final  TUserService tUserService;
+
     private final TRoleService tRoleService;
 
     @Override
-    public ManageUserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String loginName) throws UsernameNotFoundException {
         if(StrUtil.isEmpty(loginName)){
-            throw  new RuntimeException("用户名不能为空");
+            throw new RuntimeException("用户名不能为空");
         }
-        ManageUserDetails userInfo = new ManageUserDetails();
+        TUser userInfo = new TUser();
 
         TUser tUser = tUserService.findUserByUserName(loginName);
         if (tUser == null) {
@@ -47,15 +48,15 @@ public class ManageUserDetailServiceImpl implements UserDetailsService {
         //登录用户名
         userInfo.setUsername(loginName);
         userInfo.setPassword(tUser.getPassword());
-        Set<SimpleGrantedAuthority> authoritiesSet = new HashSet<>();
+        Set<GrantedAuthority> authorities = new HashSet<>();
         List<TRole> userRoles = tRoleService.findRoleByUserId(tUser.getId());
         List<String> roleCodeList = userRoles.stream().map(TRole::getRoleCode).collect(Collectors.toList());
         for (String roleCode : roleCodeList) {
             //用户拥有的角色
             SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(roleCode);
-            authoritiesSet.add(simpleGrantedAuthority);
+            authorities.add(simpleGrantedAuthority);
         }
-        userInfo.setAuthorities(authoritiesSet);
-        return userInfo;
+//        userInfo.setAuthorities(authorities);
+        return new User(userInfo.getUsername(),userInfo.getPassword(),authorities);
     }
 }
