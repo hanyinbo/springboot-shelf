@@ -24,9 +24,9 @@ public class LoginController {
 
     @ApiOperation(value = "登录之后返回token")
     @PostMapping("/login")
-    public Result login(@RequestBody LoginParamDto loginParamDto, HttpServletRequest request){
+    public Result login(@RequestBody LoginParamDto loginParamDto){
         log.info(JSONObject.toJSONString(loginParamDto));
-        return loginService.login(loginParamDto.getUsername(),loginParamDto.getPassword(),request);
+        return loginService.login(loginParamDto.getUsername(),loginParamDto.getPassword());
     }
 
     @ApiOperation(value = "获取用户信息")

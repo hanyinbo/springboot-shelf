@@ -46,7 +46,7 @@ public class LoginServiceImpl extends ServiceImpl<LoginMapper, TUser> implements
     private String tokenHead;
 
     @Override
-    public Result login(String userName, String password, HttpServletRequest request) {
+    public Result login(String userName, String password) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
         try {
             String aesPwd = PasswordAESUtil.decryptedDES(password);

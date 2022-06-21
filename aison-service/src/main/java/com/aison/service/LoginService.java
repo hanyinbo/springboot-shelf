@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface LoginService extends IService<TUser> {
 
-    Result login(String userName, String password, HttpServletRequest request);
+    Result login(String userName, String password);
 
     TUser getUserByUserName(String username);
 }
