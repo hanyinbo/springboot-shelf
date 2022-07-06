@@ -41,7 +41,7 @@ public class TestController {
     private TUserServiceImpl tUserServiceImpl;
 
     @ApiOperation("测试项目搭建启动")
-    @GetMapping(value = "test1")
+    @GetMapping(value = "c")
     public String test1() {
         return "测试搭建完成";
     }

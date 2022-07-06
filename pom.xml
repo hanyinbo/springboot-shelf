@@ -13,9 +13,10 @@
         <mybatisplus-version>3.4.0</mybatisplus-version>
         <fastjson-version>1.2.75</fastjson-version>
         <commons-version>3.8.1</commons-version>
-        <swagger-version>2.2.2</swagger-version>
+        <swagger-version>2.9.2</swagger-version>
+        <swagger-ui-version>1.7.6</swagger-ui-version>
         <jwt-version>0.9.1</jwt-version>
-<!--        <activiti-version>6.0.0</activiti-version>-->
+        <!--        <activiti-version>6.0.0</activiti-version>-->
         <druid-version>0.2.16</druid-version>
         <aws.version>1.11.543</aws.version>
         <minio.version>7.1.4</minio.version>
@@ -71,17 +72,17 @@
         <!--            <version>${activiti-version}</version>-->
         <!--        </dependency>-->
         <!--activiti基础包-->
-<!--        <dependency>-->
-<!--            <groupId>org.activiti</groupId>-->
-<!--            <artifactId>activiti-spring-boot-starter-basic</artifactId>-->
-<!--            <version>${activiti-version}</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>&lt;!&ndash; 排除activiti的mybatis，避免和外面的mybatis-plus冲突 &ndash;&gt;-->
-<!--                    <artifactId>mybatis</artifactId>-->
-<!--                    <groupId>org.mybatis</groupId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.activiti</groupId>-->
+        <!--            <artifactId>activiti-spring-boot-starter-basic</artifactId>-->
+        <!--            <version>${activiti-version}</version>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>&lt;!&ndash; 排除activiti的mybatis，避免和外面的mybatis-plus冲突 &ndash;&gt;-->
+        <!--                    <artifactId>mybatis</artifactId>-->
+        <!--                    <groupId>org.mybatis</groupId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
         <!--        &lt;!&ndash;整合activiti的 druid 要求的版本为0.2.16 或 1.0.9，百度上说是官方的bug&ndash;&gt;-->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -164,12 +165,37 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>${swagger-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.swagger</groupId>
+                    <artifactId>swagger-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.swagger</groupId>
+                    <artifactId>swagger-models</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Swagger的ui界面 -->
+        <!--        <dependency>-->
+        <!--            <groupId>io.springfox</groupId>-->
+        <!--            <artifactId>springfox-swagger-ui</artifactId>-->
+        <!--            <version>${swagger-version}</version>-->
+        <!--        </dependency>-->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${swagger-version}</version>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>swagger-bootstrap-ui</artifactId>
+            <version>${swagger-ui-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>1.5.21</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-models</artifactId>
+            <version>1.5.21</version>
         </dependency>
         <!-- DEVTOOLS-->
         <!--        <dependency>-->
