@@ -4,17 +4,18 @@ import com.aison.common.Result;
 import com.aison.dto.LoginParamDto;
 import com.aison.entity.TUser;
 import com.aison.service.LoginService;
-import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
-@Api(value = "LoginController")
+@Api(value = "登录模块")
 @RestController
 @Slf4j
 public class LoginController {
@@ -25,7 +26,6 @@ public class LoginController {
     @ApiOperation(value = "登录之后返回token")
     @PostMapping("/login")
     public Result login(@RequestBody LoginParamDto loginParamDto){
-        log.info(JSONObject.toJSONString(loginParamDto));
         return loginService.login(loginParamDto.getUsername(),loginParamDto.getPassword());
     }
 

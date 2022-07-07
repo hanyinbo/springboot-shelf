@@ -1,19 +1,13 @@
 package com.aison.configuration;
 
-import com.aison.authority.ManageAccessDecisionManager;
-import com.aison.authority.ManageFilterInvocationSecurityMetadataSource;
-import com.aison.authority.ManageUserDetailServiceImpl;
 import com.aison.entity.TUser;
-//import com.aison.filter.JWTLoginFilter;
-//import com.aison.filter.JWTLoginFilter;
 import com.aison.filter.JWTAuthenticationTokenFilter;
-import com.aison.handler.*;
-import com.aison.service.LoginService;
+import com.aison.handler.ManageAccessDeniedHandler;
+import com.aison.handler.ManageAuthenticationEntryPoint;
 import com.aison.service.TUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -24,6 +18,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+//import com.aison.filter.JWTLoginFilter;
+//import com.aison.filter.JWTLoginFilter;
 
 /**
  * Security配置类
@@ -78,8 +75,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception{
         web.ignoring().antMatchers(
-                "login",
-                "logout",
+                "/login",
+                "/logout",
                 "/css/**",
                 "/js/**",
                 "index.html",
