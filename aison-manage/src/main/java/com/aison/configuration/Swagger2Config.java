@@ -52,14 +52,6 @@ public class Swagger2Config {
         return apiKeyList;
     }
 
-//
-//    private List<SecurityContext> securityContexts(){
-////        设置登录的路径
-//        List<SecurityContext> securityContextList = new ArrayList<>();
-//
-//
-//    }
-
 
     private List<SecurityContext> securityContexts() {
         List<SecurityContext> securityContexts = new ArrayList<>();
@@ -68,6 +60,7 @@ public class Swagger2Config {
                 .forPaths(PathSelectors.regex("^(?!auth).*$")).build());
         return securityContexts;
     }
+
     private List<SecurityReference> defaultAuth() {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];

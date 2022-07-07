@@ -1,5 +1,6 @@
 package com.aison.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.aison.common.Result;
 import com.aison.entity.TUser;
 import com.aison.mapper.LoginMapper;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +40,13 @@ public class LoginServiceImpl extends ServiceImpl<LoginMapper, TUser> implements
     private String tokenHead;
 
     @Override
-    public Result login(String userName, String password) {
+    public Result login(String userName, String password, String code, HttpServletRequest request) {
+        String captcha = (String) request.getSession().getAttribute("captcha");
+        log.info("获取的captcha:"+captcha);
+        System.out.println("获取的captcha  sout");
+        if (StrUtil.isEmpty(code) || !captcha.equalsIgnoreCase(code)){
+            return Result.build(104,"验证码输入错误，请重新输入!");
+        }
         UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
         try {
             String aesPwd = PasswordAESUtil.decryptedDES(password);

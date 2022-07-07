@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 @Api(value = "登录模块")
@@ -25,8 +26,8 @@ public class LoginController {
 
     @ApiOperation(value = "登录之后返回token")
     @PostMapping("/login")
-    public Result login(@RequestBody LoginParamDto loginParamDto){
-        return loginService.login(loginParamDto.getUsername(),loginParamDto.getPassword());
+    public Result login(@RequestBody LoginParamDto loginParamDto, HttpServletRequest request){
+        return loginService.login(loginParamDto.getUsername(),loginParamDto.getPassword(),loginParamDto.getCode(),request);
     }
 
     @ApiOperation(value = "获取用户信息")

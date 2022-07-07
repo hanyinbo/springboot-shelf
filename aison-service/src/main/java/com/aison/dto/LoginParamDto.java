@@ -2,7 +2,6 @@ package com.aison.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import javafx.scene.chart.ValueAxis;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -10,10 +9,13 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "登录对象",description = "")
+@ApiModel(value = "登录对象",description = "登录对象")
 public class LoginParamDto {
     @ApiModelProperty(value = "用户名",required = true)
     private String username;
     @ApiModelProperty(value = "密码",required = true)
     private String password;
+    @ApiModelProperty(value = "验证码",required = true)
+    private String code;
+
 }
