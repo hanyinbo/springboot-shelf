@@ -13,36 +13,26 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.minio.messages.Item;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sun.rmi.runtime.Log;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+@Api(value = "后台管理接口模块")
 @RestController
 @RequestMapping(value = "/mini")
 @Slf4j
 public class WxController {
     @Autowired
     private WxSwiperImgService wxSwiperImgService;
-    @Autowired
-    private WxNavigationImgService wxNavigationImgService;
     @Autowired
     private WxRecruitInfoService wxRecruitInfoService;
     @Autowired
@@ -77,7 +67,6 @@ public class WxController {
         QueryWrapper<WxCompany> companyWrapper = new QueryWrapper<>();
         companyWrapper.eq("del_flag",0);
         List<WxCompany> list = wxCompanyService.list(companyWrapper);
-        log.info("公司列表："+JSONObject.toJSONString(list));
         return Result.buildOk(wxCompanyService.list(companyWrapper));
     }
 
@@ -198,7 +187,6 @@ public class WxController {
     @GetMapping("/getPageOfCompany")
     public Result<List<WxCompany>> getPageOfCompany(WxCompanyOfPageDto page){
         IPage<WxCompany> pageOfCompany = wxCompanyService.getPageOfCompany(page);
-        log.info("分页获取公司："+JSONObject.toJSONString(pageOfCompany));
         return Result.buildOk(pageOfCompany.getRecords());
     }
 
@@ -212,7 +200,6 @@ public class WxController {
         WxCompanyDto dto = new WxCompanyDto();
         dto.setType("推荐企业");
         List<WxRecruitInfo> companyList = wxRecruitInfoService.list();
-        log.info("企业列表："+ JSONObject.toJSONString(companyList));
         dto.setCompanyList(companyList);
         dtoList.add(dto);
         return Result.buildOk(dtoList);
@@ -263,7 +250,6 @@ public class WxController {
      */
     @PutMapping(value = "/updateRecomment")
     public Result<Boolean> updateRecomment(@RequestBody WxRecomment wxRecomment){
-        log.info("修改招聘信息："+JSONObject.toJSONString(wxRecomment));
         if(wxRecomment == null || wxRecomment.getId()==null || wxRecomment.getCustomName()==null ){
             return Result.build(301,"业务参数不能为空");
         }
@@ -280,7 +266,6 @@ public class WxController {
      */
     @PostMapping(value = "/addRecomment")
     public Result<Boolean> addRecomment(@RequestBody WxRecomment wxRecomment){
-        log.info("新增报备信息："+JSONObject.toJSONString(wxRecomment));
         if(wxRecomment == null || wxRecomment.getCompanyId()==null || wxRecomment.getCustomName()==null || wxRecomment.getRecommentId()==null ){
             return Result.build(301,"业务参数不能为空");
         }
@@ -527,7 +512,6 @@ public class WxController {
         QueryWrapper<WxRecruitInfo> wxCompanyQueryWrapper = new QueryWrapper<>();
         wxCompanyQueryWrapper.like("company_name",companyName);
         List<WxRecruitInfo> companyList = wxRecruitInfoService.list(wxCompanyQueryWrapper);
-        log.info("获取公司；"+JSONObject.toJSONString(companyList));
         return Result.buildOk(companyList);
     }
 
@@ -556,7 +540,6 @@ public class WxController {
         List<WxRecruitPosition> wxRecruitPositionList = wxRecruitPositionService.list(positionQueryWrapper);
         wxRecruitInfo.setWxRecruitPositionList(wxRecruitPositionList);
         wxRecruitInfo.setCompanyDetailImgs(detailList);
-        log.info("获取公司明细；"+JSONObject.toJSONString(wxRecruitInfo));
         return Result.buildOk(wxRecruitInfo);
     }
 
@@ -573,7 +556,6 @@ public class WxController {
             wrappers.eq(WxRecruitInfo::getCompanyName, wxRecruitInfo.getCompanyName());
         }
         Page page1 = wxRecruitInfoService.page(page,wrappers);
-        log.info("企业列表："+ JSONObject.toJSONString(page1));
         return Result.buildOk(page1);
     }
 
@@ -609,7 +591,6 @@ public class WxController {
         wxRecruitInfo.setPosition(positionName);
         boolean b = wxRecruitInfoService.saveOrUpdate(wxRecruitInfo);
         if(b){
-            log.info("招聘表："+wxRecruitInfo.getId());
             QueryWrapper<WxPosition> wrapper = new QueryWrapper();
             wrapper.in("position_name",wxRecruitInfo.getWxPositionList());
             List<WxPosition> wxPositionList = wxPositionService.list(wrapper);
@@ -713,7 +694,6 @@ public class WxController {
     @GetMapping("/getRecruitData/{id}")
     public Result<WxRecruitDto> getRecruitData(@PathVariable("id") Long id){
         WxRecruitInfo one = wxRecruitInfoService.getById(id);
-        log.info("getone:"+JSONObject.toJSONString(one));
         if(one==null || one.getId()==null){
             return Result.build(310,"该公司未设置招聘");
         }
@@ -732,7 +712,6 @@ public class WxController {
         recruitWrapper.eq("recruit_id",id);
         List<String> recruitPositionList = wxRecruitPositionService.list(recruitWrapper).stream().map(WxRecruitPosition::getPositionName).collect(Collectors.toList());
         dto.setWxPositionList(recruitPositionList);
-        log.info("招聘详情:"+JSONObject.toJSONString(dto));
         return Result.buildOk(dto);
     }
 
@@ -754,7 +733,6 @@ public class WxController {
      */
     @GetMapping(value = "/getWxUerPage")
     public Result<List<WxUser>> getWxUerPage(Page page,WxUser wxUser){
-        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxUser));
         IPage<WxUser> userOfPage = wxUserService.getUserOfPage(page, wxUser);
         return Result.buildOk(userOfPage.getRecords());
     }
@@ -820,7 +798,6 @@ public class WxController {
         QueryWrapper<WxUser> userWrapper = new QueryWrapper<>();
         userWrapper.eq("nick_name",wxUser.getNickName());
         userWrapper.ne("id",wxUser.getId());
-        log.info("编辑用户："+wxUser.getId());
         List<WxUser> userList = wxUserService.list(userWrapper);
         if(userList !=null && userList.size()>0){
             return Result.build(311,"用户昵称不允许重复");
@@ -859,7 +836,6 @@ public class WxController {
             return Result.build(311,"用户昵称不允许重复");
         }
         wxUser.setDelFlag(0);
-        log.info("添加用户对象："+JSONObject.toJSONString(wxUser));
         return Result.buildOk(wxUserService.save(wxUser));
     }
 
@@ -922,7 +898,6 @@ public class WxController {
             return Result.build(311,"职位名称不允许重复");
         }
         wxPosition.setDelFlag(0);
-        log.info("添加职位对象："+JSONObject.toJSONString(wxPosition));
         return Result.buildOk(wxPositionService.save(wxPosition));
     }
 
@@ -943,7 +918,6 @@ public class WxController {
         QueryWrapper<WxPosition> positionWrapper = new QueryWrapper<>();
         positionWrapper.eq("position_name",wxPosition.getPositionName());
         positionWrapper.ne("id",wxPosition.getId());
-        log.info("编辑职位"+wxPosition.getId());
         List<WxPosition> positionList = wxPositionService.list(positionWrapper);
         if(positionList !=null && positionList.size()>0){
             return Result.build(311,"职位名称不允许重复");
@@ -970,7 +944,6 @@ public class WxController {
      */
     @GetMapping(value = "/getWxPositionPage")
     public Result<List<WxPosition>> getWxPositionPage(Page page,WxPosition wxPosition){
-        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxPosition));
         IPage<WxPosition> positionPage = wxPositionService.getPageOfPosition(page, wxPosition);
         return Result.buildOk(positionPage.getRecords());
     }
@@ -1047,7 +1020,6 @@ public class WxController {
      */
     @GetMapping(value = "/getAllBrokeragePage")
     public Result<List<WxBrokerage>> getAllBrokeragePage(Page page,WxBrokerage wxBrokerage){
-        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxBrokerage));
         QueryWrapper<WxBrokerage> queryWrapper = new QueryWrapper<>();
         if(wxBrokerage.getCusName()!=null){
             queryWrapper.like("cus_name",wxBrokerage.getCusName());
@@ -1085,7 +1057,6 @@ public class WxController {
      */
     @GetMapping(value = "/getNotBrokeragePage")
     public Result<List<WxBrokerage>> getNotBrokeragePage(Page page,WxBrokerage wxBrokerage){
-        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxBrokerage));
         QueryWrapper<WxBrokerage> queryWrapper = new QueryWrapper<>();
         if(wxBrokerage.getCusName()!=null){
             queryWrapper.like("cus_name",wxBrokerage.getCusName());
@@ -1120,7 +1091,6 @@ public class WxController {
      */
     @GetMapping(value = "/getOkBrokeragePage")
     public Result<List<WxBrokerage>> getOkBrokeragePage(Page page,WxBrokerage wxBrokerage){
-        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxBrokerage));
         QueryWrapper<WxBrokerage> queryWrapper = new QueryWrapper<>();
         if(wxBrokerage.getCusName()!=null){
             queryWrapper.like("cus_name",wxBrokerage.getCusName());
@@ -1259,7 +1229,6 @@ public class WxController {
      */
     @GetMapping(value = "/getWxCustomPage")
     public Result<List<WxCustom>> getWxCustomPage(Page page,WxCustom wxCustom){
-        log.info("分页参数："+page.getSize()+"**"+JSONObject.toJSONString(wxCustom));
         QueryWrapper<WxCustom> queryWrapper = new QueryWrapper<>();
         if(wxCustom.getCusName()!=null){
             queryWrapper.like("cus_name",wxCustom.getCusName());
