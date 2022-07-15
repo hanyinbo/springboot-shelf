@@ -1,9 +1,11 @@
 package com.aison.controller;
 
+import com.google.code.kaptcha.Constants;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 验证码
@@ -22,6 +25,8 @@ import java.io.IOException;
 public class CaptchaController {
     @Autowired
     private DefaultKaptcha defaultKaptcha;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @GetMapping(value = "/captcha")
     @ApiModelProperty(value = "验证码")
@@ -38,10 +43,12 @@ public class CaptchaController {
         request.getSession().setAttribute("captcha",text);
         BufferedImage bufferedImage = defaultKaptcha.createImage(text);
         ServletOutputStream outputStream = null;
-
         try{
             outputStream=response.getOutputStream();
             ImageIO.write(bufferedImage,"jpeg",outputStream);
+
+            redisTemplate.opsForValue().set(Constants.KAPTCHA_SESSION_KEY,text,60 , TimeUnit.SECONDS);
+
             outputStream.flush();
         }catch(IOException e){
             e.printStackTrace();
