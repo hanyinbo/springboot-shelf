@@ -19,9 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-//import com.aison.filter.JWTLoginFilter;
-//import com.aison.filter.JWTLoginFilter;
-
 /**
  * Security配置类
  */
@@ -32,33 +29,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 // 只有加了@EnableGlobalMethodSecurity(prePostEnabled=true) 那么在上面使用的 @PreAuthorize(“hasAuthority(‘admin’)”)才会生效
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-//    private ManageFilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
-
     private ManageAccessDeniedHandler manageAccessDeniedHandler;
-
-//    private ManageLogoutSuccessHandler manageLogoutSuccessHandler;
 
     private ManageAuthenticationEntryPoint manageAuthenticationEntryPoint;
 
-//    private ManageAuthenticationSuccessHandler manageAuthenticationSuccessHandler;
-
-//    private ManageAuthenticationFailureHandler manageAuthenticationFailureHandler;
-//
-//    private JWTAuthenticationFilter jwtAuthenticationFilter;
 
     private TUserService tUserService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf()
+        http.cors()
+                .and().csrf()
                 .disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/login", "/logout")
-//                .permitAll()
-//                除了上面，所有请求都要认证
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -73,7 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception{
+    public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(
                 "/login",
                 "/logout",
@@ -88,22 +74,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/captcha"
         );
     }
+
     @Bean
     public JWTAuthenticationTokenFilter jwtAuthenticationTokenFilter() {
         return new JWTAuthenticationTokenFilter();
     }
 
-//    @Bean
-//    public JWTLoginFilter jwtLoginFilter() throws Exception {
-//        JWTLoginFilter filter = new JWTLoginFilter();
-//        filter.setAuthenticationSuccessHandler(manageAuthenticationSuccessHandler);
-//        filter.setAuthenticationFailureHandler(manageAuthenticationFailureHandler);
-//        filter.setFilterProcessesUrl("/auth/login");
-//        //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
-//        filter.setAuthenticationManager(authenticationManagerBean());
-//        return filter;
-//
-//    }
 
     @Bean
     public JWTAuthenticationTokenFilter jwtAuthenticationFilter() throws Exception {

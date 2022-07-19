@@ -45,10 +45,6 @@ public class LoginServiceImpl extends ServiceImpl<LoginMapper, TUser> implements
 
     @Override
     public Result login(String userName, String password, String code, HttpServletRequest request) {
-//        String captcha = (String) request.getSession().getAttribute("captcha");
-//        if (StrUtil.isEmpty(code) || !captcha.equalsIgnoreCase(code)){
-//            return Result.build(104,"验证码输入错误，请重新输入!");
-//        }
         // 查询redis中是否有值
         String captchaCode = (String) redisTemplate.opsForValue().get(Constants.KAPTCHA_SESSION_KEY);
         if(StringUtils.isNotBlank(captchaCode)){
@@ -62,6 +58,8 @@ public class LoginServiceImpl extends ServiceImpl<LoginMapper, TUser> implements
             }else {
                 return Result.build(104,"验证码不正确!");
             }
+        }else {
+            return Result.build(104,"验证码不存在或已过期!");
         }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
