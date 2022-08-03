@@ -14,5 +14,4 @@ public interface LoginService extends IService<TUser> {
 
     TUser getUserByUserName(String username);
 
-    List<TMenu> getMenuListByUserId();
 }

@@ -34,9 +34,6 @@ public class LoginServiceImpl extends ServiceImpl<LoginMapper, TUser> implements
 
     @Autowired
     private UserDetailsService userDetailsService;
-
-    @Autowired
-    private TMenuService tMenuService;
     @Autowired
     private TUserService tUserService;
     @Autowired
@@ -94,11 +91,5 @@ public class LoginServiceImpl extends ServiceImpl<LoginMapper, TUser> implements
         return tUserService.findUserByUserName(username);
     }
 
-    @Override
-    public List<TMenu> getMenuListByUserId() {
-        TUser user = (TUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        log.info("获取用户："+user);
 
-        return tMenuService.getMenuListByUserId(user.getId());
-    }
 }

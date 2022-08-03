@@ -20,7 +20,6 @@ import java.util.List;
 public class MenuController {
 
     private TMenuService tMenuService;
-    private LoginService loginService;
 
     @ApiOperation("根据用户角色ID获取菜单")
     @GetMapping("/getMenuListByRole")
@@ -33,12 +32,5 @@ public class MenuController {
     public List<String> findAllRoleNameByPath(String path){
         return tMenuService.findAllRoleNameByPath(path);
     }
-
-    @ApiOperation("根据用户ID获取菜单")
-    @GetMapping("/getMenuListByUserId")
-    public List<TMenu> getMenuListByUserId(){
-        return loginService.getMenuListByUserId();
-    }
-
 
 }

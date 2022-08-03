@@ -34,27 +34,19 @@ public class TMenuServiceImpl extends ServiceImpl<TMenuMapper, TMenu> implements
     @Override
     public List<MenuTree> getListMenuByRole() {
         TUser user = (TUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        log.info("获取用户："+user);
         List<Long> roleList = tRoleService.findRoleByUserId(user.getId()).stream().map(TRole::getRoleId).collect(Collectors.toList());
-        List<TMenu> menuList = baseMapper.getListMenuByRoleId(roleList);
-        Long parent = 0L;
-        return MenuTreeUtil.buildTree(menuList,parent);
+        String roles = roleList.stream().map(labelId -> labelId+"").collect(Collectors.joining(","));
+        List<MenuTree> menuTrees = (List<MenuTree>) redisTemplate.opsForValue().get("menu_" + roles);
+        if(CollUtil.isEmpty(menuTrees)){
+            List<TMenu> menuList = baseMapper.getListMenuByRoleId(roleList);
+            menuTrees = MenuTreeUtil.buildTree(menuList,  0L);
+            redisTemplate.opsForValue().set("menu_"+roles,menuTrees);
+        }
+        return menuTrees;
     }
 
     @Override
     public List<String> findAllRoleNameByPath(String path) {
         return baseMapper.findAllRoleNameByPath(path);
-    }
-
-    @Override
-    public List<TMenu> getMenuListByUserId(Long id) {
-        List<TMenu> menuList = (List<TMenu>) redisTemplate.opsForValue().get("menu_" + id);
-        if(CollUtil.isEmpty(menuList)){
-            log.info("进入数据库查询");
-            menuList = baseMapper.getMenuListByUserId(id);
-//            redisTemplate.opsForValue().set("menu_"+id,menuList);
-        }
-        log.info("菜单："+menuList.toString());
-        return menuList;
     }
 }
