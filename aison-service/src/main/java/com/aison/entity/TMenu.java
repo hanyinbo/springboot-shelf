@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @TableName(value = "t_menu")
 @Data
@@ -35,21 +35,18 @@ public class TMenu extends BaseEntity {
     private String path;
     @TableField(value = "icon")
     @ApiModelProperty(value = "图标")
-    private Long icon;
+    private String icon;
     @TableField(value = "del_flag")
     @ApiModelProperty(value = "0-正常，1-删除")
     private Integer  delFlag;
+    @TableField(value = "enable")
+    @ApiModelProperty(value = "是否启用")
+    private Boolean  enable;
     @TableField(value = "creator")
     @ApiModelProperty(value = "创建人")
     private String creator;
-    @TableField(value = "create_time")
-    @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createTime;
-    @TableField(value = "updator")
-    @ApiModelProperty(value = "修改人")
-    private String updator;
-    @TableField(value = "update_time")
-    @ApiModelProperty(value = "修改时间")
-    private LocalDateTime updateTime;
+    @ApiModelProperty(value = "子菜单")
+    @TableField(exist = false)
+    private List<TMenu> children;
 
 }

@@ -35,4 +35,5 @@ public class TUserServiceImpl extends ServiceImpl<TUserMapper, TUser> implements
         }
         return tUserMapper.selectOne(wrapper);
     }
+
 }

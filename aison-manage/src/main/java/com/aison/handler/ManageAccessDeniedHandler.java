@@ -1,7 +1,6 @@
 package com.aison.handler;
 
 import com.aison.utils.ResponseUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;

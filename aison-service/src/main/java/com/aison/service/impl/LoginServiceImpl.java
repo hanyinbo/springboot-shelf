@@ -1,9 +1,11 @@
 package com.aison.service.impl;
 
 import com.aison.common.Result;
+import com.aison.entity.TMenu;
 import com.aison.entity.TUser;
 import com.aison.mapper.LoginMapper;
 import com.aison.service.LoginService;
+import com.aison.service.TMenuService;
 import com.aison.service.TUserService;
 import com.aison.utils.JwtTokenUtils;
 import com.aison.utils.PasswordAESUtil;
@@ -19,11 +21,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -32,8 +34,9 @@ public class LoginServiceImpl extends ServiceImpl<LoginMapper, TUser> implements
 
     @Autowired
     private UserDetailsService userDetailsService;
+
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private TMenuService tMenuService;
     @Autowired
     private TUserService tUserService;
     @Autowired
@@ -89,5 +92,13 @@ public class LoginServiceImpl extends ServiceImpl<LoginMapper, TUser> implements
     @Override
     public TUser getUserByUserName(String username) {
         return tUserService.findUserByUserName(username);
+    }
+
+    @Override
+    public List<TMenu> getMenuListByUserId() {
+        TUser user = (TUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("获取用户："+user);
+
+        return tMenuService.getMenuListByUserId(user.getId());
     }
 }

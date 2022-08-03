@@ -12,6 +12,18 @@ spring:
     host: 139.224.248.1
     password: Custom@1.
     port: 6379
+    timeout: 1000ms
+    lettuce:
+      pool:
+#       最大连接数  默认8
+        max-active: 1024
+        max-wait: 10000ms
+#        最大空闲连接
+        max-idle: 200
+        #        最小空闲连接
+        min-idle:  5
+
+
   # activiti default configuration
   #在activiti的默认配置中，process-definition-location-prefix 是指定activiti流程描述文件的前缀（即路径），
   #启动时，activiti就会去寻找此路径下的流程描述文件，并且自动部署；suffix 是一个String数组，表示描述文件的默    认后缀名，默认以上两种。
