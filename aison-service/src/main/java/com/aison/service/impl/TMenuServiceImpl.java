@@ -37,11 +37,7 @@ public class TMenuServiceImpl extends ServiceImpl<TMenuMapper, TMenu> implements
         log.info("获取用户："+user);
         List<Long> roleList = tRoleService.findRoleByUserId(user.getId()).stream().map(TRole::getRoleId).collect(Collectors.toList());
         List<TMenu> menuList = baseMapper.getListMenuByRoleId(roleList);
-        List<MenuTree> menuTree = menuList.stream().map(MenuTree::new).sorted(Comparator.comparingInt(MenuTree::getSort)).collect(Collectors.toList());
-        log.info("菜单："+menuTree.size());
         Long parent = 0L;
-        List<MenuTree> build = MenuTreeUtil.buildTree(menuList,parent);
-        log.info("处理后的菜单8："+build);
         return MenuTreeUtil.buildTree(menuList,parent);
     }
 
