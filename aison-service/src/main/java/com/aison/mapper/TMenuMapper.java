@@ -13,4 +13,6 @@ public interface TMenuMapper extends BaseMapper<TMenu> {
     List<TMenu> getListMenuByRoleId(@Param("roleIds") List<Long> roleIds);
 
     List<String> findAllRoleNameByPath(String path);
+
+    List<TMenu> getMenuWithRole(@Param("roleIds") List<Long> roleList);
 }

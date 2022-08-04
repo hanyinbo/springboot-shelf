@@ -14,4 +14,6 @@ public interface TMenuService extends IService<TMenu> {
 
     public  List<String> findAllRoleNameByPath(String path);
 
+    public List<TMenu> getMenuWithRole();
+
 }

@@ -48,5 +48,8 @@ public class TMenu extends BaseEntity {
     @ApiModelProperty(value = "子菜单")
     @TableField(exist = false)
     private List<TMenu> children;
+    @ApiModelProperty(value = "角色")
+    @TableField(exist = false)
+    private List<TRole> roleList;
 
 }

@@ -1,13 +1,17 @@
 package com.aison.configuration;
 
+import com.aison.authority.ManageAccessDecisionManager;
+import com.aison.authority.ManageFilterInvocationSecurityMetadataSource;
 import com.aison.entity.TUser;
 import com.aison.filter.JWTAuthenticationTokenFilter;
 import com.aison.handler.ManageAccessDeniedHandler;
 import com.aison.handler.ManageAuthenticationEntryPoint;
+import com.aison.service.TRoleService;
 import com.aison.service.TUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -15,8 +19,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -33,8 +39,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private ManageAuthenticationEntryPoint manageAuthenticationEntryPoint;
 
-
     private TUserService tUserService;
+
+    private TRoleService tRoleService;
+
+    private ManageAccessDecisionManager manageAccessDecisionManager;
+
+    private ManageFilterInvocationSecurityMetadataSource securityMetadataSource;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -47,6 +58,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .anyRequest()
                 .authenticated()
+//                动态权限配置
+                .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+                    @Override
+                    public <O extends FilterSecurityInterceptor> O postProcess(O o) {
+                        o.setAccessDecisionManager(manageAccessDecisionManager);
+                        o.setSecurityMetadataSource(securityMetadataSource);
+                        return o;
+                    }
+                })
                 .and()
                 .headers()
                 .cacheControl();
@@ -97,9 +117,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return username -> {
             TUser user = tUserService.findUserByUserName(username);
             if (null != user) {
+                user.setRoles(tRoleService.findRoleByUserId(user.getId()));
                 return user;
             }
-            return null;
+            throw new UsernameNotFoundException("用户名或密码不存在");
         };
 
     }

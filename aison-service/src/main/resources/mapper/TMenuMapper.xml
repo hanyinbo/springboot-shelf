@@ -57,4 +57,40 @@
         </where>
     </select>
 
+    <resultMap id="BaseMenuWithRole" type="com.aison.entity.TMenu" extends="BaseMenuMap">
+        <collection property="roleList" ofType="com.aison.entity.TRole">
+            <result property="roleId" column="roleId"></result>
+            <result property="roleName" column="roleName"></result>
+            <result property="roleCode" column="roleCode"></result>
+            <result property="creator" column="creator"></result>
+            <result property="createTime" column="createTime"></result>
+            <result property="updator" column="updator"></result>
+            <result property="updateTime" column="updateTime"></result>
+            <result property="delFlag" column="delFlag"></result>
+            <result property="creator" column="creator"></result>
+        </collection>
+    </resultMap>
+    <select id="getMenuWithRole" resultMap="BaseMenuWithRole">
+        select distinct a.*,
+        t.role_id as roleId,
+        t.role_name as roleName,
+        t.role_code as roleCode,
+        t.creator as creator,
+        t.create_time as createTime,
+        t.updator as updator,
+        t.update_time as updateTime,
+        t.del_flag as delFlag
+        from t_menu a left join t_role_menu b on a.menu_id=b.menu_id
+        left join t_role t on t.role_id=b.role_id
+        <where>
+            a.del_flag=0 and a.enable=true
+            <if test="roleIds != null">
+                and b.role_id in
+                <foreach collection="roleIds" index="index" item="roleId" open="(" separator=","
+                         close=")">
+                    #{roleId}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

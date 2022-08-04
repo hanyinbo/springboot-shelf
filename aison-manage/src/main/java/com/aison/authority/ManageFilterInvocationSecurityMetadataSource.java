@@ -1,8 +1,12 @@
 package com.aison.authority;
 
+import cn.hutool.core.util.StrUtil;
+import com.aison.dto.MenuTree;
 import com.aison.entity.TMenu;
+import com.aison.entity.TRole;
 import com.aison.service.TMenuService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
@@ -18,15 +22,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
-  *  资源控制类
-  * @author hyb
-　* @date 2022/2/28 14:07
-  */
+ * 资源控制类
+ *
+ * @author hyb
+ * 　* @date 2022/2/28 14:07
+ */
 @Component
 @Slf4j
 public class ManageFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
-    private final TMenuService menuService;
-    private AntPathMatcher antPathMatcher = new AntPathMatcher();
+
+    @Autowired
+    private TMenuService menuService;
+
+    AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     public ManageFilterInvocationSecurityMetadataSource(TMenuService menuService) {
         this.menuService = menuService;
@@ -34,28 +42,26 @@ public class ManageFilterInvocationSecurityMetadataSource implements FilterInvoc
 
     @Override
     public Collection<ConfigAttribute> getAttributes(Object o) throws IllegalArgumentException {
-        Set<ConfigAttribute> set = new HashSet<>();
-        // 获取请求地址
-        String requestUrl = ((FilterInvocation) o).getHttpRequest().getServletPath();
-        log.debug("请求URI = {} ", requestUrl);
-        List<String> menuUrl = menuService.list().stream().map(TMenu::getPath).collect(Collectors.toList());
-        menuUrl.parallelStream().forEach(url ->
-        {
-            if (antPathMatcher.match(url, requestUrl)) {
-                //当前请求需要的权限
-                List<String> roleNames = menuService.findAllRoleNameByPath(url);
-                roleNames.forEach(roleName -> {
-                    SecurityConfig securityConfig = new SecurityConfig(roleName);
-                    set.add(securityConfig);
-                });
+//        获取请求的url
+        String requestUrl = ((FilterInvocation) o).getRequestUrl();
+        log.info("获取请求的url:"+requestUrl);
+        List<TMenu> menuList = menuService.getMenuWithRole();
+        for (TMenu menu : menuList) {
+            if(StrUtil.isEmpty(menu.getPath())){
+                break;
             }
-        });
-        log.debug("请求menuUrl", menuUrl);
-        if(CollectionUtils.isEmpty(menuUrl)){
-            SecurityConfig securityConfig = new SecurityConfig("ROLE_LOGIN");
-            set.add(securityConfig);
+            if(antPathMatcher.match(menu.getPath(), requestUrl)){
+                List<TRole> roles = menu.getRoleList();
+                String[] roleArr = new String[roles.size()];
+                for (int i = 0; i < roleArr.length; i++){
+                    roleArr[i] = roles.get(i).getRoleCode();
+                }
+                log.info("角色："+roleArr);
+                return SecurityConfig.createList(roleArr);
+            }
         }
-        return set;
+        //如果当前请求的URL在资源表中不存在响应的模式，就假设该请求登录后即可访问，直接返回ROLE_LOGIN
+        return SecurityConfig.createList("ROLE_LOGIN");
     }
 
     @Override

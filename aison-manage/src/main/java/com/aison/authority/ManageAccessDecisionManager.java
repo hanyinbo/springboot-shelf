@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,7 +29,16 @@ public class ManageAccessDecisionManager implements AccessDecisionManager {
         for (ConfigAttribute configAttribute : collection) {
             // 当前请求需要的权限
             String needRole = configAttribute.getAttribute();
-            // 当前用户所具有的权限
+            log.info("请求角色："+needRole);
+//            判断角色是否登录即可访问的角色
+            if("ROLE_LOGIN".equals(needRole)){
+                if(authentication instanceof AnonymousAuthenticationToken){
+                    throw new AccessDeniedException("尚未登陆，请登录！");
+                }else {
+                    return;
+                }
+            }
+            // 当前用户角色是否为url所需角色
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             for (GrantedAuthority grantedAuthority : authorities) {
                 if (grantedAuthority.getAuthority().equals(needRole)) {
@@ -36,7 +46,7 @@ public class ManageAccessDecisionManager implements AccessDecisionManager {
                 }
             }
         }
-        throw new AccessDeniedException("用户" + authentication.getPrincipal() + "的权限不足");
+        throw new AccessDeniedException("用户的权限不足，请联系管理员！");
     }
 
     @Override

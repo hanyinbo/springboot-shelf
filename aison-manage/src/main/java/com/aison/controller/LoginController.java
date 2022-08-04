@@ -4,9 +4,11 @@ import com.aison.common.Result;
 import com.aison.dto.LoginParamDto;
 import com.aison.entity.TUser;
 import com.aison.service.LoginService;
+import com.aison.service.TRoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,22 +25,26 @@ public class LoginController {
 
     @Autowired
     private LoginService loginService;
+    @Autowired
+    private TRoleService tRoleService;
 
     @ApiOperation(value = "登录之后返回token")
     @PostMapping("/login")
-    public Result login(@RequestBody LoginParamDto loginParamDto, HttpServletRequest request){
-        return loginService.login(loginParamDto.getUsername(),loginParamDto.getPassword(),loginParamDto.getCode(),request);
+    public Result login(@RequestBody LoginParamDto loginParamDto, HttpServletRequest request) {
+        return loginService.login(loginParamDto.getUsername(), loginParamDto.getPassword(), loginParamDto.getCode(), request);
     }
 
     @ApiOperation(value = "获取用户信息")
     @GetMapping("/getUserInfo")
-    public Result getUserInfo(Principal principal){
-        if(null==principal){
+    public Result getUserInfo(Principal principal) {
+        if (null == principal) {
             return Result.buildOk(null);
         }
         String username = principal.getName();
         TUser tUser = loginService.getUserByUserName(username);
         tUser.setPassword(null);
+        tUser.setRoles(tRoleService.findRoleByUserId(tUser.getId()));
         return Result.buildOk(tUser);
     }
+
 }

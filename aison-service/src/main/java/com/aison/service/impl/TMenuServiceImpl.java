@@ -49,4 +49,11 @@ public class TMenuServiceImpl extends ServiceImpl<TMenuMapper, TMenu> implements
     public List<String> findAllRoleNameByPath(String path) {
         return baseMapper.findAllRoleNameByPath(path);
     }
+
+    @Override
+    public List<TMenu> getMenuWithRole() {
+        TUser user = (TUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Long> roleList = tRoleService.findRoleByUserId(user.getId()).stream().map(TRole::getRoleId).collect(Collectors.toList());
+        return baseMapper.getMenuWithRole(roleList);
+    }
 }
