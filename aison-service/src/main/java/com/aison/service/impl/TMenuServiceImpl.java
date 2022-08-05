@@ -34,8 +34,9 @@ public class TMenuServiceImpl extends ServiceImpl<TMenuMapper, TMenu> implements
     @Override
     public List<MenuTree> getListMenuByRole() {
         TUser user = (TUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Long> roleList = tRoleService.findRoleByUserId(user.getId()).stream().map(TRole::getRoleId).collect(Collectors.toList());
-        String roles = roleList.stream().map(labelId -> labelId+"").collect(Collectors.joining(","));
+        log.info("菜单接口，用户信息:"+user.getRoles().toString());
+        List<Long> roleList =user.getRoles().stream().map(TRole::getRoleId).collect(Collectors.toList());
+        String roles = user.getRoles().stream().map(labelId -> labelId+"").collect(Collectors.joining(","));
         List<MenuTree> menuTrees = (List<MenuTree>) redisTemplate.opsForValue().get("menu_" + roles);
         if(CollUtil.isEmpty(menuTrees)){
             List<TMenu> menuList = baseMapper.getListMenuByRoleId(roleList);
