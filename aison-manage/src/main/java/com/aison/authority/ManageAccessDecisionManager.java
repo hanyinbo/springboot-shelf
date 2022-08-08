@@ -29,15 +29,15 @@ public class ManageAccessDecisionManager implements AccessDecisionManager {
         for (ConfigAttribute configAttribute : collection) {
             // 当前请求需要的权限
             String needRole = configAttribute.getAttribute();
-            log.info("请求角色："+needRole);
+            log.info("请求角色：" + needRole);
 //            判断角色是否登录即可访问的角色
-            if("ROLE_LOGIN".equals(needRole)){
-                if(authentication instanceof AnonymousAuthenticationToken){
-                    throw new AccessDeniedException("尚未登陆，请登录！");
-                }else {
-                    return;
-                }
-            }
+//            if("ROLE_LOGIN".equals(needRole)){
+//                if(authentication instanceof AnonymousAuthenticationToken){
+//                    throw new AccessDeniedException("尚未登陆，请登录！");
+//                }else {
+//                    return;
+//                }
+//            }
             // 当前用户角色是否为url所需角色
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             for (GrantedAuthority grantedAuthority : authorities) {

@@ -32,16 +32,16 @@
     <!--    </resultMap>-->
 
     <resultMap id="BaseMenuMap" type="com.aison.entity.TMenu">
-        <result property="menuId" column="menuId"></result>
-        <result property="menuName" column="menuName"></result>
-        <result property="parentId" column="parentId"></result>
+        <result property="menuId" column="menu_id"></result>
+        <result property="menuName" column="menu_name"></result>
+        <result property="parentId" column="parent_id"></result>
         <result property="path" column="path"></result>
         <result property="icon" column="icon"></result>
         <result property="sort" column="sort"></result>
         <result property="type" column="type"></result>
-        <result property="createTime" column="createTime"></result>
+        <result property="createTime" column="create_time"></result>
         <result property="creator" column="creator"></result>
-        <result property="updateTime" column="updateTime"></result>
+        <result property="updateTime" column="update_time"></result>
         <result property="updator" column="updator"></result>
     </resultMap>
 

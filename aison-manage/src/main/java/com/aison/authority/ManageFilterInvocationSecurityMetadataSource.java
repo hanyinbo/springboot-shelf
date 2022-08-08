@@ -15,10 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,24 +41,25 @@ public class ManageFilterInvocationSecurityMetadataSource implements FilterInvoc
     public Collection<ConfigAttribute> getAttributes(Object o) throws IllegalArgumentException {
 //        获取请求的url
         String requestUrl = ((FilterInvocation) o).getRequestUrl();
-        log.info("获取请求的url:"+requestUrl);
+        log.info("获取请求的url:" + requestUrl);
         List<TMenu> menuList = menuService.getMenuWithRole();
+        String[] roleArr = new String[menuList.size()];
         for (TMenu menu : menuList) {
-            if(StrUtil.isEmpty(menu.getPath())){
-                break;
+            if (StrUtil.isEmpty(menu.getPath())) {
+                continue;
             }
-            if(antPathMatcher.match(menu.getPath(), requestUrl)){
+            log.info("数据库url:"+menu.getPath());
+            if (antPathMatcher.match(menu.getPath(), requestUrl)) {
                 List<TRole> roles = menu.getRoleList();
-                String[] roleArr = new String[roles.size()];
-                for (int i = 0; i < roleArr.length; i++){
+                roleArr = new String[roles.size()];
+                for (int i = 0; i < roleArr.length; i++) {
                     roleArr[i] = roles.get(i).getRoleCode();
                 }
-                log.info("角色："+roleArr);
-                return SecurityConfig.createList(roleArr);
+                log.info("角色：" + roleArr);
             }
         }
         //如果当前请求的URL在资源表中不存在响应的模式，就假设该请求登录后即可访问，直接返回ROLE_LOGIN
-        return SecurityConfig.createList("ROLE_LOGIN");
+        return SecurityConfig.createList(roleArr);
     }
 
     @Override
