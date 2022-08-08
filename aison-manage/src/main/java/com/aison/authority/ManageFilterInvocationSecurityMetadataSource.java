@@ -39,27 +39,27 @@ public class ManageFilterInvocationSecurityMetadataSource implements FilterInvoc
 
     @Override
     public Collection<ConfigAttribute> getAttributes(Object o) throws IllegalArgumentException {
+        Set<ConfigAttribute> set = new HashSet<>();
 //        获取请求的url
         String requestUrl = ((FilterInvocation) o).getRequestUrl();
         log.info("获取请求的url:" + requestUrl);
         List<TMenu> menuList = menuService.getMenuWithRole();
-        String[] roleArr = new String[menuList.size()];
         for (TMenu menu : menuList) {
             if (StrUtil.isEmpty(menu.getPath())) {
                 continue;
             }
             log.info("数据库url:"+menu.getPath());
             if (antPathMatcher.match(menu.getPath(), requestUrl)) {
-                List<TRole> roles = menu.getRoleList();
-                roleArr = new String[roles.size()];
-                for (int i = 0; i < roleArr.length; i++) {
-                    roleArr[i] = roles.get(i).getRoleCode();
-                }
-                log.info("角色：" + roleArr);
+                List<String> rolesCodeList = menu.getRoleList().stream().map(TRole::getRoleCode).collect(Collectors.toList());
+                rolesCodeList.forEach(roleCode ->{
+                    SecurityConfig securityConfig = new SecurityConfig(roleCode);
+                    set.add(securityConfig);
+                });
+                log.info("角色：" + set);
             }
         }
         //如果当前请求的URL在资源表中不存在响应的模式，就假设该请求登录后即可访问，直接返回ROLE_LOGIN
-        return SecurityConfig.createList(roleArr);
+        return set;
     }
 
     @Override
