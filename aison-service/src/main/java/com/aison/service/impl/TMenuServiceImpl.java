@@ -1,6 +1,7 @@
 package com.aison.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.aison.common.Result;
 import com.aison.dto.MenuTree;
 import com.aison.entity.TMenu;
 import com.aison.entity.TRole;
@@ -32,9 +33,8 @@ public class TMenuServiceImpl extends ServiceImpl<TMenuMapper, TMenu> implements
     private TRoleService tRoleService;
 
     @Override
-    public List<MenuTree> getListMenuByRole() {
+    public Result getListMenuByRole() {
         TUser user = (TUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        log.info("菜单接口，用户信息:"+user.getRoles().toString());
         List<Long> roleList =user.getRoles().stream().map(TRole::getRoleId).collect(Collectors.toList());
         String roles = roleList.stream().map(labelId -> labelId+"").collect(Collectors.joining(","));
         List<MenuTree> menuTrees = (List<MenuTree>) redisTemplate.opsForValue().get("menu_" + roles);
@@ -43,7 +43,7 @@ public class TMenuServiceImpl extends ServiceImpl<TMenuMapper, TMenu> implements
             menuTrees = MenuTreeUtil.buildTree(menuList,  0L);
             redisTemplate.opsForValue().set("menu_"+roles,menuTrees);
         }
-        return menuTrees;
+        return Result.buildOk(menuTrees);
     }
 
     @Override

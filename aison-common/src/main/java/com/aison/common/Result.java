@@ -17,7 +17,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2019-09-19 09:02:33
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @ApiModel(value = "MallResult", description = "返回结果")
 public class Result<T> implements Serializable {
     private static final long serialVersionUID = -2492072809889519824L;
@@ -69,15 +69,15 @@ public class Result<T> implements Serializable {
     /**
      * build参数不全返回结果
      */
-    public static <T> Result<T> buildParamFail() {
-        return new Result<T>(Msg.PARAM_FAIL, Msg.TEXT_PARAM_FAIL, null);
-    }
-    /**
-     * build参数格式错误返回结果
-     */
-    public static <T> Result<T> buildParamFormatFail() {
-        return new Result<T>(Msg.PARAM_FAIL, Msg.TEXT_PARAM_FORMAT_FAIL, null);
-    }
+//    public static <T> Result<T> buildParamFail() {
+//        return new Result<T>(Msg.PARAM_FAIL, Msg.TEXT_PARAM_FAIL, null);
+//    }
+//    /**
+//     * build参数格式错误返回结果
+//     */
+//    public static <T> Result<T> buildParamFormatFail() {
+//        return new Result<T>(Msg.PARAM_FAIL, Msg.TEXT_PARAM_FORMAT_FAIL, null);
+//    }
 
     /**
      * build保存成功返回结果

@@ -47,7 +47,7 @@ public class CaptchaController {
             outputStream=response.getOutputStream();
             ImageIO.write(bufferedImage,"jpeg",outputStream);
 
-            redisTemplate.opsForValue().set(Constants.KAPTCHA_SESSION_KEY,text,60 , TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(Constants.KAPTCHA_SESSION_KEY,text,1000 , TimeUnit.SECONDS);
 
             outputStream.flush();
         }catch(IOException e){

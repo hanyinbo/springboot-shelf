@@ -1,5 +1,6 @@
 package com.aison.service.impl;
 
+import com.aison.common.Msg;
 import com.aison.common.Result;
 import com.aison.entity.TMenu;
 import com.aison.entity.TUser;
@@ -51,15 +52,14 @@ public class LoginServiceImpl extends ServiceImpl<LoginMapper, TUser> implements
             if(captchaCode.equals(code)){
                 // 验证有效时间
                 Long expire = redisTemplate.boundHashOps(Constants.KAPTCHA_SESSION_KEY).getExpire();
-                System.out.println("expire->>>"+expire);
                 if (expire < 0L){
-                    return Result.build(104,"验证码已过期!");
+                    return Result.build(Msg.CAPTCHA_FAIL,Msg.CAPTCHA_EXPIRE_FAIL);
                 }
             }else {
-                return Result.build(104,"验证码不正确!");
+                return Result.build(Msg.CAPTCHA_FAIL,Msg.CAPTCHA_ERROR_FAIL);
             }
         }else {
-            return Result.build(104,"验证码不存在或已过期!");
+            return Result.build(Msg.CAPTCHA_FAIL,Msg.CAPTCHA_EXPIRE_ERROR_FAIL);
         }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
@@ -67,13 +67,13 @@ public class LoginServiceImpl extends ServiceImpl<LoginMapper, TUser> implements
             String aesPwd = PasswordAESUtil.decryptedDES(password);
             boolean matches = new BCryptPasswordEncoder().matches(aesPwd, userDetails.getPassword());
             if (userDetails == null || !matches) {
-                return Result.build(101, "用户名或密码错误");
+                return Result.build(Msg.LOGIN_FAIL, Msg.LOGIN_USER_PWD_ERROR_FAIL);
             }
             if (!userDetails.isEnabled()) {
-                return Result.build(102, "账号被禁用，请联系管理员");
+                return Result.build(Msg.LOGIN_FAIL, Msg.LOGIN_ACCOUNT_FORBIDDEN_FAIL);
             }
         } catch (Exception e) {
-            return Result.build(103, "登录异常，解析密码错误");
+            return Result.build(Msg.LOGIN_FAIL, Msg.LOGIN__ERROR_FAIL);
         }
         //更新security登录对象
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

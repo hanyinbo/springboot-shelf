@@ -1,5 +1,6 @@
 package com.aison.controller;
 
+import com.aison.common.Result;
 import com.aison.utils.MinioService;
 import com.aison.utils.MinioUtil;
 import io.minio.messages.Bucket;
@@ -27,45 +28,44 @@ public class MinioController {
 
     @ApiOperation(value = "查看存储bucket是否存在")
     @GetMapping("/bucketExists")
-    public Boolean bucketExists(String bucketName) {
-//        Boolean aBoolean = minioUtil.bucketExists(bucketName);
-        return minioUtil.bucketExists(bucketName);
+    public Result bucketExists(String bucketName) {
+        return Result.buildOk(minioUtil.bucketExists(bucketName));
     }
 
     @ApiOperation(value = "获取全部bucket")
     @GetMapping("/getAllBuckets")
-    public List<Bucket> getAllBuckets() {
+    public Result getAllBuckets() {
 
-        return minioUtil.getAllBuckets();
+        return Result.buildOk(minioUtil.getAllBuckets());
     }
 
     @ApiOperation(value = "获取全部bucket")
     @PostMapping("/makeBucket")
-    public Boolean makeBucket(String ei) {
+    public Result makeBucket(String ei) {
 
-        return minioUtil.makeBucket(ei);
+        return Result.buildOk(minioUtil.makeBucket(ei));
     }
 
     @ApiOperation(value = "获取全部bucket")
     @GetMapping("/getObjectInfo")
-    public String getObjectInfo(String bucket, String fileName) throws Exception {
+    public Result getObjectInfo(String bucket, String fileName) throws Exception {
         bucket = "swiper";
         fileName = "swiper1.jpg";
-        return minioUtil.getObjectInfo(bucket, fileName);
+        return Result.buildOk(minioUtil.getObjectInfo(bucket, fileName));
     }
 
     @ApiOperation(value = "获取全部bucket")
     @GetMapping("/preview")
-    public String preview() {
+    public Result preview() {
         String fileName = "swiper1.jpg";
-        return minioUtil.preview(fileName);
+        return Result.buildOk(minioUtil.preview(fileName));
     }
 
 
     @ApiOperation(value = "获取全部bucket")
     @GetMapping("/getPathUrl")
-    public String getPathUrl() {
-       return minioService.getObjectUrl("eeew","swiper2.png");
+    public Result getPathUrl() {
+       return Result.buildOk(minioService.getObjectUrl("eeew","swiper2.png"));
     }
 
 }

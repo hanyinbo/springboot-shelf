@@ -20,15 +20,18 @@ import java.util.Map;
  * @author aison
  * @version 1.0
  * @date 2019-10-24 11:13
+ * <p>
+ * * @ConfigurationProperties 可直接定义yml中属性，变量名可与配置文件属性名成驼峰命名直接使用，切记不可定义static变量
+ * @ConfigurationProperties(prefix = "jwt")
  */
-//@ConfigurationProperties 可直接定义yml中属性，变量名可与配置文件属性名成驼峰命名直接使用，切记不可定义static变量
-//@ConfigurationProperties(prefix = "jwt")
+
 @Component
 @Slf4j
 public class JwtTokenUtils {
 
     private static final String CLAIM_KEY_USERNAME = "sub";
     private static final String CLAIM_KEY_CREATED = "created";
+
 
     @Value("${jwt.secret}")
     private String secret;
@@ -59,6 +62,9 @@ public class JwtTokenUtils {
         String username;
         try {
             Claims claims = getClaimsFormToken(token);
+            if (claims == null) {
+                return null;
+            }
             username = claims.getSubject();
         } catch (Exception e) {
             username = null;
@@ -67,23 +73,45 @@ public class JwtTokenUtils {
 
     }
 
-    public Boolean validateToken(String token,UserDetails userDetails){
+    public Boolean validateToken(String token, UserDetails userDetails) {
         String username = getUserNameFromToken(token);
+        if (StrUtil.isEmpty(username)) {
+            return false;
+        }
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     /**
-     * 判断token是否失效
+     * 判断token是否存在与有效
+     *
      * @param token
      * @return
      */
-    private Boolean isTokenExpired(String token) {
+    public boolean checkToken(String token) {
+        try {
+            if (StrUtil.isEmpty(token)) return false;
+            Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+            if (claims.getExpiration().before(new Date())) return false;
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 判断token是否失效
+     *
+     * @param token
+     * @return
+     */
+    public Boolean isTokenExpired(String token) {
         Date expireDate = getExpireDateFormToken(token);
         return expireDate.before(new Date());
     }
 
     /**
      * 从token中获取过期时间
+     *
      * @param token
      * @return
      */
@@ -94,26 +122,37 @@ public class JwtTokenUtils {
 
     /**
      * 判断token是否过期
+     *
      * @param token
      * @return
      */
-    public boolean canRefresh(String token){
-       return !isTokenExpired(token);
+    public boolean canRefresh(String token) {
+        return !isTokenExpired(token);
     }
 
+    /**
+     * 刷新token
+     *
+     * @param
+     * @return
+     */
+    public String refreshToken(String token) {
+        Claims claims = getClaimsFormToken(token);
+        claims.put(CLAIM_KEY_CREATED, new Date());
+        return generateToken(claims);
+    }
 
     private Claims getClaimsFormToken(String token) {
         Claims claims = null;
         try {
-            if(StrUtil.isEmpty(token)){
-                return claims;
+            if (StrUtil.isEmpty(token)) {
+                return null;
             }
             claims = Jwts.parser()
                     .setSigningKey(secret)
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return claims;
     }

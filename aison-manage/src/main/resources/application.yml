@@ -56,7 +56,7 @@ jwt:
   secret: aisonjwt
   tokenHeader: Authorization
   tokenHead: Bearer
-  expiration: 684888
+  expiration: 3000
 pwd:
   aesKey: a5h*jos&fj18oico
 

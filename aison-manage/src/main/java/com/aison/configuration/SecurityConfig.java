@@ -1,5 +1,6 @@
 package com.aison.configuration;
 
+
 import com.aison.authority.ManageAccessDecisionManager;
 import com.aison.authority.ManageFilterInvocationSecurityMetadataSource;
 import com.aison.entity.TUser;
@@ -72,6 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .cacheControl();
 //        添加jwt,登录过滤器
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
 //        添加自定义未授权未登录结果返回
         http.exceptionHandling()
                 .accessDeniedHandler(manageAccessDeniedHandler)
@@ -130,5 +132,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-
+//
+//    @Bean
+//    public JwtTokenInterceptor authenticationInterceptor() {
+//        //拦截器
+//        return new JwtTokenInterceptor();
+//    }
 }

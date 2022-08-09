@@ -1,8 +1,6 @@
 package com.aison.controller;
 
-import com.aison.dto.MenuTree;
-import com.aison.entity.TMenu;
-import com.aison.service.LoginService;
+import com.aison.common.Result;
 import com.aison.service.TMenuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,14 +21,14 @@ public class MenuController {
 
     @ApiOperation("根据用户角色ID获取菜单")
     @GetMapping("/getMenuListByRole")
-    public List<MenuTree> getMenuListByRole(){
+    public Result getMenuListByRole(){
         return tMenuService.getListMenuByRole();
     }
 
     @ApiOperation("根据path获取菜单")
     @RequestMapping("/findAllRoleNameByPath")
-    public List<String> findAllRoleNameByPath(String path){
-        return tMenuService.findAllRoleNameByPath(path);
+    public Result findAllRoleNameByPath(String path){
+        return Result.buildOk(tMenuService.findAllRoleNameByPath(path));
     }
 
 }

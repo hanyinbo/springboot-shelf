@@ -1,5 +1,6 @@
 package com.aison.controller;
 
+import com.aison.common.Result;
 import com.aison.entity.TRole;
 import com.aison.service.TRoleService;
 import io.swagger.annotations.Api;
@@ -20,7 +21,7 @@ public class RoleController {
 
     @ApiOperation("根据用户ID获取角色列表")
     @GetMapping("/getMenuListByUserId")
-    public List<TRole> getMenuListByUserId(Long userId){
-       return tRoleService.findRoleByUserId(userId) ;
+    public Result getMenuListByUserId(Long userId){
+       return Result.buildOk(tRoleService.findRoleByUserId(userId));
     }
 }

@@ -1,6 +1,9 @@
 package com.aison.filter;
 
+import com.aison.common.Msg;
+import com.aison.common.Result;
 import com.aison.utils.JwtTokenUtils;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,28 +52,35 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader(tokenHeader);
         try {
-            //        存在token
-            if(null !=authHeader && authHeader.startsWith(tokenHead)){
+            //存在token
+            if (null != authHeader && authHeader.startsWith(tokenHead)) {
                 String authToken = authHeader.substring(tokenHead.length());
-//                if(authToken.equals(" null")){
-//                    filterChain.doFilter(request,response);
-//                    return;
-//                }
+
+                if(!"null".equals(authToken.trim()) && !jwtTokenUtils.checkToken(authToken.trim())){
+                    //重置response
+                    response.reset();
+                    //设置编码格式
+                    response.setCharacterEncoding("UTF-8");
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.TOKEN_FAIL, Msg.TEXT_TOKEN_INVALID_FAIL)));
+                    return;
+                }
                 String username = jwtTokenUtils.getUserNameFromToken(authToken);
-//            token存在用户名但未登录
-                if(null!=username && null==SecurityContextHolder.getContext().getAuthentication()){
-//              登录
+
+                //token存在用户名但未登录
+                if (null != username && null == SecurityContextHolder.getContext().getAuthentication()) {
+                    //登录
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-//                验证token是由有效，重新设置用户对象
-                    if(jwtTokenUtils.validateToken(authToken,userDetails)){
-                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,userDetails.getAuthorities());
+                    //验证token是由有效，重新设置用户对象
+                    if (jwtTokenUtils.validateToken(authToken, userDetails)) {
+                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     }
                 }
             }
-            filterChain.doFilter(request,response);
-        }catch (Exception e){
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
