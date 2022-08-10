@@ -29,7 +29,7 @@ public class LoginController {
     private TRoleService tRoleService;
 
     @ApiOperation(value = "登录之后返回token")
-    @PostMapping("/login")
+    @PostMapping("/doLogin")
     public Result login(@RequestBody LoginParamDto loginParamDto, HttpServletRequest request) {
         return loginService.login(loginParamDto.getUsername(), loginParamDto.getPassword(), loginParamDto.getCode(), request);
     }
@@ -43,7 +43,6 @@ public class LoginController {
         String username = principal.getName();
         TUser tUser = loginService.getUserByUserName(username);
         tUser.setPassword(null);
-        tUser.setRoles(tRoleService.findRoleByUserId(tUser.getId()));
         return Result.buildOk(tUser);
     }
 

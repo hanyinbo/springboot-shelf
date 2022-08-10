@@ -1,5 +1,6 @@
 package com.aison.authority;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.aison.dto.MenuTree;
 import com.aison.entity.TMenu;
@@ -56,6 +57,10 @@ public class ManageFilterInvocationSecurityMetadataSource implements FilterInvoc
             }
         }
         //如果当前请求的URL在资源表中不存在响应的模式，就假设该请求登录后即可访问，直接返回ROLE_LOGIN
+       if(CollUtil.isEmpty(set)){
+           SecurityConfig securityConfig = new SecurityConfig("ROLE_LOGIN");
+           set.add(securityConfig);
+       }
         return set;
     }
 

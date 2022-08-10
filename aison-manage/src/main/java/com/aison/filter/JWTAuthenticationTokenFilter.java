@@ -56,16 +56,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
             if (null != authHeader && authHeader.startsWith(tokenHead)) {
                 String authToken = authHeader.substring(tokenHead.length());
 
-                if(!"null".equals(authToken.trim()) && !jwtTokenUtils.checkToken(authToken.trim())){
-                    //重置response
-                    response.reset();
-                    //设置编码格式
-                    response.setCharacterEncoding("UTF-8");
-                    response.setContentType("application/json;charset=UTF-8");
-                    response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.TOKEN_FAIL, Msg.TEXT_TOKEN_INVALID_FAIL)));
-                    return;
-                }
-                String username = jwtTokenUtils.getUserNameFromToken(authToken);
+                String username = jwtTokenUtils.getUserNameFromToken(authToken.trim());
 
                 //token存在用户名但未登录
                 if (null != username && null == SecurityContextHolder.getContext().getAuthentication()) {

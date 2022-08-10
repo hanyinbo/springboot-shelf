@@ -2,6 +2,7 @@ package com.aison.utils;
 
 import cn.hutool.core.util.StrUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -152,7 +153,8 @@ public class JwtTokenUtils {
                     .setSigningKey(secret)
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (Exception e) {
+        } catch (ExpiredJwtException e) {
+            claims=e.getClaims();
         }
         return claims;
     }

@@ -13,10 +13,12 @@ import com.aison.util.MenuTreeUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,8 +55,12 @@ public class TMenuServiceImpl extends ServiceImpl<TMenuMapper, TMenu> implements
 
     @Override
     public List<TMenu> getMenuWithRole() {
-        TUser user = (TUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Long> roleList = tRoleService.findRoleByUserId(user.getId()).stream().map(TRole::getRoleId).collect(Collectors.toList());
-        return baseMapper.getMenuWithRole(roleList);
+        List<TMenu>  tMenuList= new ArrayList<>();
+        Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if( user instanceof  TUser){
+            List<Long> roleList = tRoleService.findRoleByUserId(((TUser) user).getId()).stream().map(TRole::getRoleId).collect(Collectors.toList());
+            tMenuList =  baseMapper.getMenuWithRole(roleList);
+        }
+        return tMenuList;
     }
 }
