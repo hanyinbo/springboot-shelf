@@ -36,6 +36,18 @@ public class TMenu extends BaseEntity {
     @TableField(value = "icon")
     @ApiModelProperty(value = "图标")
     private String icon;
+    @TableField(value = "open")
+    @ApiModelProperty(value = "是否默认打开")
+    private Boolean open;
+    @TableField(value = "selected")
+    @ApiModelProperty(value = "是否默认被选中")
+    private Boolean selected;
+    @TableField(value = "level")
+    @ApiModelProperty(value = "几级菜单")
+    private Integer level;
+    @TableField(value = "disabled")
+    @ApiModelProperty(value = "是否默认被隐藏")
+    private Boolean disabled;
     @TableField(value = "del_flag")
     @ApiModelProperty(value = "0-正常，1-删除")
     private Integer  delFlag;

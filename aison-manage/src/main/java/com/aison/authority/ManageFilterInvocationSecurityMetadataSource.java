@@ -32,8 +32,6 @@ public class ManageFilterInvocationSecurityMetadataSource implements FilterInvoc
     @Autowired
     private TMenuService menuService;
 
-    AntPathMatcher antPathMatcher = new AntPathMatcher();
-
     public ManageFilterInvocationSecurityMetadataSource(TMenuService menuService) {
         this.menuService = menuService;
     }
@@ -42,25 +40,20 @@ public class ManageFilterInvocationSecurityMetadataSource implements FilterInvoc
     public Collection<ConfigAttribute> getAttributes(Object o) throws IllegalArgumentException {
         Set<ConfigAttribute> set = new HashSet<>();
         //获取请求的url
-        String requestUrl = ((FilterInvocation) o).getRequestUrl();
         List<TMenu> menuList = menuService.getMenuWithRole();
         for (TMenu menu : menuList) {
-            if (StrUtil.isEmpty(menu.getPath())) {
-                continue;
-            }
-            if (antPathMatcher.match(menu.getPath(), requestUrl)) {
-                List<String> rolesCodeList = menu.getRoleList().stream().map(TRole::getRoleCode).collect(Collectors.toList());
-                rolesCodeList.forEach(roleCode ->{
-                    SecurityConfig securityConfig = new SecurityConfig(roleCode);
-                    set.add(securityConfig);
-                });
-            }
+            List<String> rolesCodeList = menu.getRoleList().stream().map(TRole::getRoleCode).collect(Collectors.toList());
+            rolesCodeList.forEach(roleCode -> {
+                SecurityConfig securityConfig = new SecurityConfig(roleCode);
+                set.add(securityConfig);
+            });
         }
+
         //如果当前请求的URL在资源表中不存在响应的模式，就假设该请求登录后即可访问，直接返回ROLE_LOGIN
-       if(CollUtil.isEmpty(set)){
-           SecurityConfig securityConfig = new SecurityConfig("ROLE_LOGIN");
-           set.add(securityConfig);
-       }
+        if (CollUtil.isEmpty(set)) {
+            SecurityConfig securityConfig = new SecurityConfig("ROLE_LOGIN");
+            set.add(securityConfig);
+        }
         return set;
     }
 

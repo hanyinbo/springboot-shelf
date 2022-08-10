@@ -25,8 +25,6 @@ public class LoginController {
 
     @Autowired
     private LoginService loginService;
-    @Autowired
-    private TRoleService tRoleService;
 
     @ApiOperation(value = "登录之后返回token")
     @PostMapping("/doLogin")

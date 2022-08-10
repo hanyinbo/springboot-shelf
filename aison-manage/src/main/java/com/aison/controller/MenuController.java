@@ -20,7 +20,7 @@ public class MenuController {
     private TMenuService tMenuService;
 
     @ApiOperation("根据用户角色ID获取菜单")
-    @GetMapping("/getMenuListByRole")
+    @GetMapping("/getMenu")
     public Result getMenuListByRole(){
         return tMenuService.getListMenuByRole();
     }

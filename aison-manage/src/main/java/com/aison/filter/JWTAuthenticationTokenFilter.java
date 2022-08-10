@@ -38,7 +38,6 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
     @Value("${jwt.tokenHead}")
     private String tokenHead;
 
-
     @Autowired
     private JwtTokenUtils jwtTokenUtils;
 
@@ -54,9 +53,9 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
         try {
             //存在token
             if (null != authHeader && authHeader.startsWith(tokenHead)) {
-                String authToken = authHeader.substring(tokenHead.length());
+                String authToken = authHeader.substring(tokenHead.length()).trim();
 
-                String username = jwtTokenUtils.getUserNameFromToken(authToken.trim());
+                String username = jwtTokenUtils.getUserNameFromToken(authToken);
 
                 //token存在用户名但未登录
                 if (null != username && null == SecurityContextHolder.getContext().getAuthentication()) {

@@ -95,6 +95,10 @@ public class MenuTreeUtil {
 			node.setType(menu.getType());
 			node.setSort(menu.getSort());
 			node.setHasChildren(true);
+			node.setOpen(menu.getOpen());
+			node.setDisabled(menu.getDisabled());
+			node.setSelected(menu.getSelected());
+			node.setLevel(menu.getLevel());
 			trees.add(node);
 		}
 		return MenuTreeUtil.build(trees, root);

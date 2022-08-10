@@ -20,17 +20,6 @@
         </where>
     </select>
 
-    <!--    <resultMap id="BaseResultMap" type="com.aison.vo.TMenuRoleVO">-->
-    <!--        <result property="roleId" column="role_id"></result>-->
-    <!--        <result property="menuId" column="menu_id"></result>-->
-    <!--        <result property="menuName" column="menu_name"></result>-->
-    <!--        <result property="parentId" column="parent_id"></result>-->
-    <!--        <result property="path" column="path"></result>-->
-    <!--        <result property="icon" column="icon"></result>-->
-    <!--        <result property="sort" column="sort"></result>-->
-    <!--        <result property="type" column="type"></result>-->
-    <!--    </resultMap>-->
-
     <resultMap id="BaseMenuMap" type="com.aison.entity.TMenu">
         <result property="menuId" column="menu_id"></result>
         <result property="menuName" column="menu_name"></result>
@@ -38,7 +27,11 @@
         <result property="path" column="path"></result>
         <result property="icon" column="icon"></result>
         <result property="sort" column="sort"></result>
+        <result property="level" column="level"></result>
         <result property="type" column="type"></result>
+        <result property="open" column="open"></result>
+        <result property="disabled" column="disabled"></result>
+        <result property="selected" column="selected"></result>
         <result property="createTime" column="create_time"></result>
         <result property="creator" column="creator"></result>
         <result property="updateTime" column="update_time"></result>

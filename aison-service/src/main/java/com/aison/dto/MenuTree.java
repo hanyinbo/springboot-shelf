@@ -68,6 +68,19 @@ public class MenuTree extends TreeNode implements Serializable {
 	@ApiModelProperty(value = "排序值")
 	private Integer sort;
 
+
+	@ApiModelProperty(value = "几级菜单")
+	private Integer level;
+
+	@ApiModelProperty(value = "是否默认打开")
+	private Boolean open;
+
+	@ApiModelProperty(value = "是否默认被选中")
+	private Boolean selected;
+
+	@ApiModelProperty(value = "是否默认被隐藏")
+	private Boolean disabled;
+
 	/**
 	 * 是否包含子节点
 	 *
@@ -98,6 +111,9 @@ public class MenuTree extends TreeNode implements Serializable {
 		this.path = menuVo.getPath();
 		this.type = menuVo.getType();
 		this.sort = menuVo.getSort();
+		this.open = menuVo.getOpen();
+		this.selected = menuVo.getSelected();
+		this.disabled = menuVo.getDisabled();
 	}
 
 }
