@@ -43,11 +43,6 @@ public class TMenuServiceImpl extends ServiceImpl<TMenuMapper, TMenu> implements
         if(CollUtil.isEmpty(menuTrees)){
             List<TMenu> menuList = baseMapper.getListMenuByRoleId(roleList);
             menuTrees = MenuTreeUtil.buildTree(menuList,  0L);
-//            menuTrees.forEach(tMenu ->{
-//                if(tMenu.getChildren().size()>0){
-//                    tMenu.setHasChildren(true);
-//                }
-//            });
             menuTrees.stream().filter(tMenu->tMenu.getChildren().size()>0).forEach(menu ->{
                 menu.setHasChildren(true);
             });
