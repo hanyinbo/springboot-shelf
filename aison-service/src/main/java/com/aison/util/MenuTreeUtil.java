@@ -35,7 +35,9 @@ public class MenuTreeUtil {
 			for (T it : treeNodes) {
 				if (it.getParentId().equals(treeNode.getId())) {
 					if (treeNode.getChildren() == null) {
+
 						treeNode.setChildren(new ArrayList<>());
+
 					}
 					treeNode.add(it);
 				}
@@ -94,7 +96,7 @@ public class MenuTreeUtil {
 			node.setIcon(menu.getIcon());
 			node.setType(menu.getType());
 			node.setSort(menu.getSort());
-			node.setHasChildren(true);
+			node.setHasChildren(false);
 			node.setOpen(menu.getOpen());
 			node.setDisabled(menu.getDisabled());
 			node.setSelected(menu.getSelected());

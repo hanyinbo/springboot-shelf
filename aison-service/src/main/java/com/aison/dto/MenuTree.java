@@ -86,7 +86,7 @@ public class MenuTree extends TreeNode implements Serializable {
 	 *
 	 * @since 3.7
 	 */
-	private Boolean hasChildren;
+	public Boolean hasChildren;
 
 	public MenuTree() {
 	}
