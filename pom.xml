@@ -24,6 +24,7 @@
         <aws.version>1.11.543</aws.version>
         <minio.version>7.1.4</minio.version>
         <hutool.version>5.4.3</hutool.version>
+        <spring-core.version>5.3.20</spring-core.version>
     </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -47,6 +48,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring-core.version}</version>
         </dependency>
         <!-- JPA-->
         <dependency>
