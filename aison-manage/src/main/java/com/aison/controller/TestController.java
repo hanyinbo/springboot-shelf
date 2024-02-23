@@ -17,6 +17,10 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.MessageDigest;
@@ -33,7 +37,7 @@ import java.util.function.Supplier;
 @Api(value = "测试controller", tags = {"测试操作接口"})
 @RestController
 @AllArgsConstructor //它是lombok上的注解，使用后添加一个构造函数，该函数含有所有已声明字段属性参数
-@RequestMapping(value = "aison")
+@RequestMapping(value = "/eisen")
 @Slf4j
 public class TestController {
 
@@ -140,6 +144,26 @@ public class TestController {
 //        log.info("getTokenHeader--FEAF--:"+JwtTokenUtils.TOKEN_PREFIX.length());
 //        return JwtTokenUtils.TOKEN_PREFIX.length();
 //    }
+
+    @ApiOperation("测试接口重试")
+    @GetMapping(value = "/test10/{code}")
+    @Retryable(value = Exception.class,maxAttempts = 3,backoff = @Backoff(delay = 1000l,multiplier = 1.5))
+    public String testRetry(@PathVariable String code) throws Exception{
+        System.out.println("接口请求时间："+System.currentTimeMillis()/1000);
+        System.out.println("当前时间："+ LocalDateTime.now());
+        if("2".equals(code)){
+            throw new Exception("接口异常");
+        }
+        return code;
+    }
+
+    @Recover
+    public String recover(Exception e,String code){
+        System.out.println("当前异常："+e.getMessage());
+        System.out.println("请求参数："+code);
+        return "异常返回："+code;
+    }
+
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         //单线程执行
 //		ExecutorService singleThread = Executors.newSingleThreadExecutor();

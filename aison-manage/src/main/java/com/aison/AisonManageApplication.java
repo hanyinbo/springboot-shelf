@@ -3,9 +3,10 @@ package com.aison;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.retry.annotation.EnableRetry;
 
 @SpringBootApplication
-//@SpringBootApplication
+@EnableRetry
 @MapperScan("com.aison.mapper")
 public class AisonManageApplication {
 
